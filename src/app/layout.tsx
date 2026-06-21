@@ -1,7 +1,9 @@
 import type { Metadata } from "next";
 import "./globals.css";
-import Navbar from "./components/Navbar";
-import Footer from "./components/Footer";
+import Navbar from "../components/Navbar";
+import Footer from "../components/Footer";
+import Providers from "./providers/providers";
+import { ToastContainer } from "react-toastify";
 
 export const metadata: Metadata = {
   title: "SkillBridge",
@@ -20,7 +22,11 @@ export default function RootLayout({
     <html lang="en">
       <body>
         <Navbar />
-        {children}
+        <Providers>
+          {children}
+          <ToastContainer position="top-right" />
+        </Providers>
+        
         <Footer/>
       </body>
     </html>

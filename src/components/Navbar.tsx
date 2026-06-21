@@ -60,14 +60,14 @@ const Navbar = () => {
         {/* Right Side */}
         <div className="hidden md:flex items-center gap-3">
           <Link
-            href="/login"
+            href="/auth/login"
             className="text-sm text-(--text-muted) hover:text-(--text) transition"
           >
             Login
           </Link>
 
           <Link
-            href="/register"
+            href="/auth/register"
             className="px-4 py-2 rounded-md bg-(--primary) hover:bg-(--primary-hover) text-white text-sm transition"
           >
             Get Started
@@ -140,11 +140,11 @@ const Navbar = () => {
 
           <hr className="border-(--border)" />
 
-          <Link href="/login" className="block hover:text-(--text) transition">
+          <Link href="/auth/login" className="block hover:text-(--text) transition">
             Login
           </Link>
 
-          <Link href="/register" className="block text-(--primary) font-medium">
+          <Link href="/auth/register" className="block text-(--primary) font-medium">
             Get Started
           </Link>
         </div>
