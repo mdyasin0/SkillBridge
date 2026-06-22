@@ -1,16 +1,15 @@
 "use client";
 
 import { useState } from "react";
-import { FcGoogle } from "react-icons/fc";
+
 import Link from "next/link";
 import { toast } from "react-toastify";
 import Swal from "sweetalert2";
 
-
 export default function RegisterPage() {
   const [showPassword, setShowPassword] = useState(false);
   const [imageFile, setImageFile] = useState<File | null>(null);
-  const [ setUploading] = useState(false);
+  const [uploading, setUploading] = useState(false);
   const [form, setForm] = useState({
     name: "",
     email: "",
@@ -87,59 +86,60 @@ export default function RegisterPage() {
 
     return data.data.url;
   };
- const handleSubmit = async () => {
-  if (!validate()) return;
 
-  setUploading(true);
+  const handleSubmit = async () => {
+    if (!validate()) return;
 
-  try {
-    let imageUrl = "";
+    setUploading(true);
 
-    if (imageFile) {
-      imageUrl = await uploadImageToImgbb(imageFile);
+    try {
+      let imageUrl = "";
+
+      if (imageFile) {
+        imageUrl = await uploadImageToImgbb(imageFile);
+      }
+
+      const res = await fetch("/api/register", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          ...form,
+          photo: imageUrl,
+        }),
+      });
+
+      const data = await res.json();
+
+      //  ERROR CASE  TOAST
+      if (!res.ok) {
+        toast.error(data.message || "Something went wrong");
+        return;
+      }
+
+      // SUCCESS CASE  SWEETALERT
+      Swal.fire({
+        title: "Success!",
+        text: "Registration completed successfully",
+        icon: "success",
+        confirmButtonColor: "#5B6CFF",
+      });
+
+      // optional reset
+      setForm({
+        name: "",
+        email: "",
+        password: "",
+        role: "",
+      });
+      setImageFile(null);
+    } catch (err) {
+      toast.error(String(err));
+    } finally {
+      setUploading(false);
     }
-
-    const res = await fetch("/api/register", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        ...form,
-        photo: imageUrl,
-      }),
-    });
-
-    const data = await res.json();
-
-    //  ERROR CASE  TOAST
-    if (!res.ok) {
-      toast.error(data.message || "Something went wrong");
-      return;
-    }
-
-    // SUCCESS CASE  SWEETALERT
-    Swal.fire({
-      title: "Success!",
-      text: "Registration completed successfully",
-      icon: "success",
-      confirmButtonColor: "#5B6CFF",
-    });
-
-    // optional reset
-    setForm({
-      name: "",
-      email: "",
-      password: "",
-      role: "",
-    });
-    setImageFile(null);
-  } catch (err) {
-    toast.error(String(err));
-  } finally {
-    setUploading(false);
-  }
-};
+  };
   return (
     <div
       className="min-h-screen flex items-center justify-center px-4"
@@ -208,11 +208,11 @@ export default function RegisterPage() {
             }
           }}
         />
-       {!imageFile && (
-  <p className="text-sm mb-2" style={{ color: "red" }}>
-    Profile image is required
-  </p>
-)}
+        {!imageFile && (
+          <p className="text-sm mb-2" style={{ color: "red" }}>
+            Profile image is required
+          </p>
+        )}
 
         {/* Role Dropdown */}
         <select
@@ -271,26 +271,6 @@ export default function RegisterPage() {
           }}
         >
           Register
-        </button>
-
-        {/* OR */}
-        <p
-          className="text-center text-sm mb-3"
-          style={{ color: "var(--text-muted)" }}
-        >
-          OR
-        </p>
-
-        {/* Google */}
-        <button
-          className="w-full p-3 rounded flex items-center justify-center gap-2"
-          style={{
-            border: "1px solid var(--border)",
-            background: "var(--surface)",
-          }}
-        >
-          <FcGoogle size={20} />
-          Continue with Google
         </button>
 
         {/* Login Link */}

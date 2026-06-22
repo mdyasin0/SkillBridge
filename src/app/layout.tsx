@@ -1,17 +1,21 @@
-import type { Metadata } from "next";
+"use client";
+
 import "./globals.css";
 import Navbar from "../components/Navbar";
 import Footer from "../components/Footer";
-import Providers from "./providers/providers";
 import { ToastContainer } from "react-toastify";
 
-export const metadata: Metadata = {
-  title: "SkillBridge",
-  description: "Skill verification platform",
-   icons: {
-    icon: "/favicon.png",
-  },
-};
+import { AuthProvider } from "@/context/AuthContext";
+import Providers from "./providers/providers";
+import { SessionProvider } from "next-auth/react";
+
+// export const metadata: Metadata = {
+//   title: "SkillBridge",
+//   description: "Skill verification platform",
+//   icons: {
+//     icon: "/favicon.png",
+//   },
+// };
 
 export default function RootLayout({
   children,
@@ -21,13 +25,20 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body>
-        <Navbar />
-        <Providers>
-          {children}
-          <ToastContainer position="top-right" />
-        </Providers>
         
-        <Footer/>
+
+        <SessionProvider>
+          <AuthProvider>
+            <Providers>
+              <Navbar />
+              {children}
+              <Footer />
+              <ToastContainer position="top-right" />
+            </Providers>
+          </AuthProvider>
+        </SessionProvider>
+
+        
       </body>
     </html>
   );

@@ -1,7 +1,6 @@
 "use client";
 
 import { useState } from "react";
-import { FcGoogle } from "react-icons/fc";
 import Link from "next/link";
 import { signIn } from "next-auth/react";
 import { toast } from "react-toastify";
@@ -27,7 +26,6 @@ export default function LoginPage() {
     setErrors({ ...errors, [e.target.name]: "" });
   };
 
-  
   const handleSubmit = async () => {
     const res = await signIn("credentials", {
       email: form.email,
@@ -130,26 +128,6 @@ export default function LoginPage() {
           }}
         >
           Login
-        </button>
-
-        {/* OR */}
-        <p
-          className="text-center text-sm mb-3"
-          style={{ color: "var(--text-muted)" }}
-        >
-          OR
-        </p>
-
-        {/* Google Login */}
-        <button
-          className="w-full p-3 rounded flex items-center justify-center gap-2 transition"
-          style={{
-            border: "1px solid var(--border)",
-            background: "var(--surface)",
-          }}
-        >
-          <FcGoogle size={20} />
-          Continue with Google
         </button>
 
         {/* Register Link */}
