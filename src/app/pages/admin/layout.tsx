@@ -6,7 +6,9 @@ import { usePathname } from "next/navigation";
 const routes = [
   { name: "Dashboard", path: "/admin" },
   { name: "users_management", path: "/pages/admin/users_management" },
-  { name: "Reports", path: "/admin/reports" },
+  { name: "Challenge_list", path: "/pages/admin/challenge_list" },
+  { name: "Create_challenge", path: "/pages/admin/create_challenge" },
+
 ];
 
 export default function AdminLayout({
