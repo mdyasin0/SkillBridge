@@ -8,6 +8,8 @@ const routes = [
   { name: "users_management", path: "/pages/admin/users_management" },
   { name: "Challenge_list", path: "/pages/admin/challenge_list" },
   { name: "Create_challenge", path: "/pages/admin/create_challenge" },
+  { name: "Create_ui_challenge", path: "/pages/admin/create_ui_challenge" },
+   { name: "Ui-challenges", path: "/pages/admin/ui-challenges" },
 
 ];
 
