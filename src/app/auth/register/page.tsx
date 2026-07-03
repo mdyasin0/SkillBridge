@@ -99,7 +99,7 @@ export default function RegisterPage() {
         imageUrl = await uploadImageToImgbb(imageFile);
       }
 
-      const res = await fetch("/api/register", {
+      const res = await fetch("/api/auth/create_user", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

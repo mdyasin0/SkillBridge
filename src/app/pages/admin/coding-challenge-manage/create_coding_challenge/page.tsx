@@ -79,7 +79,7 @@ export default function ProblemForm() {
     setLoading(true);
 
     try {
-      const res = await fetch("/api/create_challenge", {
+      const res = await fetch("/api/coding_challenge-manage/create_coding_challenge", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

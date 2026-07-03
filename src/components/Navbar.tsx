@@ -49,6 +49,8 @@ const Navbar = () => {
 
           <Link href="/dashboard">Dashboard</Link>
           <Link href="/recruiter/dashboard">Recruiter</Link>
+          
+           <Link href="/pages/developer">Developer</Link>
           <Link href="/pages/admin">Admin</Link>
         </nav>
 

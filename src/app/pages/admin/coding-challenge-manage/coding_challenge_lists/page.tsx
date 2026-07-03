@@ -15,7 +15,7 @@ export default function ChallengesPage() {
   const [loading, setLoading] = useState(true);
   const [deletingId, setDeletingId] = useState<number | null>(null);
   useEffect(() => {
-    fetch("/api/all_challenge")
+    fetch("/api/coding_challenge-manage/all_coding_challenge")
       .then((res) => res.json())
       .then((res) => {
         setData(res.data);
@@ -58,7 +58,7 @@ export default function ChallengesPage() {
 
   return (
     <div className="max-w-7xl mx-auto p-8">
-      <h1 className="text-3xl font-bold mb-8">Challenge List</h1>
+      <h1 className="text-3xl font-bold mb-8">Coding-Challenge-lists</h1>
 
       <div
         className="overflow-hidden rounded-xl border"
@@ -98,7 +98,7 @@ export default function ChallengesPage() {
 
                 <td className="p-4 text-center">
                   <Link
-                    href={`/pages/admin/challenge_list/${item.id}`}
+                    href={`/pages/admin/coding-challenge-manage/coding_challenge_lists/${item.id}`}
                     className="px-4 py-2 rounded-lg text-white"
                     style={{
                       background: "var(--primary)",
@@ -116,7 +116,7 @@ export default function ChallengesPage() {
                   >
                     {deletingId === item.id ? "Deleting..." : "Delete"}
                   </button>
-                  <Link href={`/pages/admin/updatecodingchallenge/${item.id}`}>
+                  <Link href={`/pages/admin/coding-challenge-manage/updatecodingchallenge/${item.id}`}>
                     <button className="px-4 py-2 rounded-lg text-white bg-green-600">
                       Update
                     </button>

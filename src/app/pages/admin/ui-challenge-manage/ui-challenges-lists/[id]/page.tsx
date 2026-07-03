@@ -21,7 +21,7 @@ export default  function ChallengeDetails() {
 
  const [challenge, setChallenge] = useState<Challenge | null>(null);
   useEffect(() => {
-    fetch(`/api/uichallengedata/${id}`)
+    fetch(`/api/ui_challenge_manage/uichallengedata/${id}`)
       .then((res) => res.json())
       .then((res) => setChallenge(res.data));
   }, [id]);

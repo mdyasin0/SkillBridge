@@ -5,23 +5,8 @@ import { usePathname } from "next/navigation";
 
 const routes = [
   { name: "Home", path: "/" },
-  { name: "users-management", path: "/pages/admin/users_management" },
-  {
-    name: "Coding-Challenge-lists",
-    path: "/pages/admin/coding-challenge-manage/coding_challenge_lists",
-  },
-  {
-    name: "Create-Coding-Challenge",
-    path: "/pages/admin/coding-challenge-manage/create_coding_challenge",
-  },
-  {
-    name: "Create-ui-challenge",
-    path: "/pages/admin/ui-challenge-manage/create_ui_challenge",
-  },
-  {
-    name: "Ui-challenges-lists",
-    path: "/pages/admin/ui-challenge-manage/ui-challenges-lists",
-  },
+  { name: "Profile", path: "/pages/developer/create-profile" },
+ 
 ];
 
 export default function AdminLayout({
@@ -41,7 +26,7 @@ export default function AdminLayout({
           borderColor: "var(--border)",
         }}
       >
-        <h2 className="text-xl font-semibold mb-6">Admin Panel</h2>
+        <h2 className="text-xl font-semibold mb-6">Developer Panel</h2>
 
         <nav className="flex flex-col gap-2">
           {routes.map((route) => {

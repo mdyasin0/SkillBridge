@@ -16,7 +16,7 @@ export default function UIChallengesPage() {
   const [deletingId, setDeletingId] = useState<number | null>(null);
 
   useEffect(() => {
-    fetch("/api/uichallengedata")
+    fetch("/api/ui_challenge_manage/uichallengedata")
       .then((res) => res.json())
       .then((res) => {
         setData(res.data);
@@ -111,7 +111,7 @@ export default function UIChallengesPage() {
                 <td className="p-4">
                   <div className="flex justify-center gap-3">
                     <Link
-                      href={`/pages/admin/ui-challenges/${challenge.id}`}
+                      href={`/pages/admin/ui-challenge-manage/ui-challenges-lists/${challenge.id}`}
                       className="px-4 py-2 rounded-lg text-white"
                       style={{
                         background: "var(--primary)",

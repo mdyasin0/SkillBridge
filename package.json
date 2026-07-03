@@ -10,6 +10,7 @@
   },
   "dependencies": {
     "@babel/standalone": "^8.0.2",
+    "@hookform/resolvers": "^5.4.0",
     "@monaco-editor/react": "^4.7.0",
     "bcryptjs": "^3.0.3",
     "lucide-react": "^1.21.0",

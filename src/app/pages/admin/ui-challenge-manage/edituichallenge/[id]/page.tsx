@@ -1,8 +1,9 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { useParams, useRouter } from "next/navigation";
 
-type FormData = {
+type Challenge = {
   title: string;
   description: string;
   technology: string;
@@ -13,18 +14,41 @@ type FormData = {
   rewardBadge: string;
 };
 
-export default function ChallengeForm() {
-  const [loading, setLoading] = useState(false);
-  const [formData, setFormData] = useState<FormData>({
+export default function EditChallengePage() {
+  const { id } = useParams();
+  const router = useRouter();
+
+  const [loading, setLoading] = useState(true);
+  const [updating, setUpdating] = useState(false);
+
+  const [formData, setFormData] = useState<Challenge>({
     title: "",
     description: "",
     technology: "",
     difficulty: "",
     category: "",
-    timeLimit: 30,
-    maxAttempts: 3,
+    timeLimit: 0,
+    maxAttempts: 0,
     rewardBadge: "",
   });
+
+  useEffect(() => {
+    const fetchChallenge = async () => {
+      try {
+        const res = await fetch(`/api/ui_challenge_manage/uichallengedata/${id}`);
+        const result = await res.json();
+
+        setFormData(result.data);
+      } catch (error) {
+        console.log(error);
+        alert("Failed to load challenge.");
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchChallenge();
+  }, [id]);
 
   const handleChange = (
     e: React.ChangeEvent<
@@ -42,75 +66,77 @@ export default function ChallengeForm() {
     }));
   };
 
- const handleSubmit = async (e: React.FormEvent) => {
-  e.preventDefault();
+  const handleSubmit = async (
+    e: React.FormEvent<HTMLFormElement>
+  ) => {
+    e.preventDefault();
 
-  try {
-    setLoading(true);
+    try {
+      setUpdating(true);
 
-    const res = await fetch("/api/uichallenge", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(formData),
-    });
+      const res = await fetch(`/api/ui_challenge_manage/updateuichallenge/${id}`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(formData),
+      });
 
-    const data = await res.json();
+      const result = await res.json();
 
-    if (!res.ok) {
-      alert(data.message);
-      return;
+      if (!res.ok) {
+        alert(result.message);
+        return;
+      }
+
+      alert(result.message);
+
+      router.push("/pages/admin/ui-challenges");
+    } catch (error) {
+      console.log(error);
+      alert("Something went wrong.");
+    } finally {
+      setUpdating(false);
     }
+  };
 
-    alert(data.message);
-
-    // Form Reset
-    setFormData({
-      title: "",
-      description: "",
-      technology: "",
-      difficulty: "",
-      category: "",
-      timeLimit: 30,
-      maxAttempts: 3,
-      rewardBadge: "",
-    });
-  } catch (error) {
-    console.error(error);
-    alert("Something went wrong");
-  } finally {
-    setLoading(false);
+  if (loading) {
+    return (
+      <div className="text-center mt-20 text-lg">
+        Loading...
+      </div>
+    );
   }
-};
 
   return (
-    <div className="max-w-4xl mx-auto p-6">
+    <div className="max-w-4xl mx-auto p-8">
       <div
-        className="rounded-2xl border p-8 shadow-lg"
+        className="rounded-2xl border p-8"
         style={{
           background: "var(--surface)",
           borderColor: "var(--border)",
           boxShadow: "var(--shadow)",
         }}
       >
-        <h2 className="text-3xl font-bold mb-8">
-          Create Challenge
-        </h2>
+        <h1 className="text-3xl font-bold mb-8">
+          Update UI Challenge
+        </h1>
 
-        <form onSubmit={handleSubmit} className="space-y-6">
-          {/* Title */}
+        <form
+          onSubmit={handleSubmit}
+          className="space-y-6"
+        >
           <div>
-            <label className="block mb-2 font-medium">
+            <label className="block mb-2">
               Title
             </label>
+
             <input
               type="text"
               name="title"
               value={formData.title}
               onChange={handleChange}
-              placeholder="Enter challenge title"
-              className="w-full rounded-xl border px-4 py-3 outline-none transition"
+              className="w-full rounded-xl border p-3"
               style={{
                 background: "var(--bg-secondary)",
                 borderColor: "var(--border)",
@@ -118,19 +144,17 @@ export default function ChallengeForm() {
             />
           </div>
 
-          {/* Description */}
           <div>
-            <label className="block mb-2 font-medium">
+            <label className="block mb-2">
               Description
             </label>
 
             <textarea
-              rows={6}
+              rows={5}
               name="description"
               value={formData.description}
               onChange={handleChange}
-              placeholder="Write challenge description..."
-              className="w-full rounded-xl border px-4 py-3 outline-none resize-none transition"
+              className="w-full rounded-xl border p-3 resize-none"
               style={{
                 background: "var(--bg-secondary)",
                 borderColor: "var(--border)",
@@ -138,11 +162,9 @@ export default function ChallengeForm() {
             />
           </div>
 
-          {/* Grid */}
-          <div className="grid md:grid-cols-2 gap-6">
-            {/* Technology */}
+          <div className="grid md:grid-cols-2 gap-5">
             <div>
-              <label className="block mb-2 font-medium">
+              <label className="block mb-2">
                 Technology
               </label>
 
@@ -151,8 +173,7 @@ export default function ChallengeForm() {
                 name="technology"
                 value={formData.technology}
                 onChange={handleChange}
-                placeholder="React / Node / Python"
-                className="w-full rounded-xl border px-4 py-3 outline-none"
+                className="w-full rounded-xl border p-3"
                 style={{
                   background: "var(--bg-secondary)",
                   borderColor: "var(--border)",
@@ -160,9 +181,8 @@ export default function ChallengeForm() {
               />
             </div>
 
-            {/* Difficulty */}
             <div>
-              <label className="block mb-2 font-medium">
+              <label className="block mb-2">
                 Difficulty
               </label>
 
@@ -170,22 +190,22 @@ export default function ChallengeForm() {
                 name="difficulty"
                 value={formData.difficulty}
                 onChange={handleChange}
-                className="w-full rounded-xl border px-4 py-3 outline-none"
+                className="w-full rounded-xl border p-3"
                 style={{
                   background: "var(--bg-secondary)",
                   borderColor: "var(--border)",
                 }}
               >
-                <option value="">Select Difficulty</option>
-                <option>Easy</option>
-                <option>Medium</option>
-                <option>Hard</option>
+                <option value="Easy">Easy</option>
+                <option value="Medium">
+                  Medium
+                </option>
+                <option value="Hard">Hard</option>
               </select>
             </div>
 
-            {/* Category */}
             <div>
-              <label className="block mb-2 font-medium">
+              <label className="block mb-2">
                 Category
               </label>
 
@@ -194,8 +214,7 @@ export default function ChallengeForm() {
                 name="category"
                 value={formData.category}
                 onChange={handleChange}
-                placeholder="Algorithms"
-                className="w-full rounded-xl border px-4 py-3 outline-none"
+                className="w-full rounded-xl border p-3"
                 style={{
                   background: "var(--bg-secondary)",
                   borderColor: "var(--border)",
@@ -203,10 +222,9 @@ export default function ChallengeForm() {
               />
             </div>
 
-            {/* Time Limit */}
             <div>
-              <label className="block mb-2 font-medium">
-                Time Limit (Minutes)
+              <label className="block mb-2">
+                Time Limit
               </label>
 
               <input
@@ -214,7 +232,7 @@ export default function ChallengeForm() {
                 name="timeLimit"
                 value={formData.timeLimit}
                 onChange={handleChange}
-                className="w-full rounded-xl border px-4 py-3 outline-none"
+                className="w-full rounded-xl border p-3"
                 style={{
                   background: "var(--bg-secondary)",
                   borderColor: "var(--border)",
@@ -222,9 +240,8 @@ export default function ChallengeForm() {
               />
             </div>
 
-            {/* Max Attempts */}
             <div>
-              <label className="block mb-2 font-medium">
+              <label className="block mb-2">
                 Max Attempts
               </label>
 
@@ -233,7 +250,7 @@ export default function ChallengeForm() {
                 name="maxAttempts"
                 value={formData.maxAttempts}
                 onChange={handleChange}
-                className="w-full rounded-xl border px-4 py-3 outline-none"
+                className="w-full rounded-xl border p-3"
                 style={{
                   background: "var(--bg-secondary)",
                   borderColor: "var(--border)",
@@ -241,9 +258,8 @@ export default function ChallengeForm() {
               />
             </div>
 
-            {/* Reward Badge */}
             <div>
-              <label className="block mb-2 font-medium">
+              <label className="block mb-2">
                 Reward Badge
               </label>
 
@@ -252,8 +268,7 @@ export default function ChallengeForm() {
                 name="rewardBadge"
                 value={formData.rewardBadge}
                 onChange={handleChange}
-                placeholder="Gold Badge"
-                className="w-full rounded-xl border px-4 py-3 outline-none"
+                className="w-full rounded-xl border p-3"
                 style={{
                   background: "var(--bg-secondary)",
                   borderColor: "var(--border)",
@@ -262,24 +277,18 @@ export default function ChallengeForm() {
             </div>
           </div>
 
-          <div className="pt-4">
           <button
-  type="submit"
-  disabled={loading}
-  className="rounded-xl px-8 py-3 font-semibold text-white transition disabled:opacity-50 disabled:cursor-not-allowed"
-  style={{
-    background: "var(--primary)",
-  }}
-  onMouseOver={(e) =>
-    (e.currentTarget.style.background = "var(--primary-hover)")
-  }
-  onMouseOut={(e) =>
-    (e.currentTarget.style.background = "var(--primary)")
-  }
->
-  {loading ? "Creating..." : "Create Challenge"}
-</button>
-          </div>
+            type="submit"
+            disabled={updating}
+            className="px-8 py-3 rounded-xl text-white disabled:opacity-50"
+            style={{
+              background: "var(--primary)",
+            }}
+          >
+            {updating
+              ? "Updating..."
+              : "Update Challenge"}
+          </button>
         </form>
       </div>
     </div>

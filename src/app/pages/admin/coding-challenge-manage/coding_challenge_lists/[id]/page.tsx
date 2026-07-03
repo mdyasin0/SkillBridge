@@ -9,7 +9,7 @@ export default function ChallengeDetails() {
   const [challenge, setChallenge] = useState<any>();
 
   useEffect(() => {
-    fetch(`/api/all_challenge/${id}`)
+    fetch(`/api/coding_challenge-manage/all_coding_challenge/${id}`)
       .then((res) => res.json())
       .then((data) => setChallenge(data));
   }, [id]);

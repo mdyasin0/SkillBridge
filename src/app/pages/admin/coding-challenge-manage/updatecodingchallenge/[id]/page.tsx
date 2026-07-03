@@ -52,7 +52,7 @@ export default function ProblemForm() {
   useEffect(() => {
     const fetchChallenge = async () => {
       try {
-        const res = await fetch(`/api/all_challenge/${id}`);
+        const res = await fetch(`/api/coding_challenge-manage/all_coding_challenge/${id}`);
 
         if (!res.ok) {
           throw new Error("Failed to fetch challenge");
@@ -87,7 +87,7 @@ export default function ProblemForm() {
     try {
       setLoading(true);
 
-      const res = await fetch(`/api/updatecodingchallenge/${id}`, {
+      const res = await fetch(`/api/coding_challenge-manage/updatecodingchallenge/${id}`, {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
@@ -100,7 +100,7 @@ export default function ProblemForm() {
       if (!res.ok) {
         throw new Error("Failed to update challenge");
       }
-      router.push("/pages/admin/challenge_list");
+      router.push("/pages/admin/coding-challenge-manage/coding_challenge_lists");
     } finally {
       setLoading(false);
     }

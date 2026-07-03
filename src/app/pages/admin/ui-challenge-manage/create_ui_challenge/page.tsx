@@ -1,9 +1,8 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import { useParams, useRouter } from "next/navigation";
+import { useState } from "react";
 
-type Challenge = {
+type FormData = {
   title: string;
   description: string;
   technology: string;
@@ -14,41 +13,18 @@ type Challenge = {
   rewardBadge: string;
 };
 
-export default function EditChallengePage() {
-  const { id } = useParams();
-  const router = useRouter();
-
-  const [loading, setLoading] = useState(true);
-  const [updating, setUpdating] = useState(false);
-
-  const [formData, setFormData] = useState<Challenge>({
+export default function ChallengeForm() {
+  const [loading, setLoading] = useState(false);
+  const [formData, setFormData] = useState<FormData>({
     title: "",
     description: "",
     technology: "",
     difficulty: "",
     category: "",
-    timeLimit: 0,
-    maxAttempts: 0,
+    timeLimit: 30,
+    maxAttempts: 3,
     rewardBadge: "",
   });
-
-  useEffect(() => {
-    const fetchChallenge = async () => {
-      try {
-        const res = await fetch(`/api/uichallengedata/${id}`);
-        const result = await res.json();
-
-        setFormData(result.data);
-      } catch (error) {
-        console.log(error);
-        alert("Failed to load challenge.");
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchChallenge();
-  }, [id]);
 
   const handleChange = (
     e: React.ChangeEvent<
@@ -66,77 +42,75 @@ export default function EditChallengePage() {
     }));
   };
 
-  const handleSubmit = async (
-    e: React.FormEvent<HTMLFormElement>
-  ) => {
-    e.preventDefault();
+ const handleSubmit = async (e: React.FormEvent) => {
+  e.preventDefault();
 
-    try {
-      setUpdating(true);
+  try {
+    setLoading(true);
 
-      const res = await fetch(`/api/updateuichallenge/${id}`, {
-        method: "PUT",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(formData),
-      });
+    const res = await fetch("/api/ui_challenge_manage/uichallengecreate", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(formData),
+    });
 
-      const result = await res.json();
+    const data = await res.json();
 
-      if (!res.ok) {
-        alert(result.message);
-        return;
-      }
-
-      alert(result.message);
-
-      router.push("/pages/admin/ui-challenges");
-    } catch (error) {
-      console.log(error);
-      alert("Something went wrong.");
-    } finally {
-      setUpdating(false);
+    if (!res.ok) {
+      alert(data.message);
+      return;
     }
-  };
 
-  if (loading) {
-    return (
-      <div className="text-center mt-20 text-lg">
-        Loading...
-      </div>
-    );
+    alert(data.message);
+
+    // Form Reset
+    setFormData({
+      title: "",
+      description: "",
+      technology: "",
+      difficulty: "",
+      category: "",
+      timeLimit: 30,
+      maxAttempts: 3,
+      rewardBadge: "",
+    });
+  } catch (error) {
+    console.error(error);
+    alert("Something went wrong");
+  } finally {
+    setLoading(false);
   }
+};
 
   return (
-    <div className="max-w-4xl mx-auto p-8">
+    <div className="max-w-4xl mx-auto p-6">
       <div
-        className="rounded-2xl border p-8"
+        className="rounded-2xl border p-8 shadow-lg"
         style={{
           background: "var(--surface)",
           borderColor: "var(--border)",
           boxShadow: "var(--shadow)",
         }}
       >
-        <h1 className="text-3xl font-bold mb-8">
-          Update UI Challenge
-        </h1>
+        <h2 className="text-3xl font-bold mb-8">
+          Create-ui-challenge
+        </h2>
 
-        <form
-          onSubmit={handleSubmit}
-          className="space-y-6"
-        >
+        <form onSubmit={handleSubmit} className="space-y-6">
+          {/* Title */}
           <div>
-            <label className="block mb-2">
+            <label className="block mb-2 font-medium">
               Title
             </label>
-
             <input
               type="text"
               name="title"
               value={formData.title}
               onChange={handleChange}
-              className="w-full rounded-xl border p-3"
+              placeholder="Enter challenge title"
+              className="w-full rounded-xl border px-4 py-3 outline-none transition"
               style={{
                 background: "var(--bg-secondary)",
                 borderColor: "var(--border)",
@@ -144,17 +118,19 @@ export default function EditChallengePage() {
             />
           </div>
 
+          {/* Description */}
           <div>
-            <label className="block mb-2">
+            <label className="block mb-2 font-medium">
               Description
             </label>
 
             <textarea
-              rows={5}
+              rows={6}
               name="description"
               value={formData.description}
               onChange={handleChange}
-              className="w-full rounded-xl border p-3 resize-none"
+              placeholder="Write challenge description..."
+              className="w-full rounded-xl border px-4 py-3 outline-none resize-none transition"
               style={{
                 background: "var(--bg-secondary)",
                 borderColor: "var(--border)",
@@ -162,9 +138,11 @@ export default function EditChallengePage() {
             />
           </div>
 
-          <div className="grid md:grid-cols-2 gap-5">
+          {/* Grid */}
+          <div className="grid md:grid-cols-2 gap-6">
+            {/* Technology */}
             <div>
-              <label className="block mb-2">
+              <label className="block mb-2 font-medium">
                 Technology
               </label>
 
@@ -173,7 +151,8 @@ export default function EditChallengePage() {
                 name="technology"
                 value={formData.technology}
                 onChange={handleChange}
-                className="w-full rounded-xl border p-3"
+                placeholder="React / Node / Python"
+                className="w-full rounded-xl border px-4 py-3 outline-none"
                 style={{
                   background: "var(--bg-secondary)",
                   borderColor: "var(--border)",
@@ -181,8 +160,9 @@ export default function EditChallengePage() {
               />
             </div>
 
+            {/* Difficulty */}
             <div>
-              <label className="block mb-2">
+              <label className="block mb-2 font-medium">
                 Difficulty
               </label>
 
@@ -190,22 +170,22 @@ export default function EditChallengePage() {
                 name="difficulty"
                 value={formData.difficulty}
                 onChange={handleChange}
-                className="w-full rounded-xl border p-3"
+                className="w-full rounded-xl border px-4 py-3 outline-none"
                 style={{
                   background: "var(--bg-secondary)",
                   borderColor: "var(--border)",
                 }}
               >
-                <option value="Easy">Easy</option>
-                <option value="Medium">
-                  Medium
-                </option>
-                <option value="Hard">Hard</option>
+                <option value="">Select Difficulty</option>
+                <option>Easy</option>
+                <option>Medium</option>
+                <option>Hard</option>
               </select>
             </div>
 
+            {/* Category */}
             <div>
-              <label className="block mb-2">
+              <label className="block mb-2 font-medium">
                 Category
               </label>
 
@@ -214,7 +194,8 @@ export default function EditChallengePage() {
                 name="category"
                 value={formData.category}
                 onChange={handleChange}
-                className="w-full rounded-xl border p-3"
+                placeholder="Algorithms"
+                className="w-full rounded-xl border px-4 py-3 outline-none"
                 style={{
                   background: "var(--bg-secondary)",
                   borderColor: "var(--border)",
@@ -222,9 +203,10 @@ export default function EditChallengePage() {
               />
             </div>
 
+            {/* Time Limit */}
             <div>
-              <label className="block mb-2">
-                Time Limit
+              <label className="block mb-2 font-medium">
+                Time Limit (Minutes)
               </label>
 
               <input
@@ -232,7 +214,7 @@ export default function EditChallengePage() {
                 name="timeLimit"
                 value={formData.timeLimit}
                 onChange={handleChange}
-                className="w-full rounded-xl border p-3"
+                className="w-full rounded-xl border px-4 py-3 outline-none"
                 style={{
                   background: "var(--bg-secondary)",
                   borderColor: "var(--border)",
@@ -240,8 +222,9 @@ export default function EditChallengePage() {
               />
             </div>
 
+            {/* Max Attempts */}
             <div>
-              <label className="block mb-2">
+              <label className="block mb-2 font-medium">
                 Max Attempts
               </label>
 
@@ -250,7 +233,7 @@ export default function EditChallengePage() {
                 name="maxAttempts"
                 value={formData.maxAttempts}
                 onChange={handleChange}
-                className="w-full rounded-xl border p-3"
+                className="w-full rounded-xl border px-4 py-3 outline-none"
                 style={{
                   background: "var(--bg-secondary)",
                   borderColor: "var(--border)",
@@ -258,8 +241,9 @@ export default function EditChallengePage() {
               />
             </div>
 
+            {/* Reward Badge */}
             <div>
-              <label className="block mb-2">
+              <label className="block mb-2 font-medium">
                 Reward Badge
               </label>
 
@@ -268,7 +252,8 @@ export default function EditChallengePage() {
                 name="rewardBadge"
                 value={formData.rewardBadge}
                 onChange={handleChange}
-                className="w-full rounded-xl border p-3"
+                placeholder="Gold Badge"
+                className="w-full rounded-xl border px-4 py-3 outline-none"
                 style={{
                   background: "var(--bg-secondary)",
                   borderColor: "var(--border)",
@@ -277,18 +262,24 @@ export default function EditChallengePage() {
             </div>
           </div>
 
+          <div className="pt-4">
           <button
-            type="submit"
-            disabled={updating}
-            className="px-8 py-3 rounded-xl text-white disabled:opacity-50"
-            style={{
-              background: "var(--primary)",
-            }}
-          >
-            {updating
-              ? "Updating..."
-              : "Update Challenge"}
-          </button>
+  type="submit"
+  disabled={loading}
+  className="rounded-xl px-8 py-3 font-semibold text-white transition disabled:opacity-50 disabled:cursor-not-allowed"
+  style={{
+    background: "var(--primary)",
+  }}
+  onMouseOver={(e) =>
+    (e.currentTarget.style.background = "var(--primary-hover)")
+  }
+  onMouseOut={(e) =>
+    (e.currentTarget.style.background = "var(--primary)")
+  }
+>
+  {loading ? "Creating..." : "Create Challenge"}
+</button>
+          </div>
         </form>
       </div>
     </div>

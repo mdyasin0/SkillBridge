@@ -26,7 +26,7 @@ export default function UserTable() {
   const [activeAction, setActiveAction] = useState<number | null>(null);
 
   useEffect(() => {
-    fetch("/api/all_users_get")
+    fetch("/api/usermanage/all_users_get")
       .then((res) => res.json())
       .then((data) => {
         setUsers(data.data);
@@ -106,7 +106,7 @@ export default function UserTable() {
   };
   const handleAction = async (id: number, action: string) => {
     try {
-      const res = await fetch(`/api/${action}`, {
+      const res = await fetch(`/api/usermanage/${action}`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
