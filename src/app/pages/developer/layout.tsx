@@ -6,6 +6,7 @@ import { usePathname } from "next/navigation";
 const routes = [
   { name: "Home", path: "/" },
   { name: "Profile", path: "/pages/developer/create-profile" },
+  { name: "Challenge", path: "/pages/developer/challenge_select" },
  
 ];
 
