@@ -7,14 +7,40 @@ export async function GET(
 ) {
   try {
     const { id } = await params;
+    const { searchParams } = new URL(req.url);
+
+    const userId = searchParams.get("userId");
+
+    if (!userId) {
+      return NextResponse.json(
+        {
+          success: false,
+          message: "User ID is required.",
+        },
+        {
+          status: 400,
+        },
+      );
+    }
 
     const [rows]: any = await db.query(
       `
-      SELECT *
-      FROM uichallenge
-      WHERE id = ?
+      SELECT
+        u.*,
+        s.submission_id,
+        s.start_time,
+        s.submitted_at,
+        s.status,
+        s.score
+      FROM uichallenge u
+      LEFT JOIN submissions s
+        ON u.id = s.challenge_id
+        AND s.user_id = ?
+        AND s.challenge_type = 'project'
+      WHERE u.id = ?
+      LIMIT 1
       `,
-      [id],
+      [userId, id],
     );
 
     if (rows.length === 0) {

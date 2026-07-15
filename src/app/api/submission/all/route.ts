@@ -6,12 +6,13 @@ export async function GET(req: Request) {
     const { searchParams } = new URL(req.url);
 
     const userId = searchParams.get("userId");
+    const status = searchParams.get("status");
 
-    if (!userId) {
+    if (!userId || !status) {
       return NextResponse.json(
         {
           success: false,
-          message: "User ID is required.",
+          message: "User ID and status are required.",
         },
         {
           status: 400,
@@ -21,17 +22,16 @@ export async function GET(req: Request) {
 
     const [rows]: any = await db.query(
       `
-      SELECT *
-      FROM uichallenge
-      WHERE id NOT IN (
-        SELECT challenge_id
-        FROM submissions
-        WHERE user_id = ?
-        AND challenge_type = 'project'
-      )
-      ORDER BY id DESC
+      SELECT u.*
+      FROM submissions s
+      INNER JOIN uichallenge u
+      ON s.challenge_id = u.id
+      WHERE s.user_id = ?
+      AND s.challenge_type = 'project'
+      AND s.status = ?
+      ORDER BY s.start_time DESC
       `,
-      [userId]
+      [userId, status]
     );
 
     return NextResponse.json(
@@ -44,7 +44,7 @@ export async function GET(req: Request) {
       }
     );
   } catch (error) {
-    console.log(error);
+    console.error(error);
 
     return NextResponse.json(
       {
