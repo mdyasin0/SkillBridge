@@ -30,22 +30,54 @@ export async function POST(req: Request) {
     );
 
     if (runningChallenges.length > 0) {
-      return NextResponse.json(
-        {
-          message: `You already have ${runningChallenges.length} running challenge${
-            runningChallenges.length > 1 ? "s" : ""
-          }. Please submit ${
-            runningChallenges.length > 1 ? "them" : "it"
-          } before starting a new challenge.`,
-          runningCount: runningChallenges.length,
-        },
-        {
-          status: 409,
-        }
-      );
+  return NextResponse.json(
+    {
+      success: false,
+      code: "PENDING_CHALLENGE",
+      message: `You already have ${runningChallenges.length} running challenge${
+        runningChallenges.length > 1 ? "s" : ""
+      }. Please submit ${
+        runningChallenges.length > 1 ? "them" : "it"
+      } before starting a new challenge.`,
+      runningCount: runningChallenges.length,
+    },
+    {
+      status: 409,
     }
+  );
+}
+// Check if user already has any active resubmission
+const [runningResubmit]: any = await db.query(
+  `
+  SELECT COUNT(*) AS resubmitCount
+  FROM submissions
+  WHERE user_id = ?
+    AND resubmit_started_at IS NOT NULL
+    AND resubmit_submitted_at IS NULL
+  `,
+  [userId]
+);
 
-    // Create submission
+const resubmitCount = runningResubmit[0].resubmitCount;
+
+if (resubmitCount > 0) {
+  return NextResponse.json(
+    {
+      success: false,
+      code: "ACTIVE_RESUBMISSION",
+      message: `You already have ${resubmitCount} active resubmission${
+        resubmitCount > 1 ? "s" : ""
+      }. Please submit ${
+        resubmitCount > 1 ? "them" : "it"
+      } before starting a new challenge.`,
+      resubmitCount,
+    },
+    {
+      status: 409,
+    }
+  );
+}
+   // Create submission
     const [result]: any = await db.query(
       `
       INSERT INTO submissions

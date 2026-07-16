@@ -22,13 +22,15 @@ export async function GET(req: Request) {
 
     const [rows]: any = await db.query(
       `
-      SELECT u.*
+      SELECT
+        u.*,
+        s.*
       FROM submissions s
       INNER JOIN uichallenge u
-      ON s.challenge_id = u.id
+        ON s.challenge_id = u.id
       WHERE s.user_id = ?
-      AND s.challenge_type = 'project'
-      AND s.status = ?
+        AND s.challenge_type = 'project'
+        AND s.status = ?
       ORDER BY s.start_time DESC
       `,
       [userId, status]

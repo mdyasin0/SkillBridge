@@ -16,6 +16,8 @@ type Challenge = {
   title: string;
   technology: string;
   difficulty: string;
+  maxAttempts: number;
+  submit_attempts: number;
 };
 
 export default function UIChallengesPage() {
@@ -182,11 +184,14 @@ export default function UIChallengesPage() {
 
       const data = await response.json();
 
-      if (!response.ok) {
-        Swal.fire({
-          icon: "warning",
-          title: "Challenge Already Running",
-          html: `
+     if (!response.ok) {
+  let title = "";
+  let html = "";
+
+  if (data.code === "PENDING_CHALLENGE") {
+    title = "Challenge Already Running";
+
+    html = `
       <div style="
         background:#F8FAFC;
         border:1px solid #E2E8F0;
@@ -203,22 +208,59 @@ export default function UIChallengesPage() {
         </p>
 
         <p style="margin-top:12px;font-size:14px;color:#64748B;">
-          Please submit your current challenge before starting a new one.
+          Please submit ${
+            data.runningCount > 1 ? "them" : "it"
+          } before starting a new challenge.
         </p>
       </div>
-    `,
-          confirmButtonText: "Got it",
-          confirmButtonColor: "#5B6CFF",
-          width: 500,
-          customClass: {
-            popup: "rounded-3xl shadow-2xl",
-            title: "text-2xl font-bold text-slate-900",
-            confirmButton: "rounded-xl px-6 py-3 font-semibold",
-          },
-        });
+    `;
+  } else if (data.code === "ACTIVE_RESUBMISSION") {
+    title = "Active Resubmission";
 
-        return;
-      }
+    html = `
+      <div style="
+        background:#F8FAFC;
+        border:1px solid #E2E8F0;
+        border-radius:14px;
+        padding:18px;
+        text-align:left;
+      ">
+        <p style="margin:0;font-size:15px;color:#475569;">
+          You currently have
+          <strong style="color:#5B6CFF;">
+            ${data.resubmitCount}
+          </strong>
+          active resubmission${data.resubmitCount > 1 ? "s" : ""}.
+        </p>
+
+        <p style="margin-top:12px;font-size:14px;color:#64748B;">
+          Please submit ${
+            data.resubmitCount > 1 ? "them" : "it"
+          } before starting a new challenge.
+        </p>
+      </div>
+    `;
+  } else {
+    title = "Something went wrong";
+    html = `<p>${data.message}</p>`;
+  }
+
+  Swal.fire({
+    icon: "warning",
+    title,
+    html,
+    confirmButtonText: "Got it",
+    confirmButtonColor: "#5B6CFF",
+    width: 500,
+    customClass: {
+      popup: "rounded-3xl shadow-2xl",
+      title: "text-2xl font-bold text-slate-900",
+      confirmButton: "rounded-xl px-6 py-3 font-semibold",
+    },
+  });
+
+  return;
+}
 
       router.push(`/pages/developer/ui-challenges-lists/${id}`);
     }
@@ -239,9 +281,132 @@ export default function UIChallengesPage() {
   const handleRunningChallenge = (id: number) => {
     router.push(`/pages/developer/ui-challenges-lists/${id}`);
   };
-  const handleResubmitChallenge = (id: number) => {
-    router.push(`/pages/developer/ui-challenges-lists/${id}/resubmit`);
-  };
+const handleResubmitChallenge = async (id: number) => {
+  const result = await MySwal.fire({
+    title: "Start Resubmission",
+    html: (
+      <div className="mt-2 text-left">
+        {/* Header */}
+        <div className="mb-5 flex items-center gap-3 rounded-xl border border-blue-100 bg-blue-50 p-4">
+          <div className="flex h-12 w-12 items-center justify-center rounded-full bg-[#5B6CFF] text-white">
+            <TiStopwatch size={28} />
+          </div>
+
+          <div>
+            <h3 className="text-base font-semibold text-slate-900">
+              Resubmission timer starts immediately
+            </h3>
+            <p className="text-sm text-slate-500">
+              Your resubmission session will begin as soon as you continue.
+            </p>
+          </div>
+        </div>
+
+        {/* Rules */}
+        <div className="rounded-xl border border-slate-200 bg-slate-50 p-4">
+          <h4 className="mb-3 font-semibold text-slate-800">
+            Resubmission Rules
+          </h4>
+
+          <ul className="space-y-3 text-sm text-slate-600">
+            <li className="flex items-start gap-3">
+              <span className="mt-1 text-green-500">
+                <IoCheckmarkDone />
+              </span>
+              <span>
+                Your resubmission timer will start immediately after clicking
+                <strong> Start Resubmission</strong>.
+              </span>
+            </li>
+
+            <li className="flex items-start gap-3">
+              <span className="mt-1 text-green-500">
+                <IoCheckmarkDone />
+              </span>
+              <span>
+                Update your previous solution and submit it when you are ready.
+              </span>
+            </li>
+
+            <li className="flex items-start gap-3">
+              <span className="mt-1 text-amber-500">
+                <CiWarning />
+              </span>
+              <span>
+                The resubmission timer <strong>cannot be paused or reset.</strong>
+              </span>
+            </li>
+
+            <li className="flex items-start gap-3 rounded-lg border border-red-200 bg-red-50 p-3">
+              <span className="mt-1 text-red-500">
+                <RxCross2 />
+              </span>
+              <span className="font-medium text-red-700">
+                Your resubmission time will be recorded and used during the
+                evaluation process.
+              </span>
+            </li>
+          </ul>
+        </div>
+
+        {/* Footer */}
+        <p className="mt-5 text-center text-sm font-medium text-[#5B6CFF]">
+          Ready to improve your previous submission?
+        </p>
+      </div>
+    ),
+
+    icon: undefined,
+
+    showCancelButton: true,
+    reverseButtons: true,
+    focusCancel: true,
+
+    confirmButtonText: "Start Resubmission",
+    cancelButtonText: "Cancel",
+
+    confirmButtonColor: "#5B6CFF",
+    cancelButtonColor: "#E2E8F0",
+
+    width: 700,
+    background: "#FFFFFF",
+
+    customClass: {
+      popup: "rounded-3xl shadow-2xl",
+      title: "text-3xl font-bold text-slate-900 pt-4",
+      confirmButton: "rounded-xl px-6 py-3 font-semibold text-white",
+      cancelButton: "rounded-xl px-6 py-3 font-semibold text-slate-700",
+    },
+  });
+
+  if (result.isConfirmed) {
+    const response = await fetch("/api/submission/resubmit", {
+      method: "PUT",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        userId: user.id,
+        challengeId: id,
+      }),
+    });
+
+    const data = await response.json();
+
+    if (!response.ok) {
+      Swal.fire({
+        icon: "error",
+        title: "Unable to Start Resubmission",
+        text: data.message,
+        confirmButtonColor: "#5B6CFF",
+      });
+
+      return;
+    }
+
+    router.push(`/pages/developer/ui-challenges-lists/${id}`);
+  }
+};
   const handleAction = (challenge: Challenge) => {
     switch (challengeStatus) {
       case "running":
@@ -428,19 +593,37 @@ export default function UIChallengesPage() {
 
                 <td className="p-4">{challenge.difficulty}</td>
 
-                <td className="p-4">
-                  <div className="flex justify-center gap-3">
-                    <button
-                      onClick={() => handleAction(challenge)}
-                      className="px-4 py-2 rounded-lg text-white"
-                      style={{
-                        background: "var(--primary)",
-                      }}
-                    >
-                      {getButtonLabel()}
-                    </button>{" "}
-                  </div>
-                </td>
+               <td className="p-4">
+  <div className="flex justify-center gap-3">
+    {challengeStatus === "completed" ? (
+      challenge.submit_attempts < challenge.maxAttempts ? (
+        <button
+          onClick={() => handleResubmitChallenge(challenge.id)}
+          className="px-4 py-2 rounded-lg text-white"
+          style={{
+            background: "var(--primary)",
+          }}
+        >
+          Resubmit {challenge.submit_attempts} / {challenge.maxAttempts}
+        </button>
+      ) : (
+        <span className="px-4 py-2 rounded-lg bg-red-100 text-red-600 font-medium">
+          Max Attempts Reached  {challenge.submit_attempts} / {challenge.maxAttempts}
+        </span>
+      )
+    ) : (
+      <button
+        onClick={() => handleAction(challenge)}
+        className="px-4 py-2 rounded-lg text-white"
+        style={{
+          background: "var(--primary)",
+        }}
+      >
+        {getButtonLabel()}
+      </button>
+    )}
+  </div>
+</td>
               </tr>
             ))}
           </tbody>
