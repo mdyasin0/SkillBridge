@@ -31,7 +31,14 @@ export default function UIChallengesPage() {
   const MySwal = withReactContent(Swal);
   const [technologyFilter, setTechnologyFilter] = useState("All");
   const technologies = ["All", ...new Set(data.map((item) => item.technology))];
-
+  const [meta, setMeta] = useState({
+    counts: {
+      available: 0,
+      running: 0,
+      completed: 0,
+      runningResubmission: 0,
+    },
+  });
   const filteredData = data.filter((item) => {
     const difficultyMatch =
       difficultyFilter === "All" || item.difficulty === difficultyFilter;
@@ -45,18 +52,21 @@ export default function UIChallengesPage() {
     if (!user?.id) return;
 
     let api = "";
-
     switch (challengeStatus) {
       case "running":
-        api = `/api/submission/all?userId=${user.id}&status=pending`;
+        api = `/api/ui_challenge_manage/uichallengedata?userId=${user.id}&status=pending`;
         break;
 
       case "completed":
-        api = `/api/submission/all?userId=${user.id}&status=submitted`;
+        api = `/api/ui_challenge_manage/uichallengedata?userId=${user.id}&status=submitted`;
+        break;
+
+      case "running-resubmission":
+        api = `/api/ui_challenge_manage/uichallengedata?userId=${user.id}&status=running-resubmission`;
         break;
 
       default:
-        api = `/api/ui_challenge_manage/uichallengedata?userId=${user.id}`;
+        api = `/api/ui_challenge_manage/uichallengedata?userId=${user.id}&status=available`;
     }
 
     setLoading(true);
@@ -65,6 +75,7 @@ export default function UIChallengesPage() {
       .then((res) => res.json())
       .then((res) => {
         setData(res.data);
+        setMeta(res.meta);
         setLoading(false);
       });
   }, [challengeStatus, user?.id]);
@@ -184,14 +195,14 @@ export default function UIChallengesPage() {
 
       const data = await response.json();
 
-     if (!response.ok) {
-  let title = "";
-  let html = "";
+      if (!response.ok) {
+        let title = "";
+        let html = "";
 
-  if (data.code === "PENDING_CHALLENGE") {
-    title = "Challenge Already Running";
+        if (data.code === "PENDING_CHALLENGE") {
+          title = "Challenge Already Running";
 
-    html = `
+          html = `
       <div style="
         background:#F8FAFC;
         border:1px solid #E2E8F0;
@@ -214,10 +225,10 @@ export default function UIChallengesPage() {
         </p>
       </div>
     `;
-  } else if (data.code === "ACTIVE_RESUBMISSION") {
-    title = "Active Resubmission";
+        } else if (data.code === "ACTIVE_RESUBMISSION") {
+          title = "Active Resubmission";
 
-    html = `
+          html = `
       <div style="
         background:#F8FAFC;
         border:1px solid #E2E8F0;
@@ -240,27 +251,27 @@ export default function UIChallengesPage() {
         </p>
       </div>
     `;
-  } else {
-    title = "Something went wrong";
-    html = `<p>${data.message}</p>`;
-  }
+        } else {
+          title = "Something went wrong";
+          html = `<p>${data.message}</p>`;
+        }
 
-  Swal.fire({
-    icon: "warning",
-    title,
-    html,
-    confirmButtonText: "Got it",
-    confirmButtonColor: "#5B6CFF",
-    width: 500,
-    customClass: {
-      popup: "rounded-3xl shadow-2xl",
-      title: "text-2xl font-bold text-slate-900",
-      confirmButton: "rounded-xl px-6 py-3 font-semibold",
-    },
-  });
+        Swal.fire({
+          icon: "warning",
+          title,
+          html,
+          confirmButtonText: "Got it",
+          confirmButtonColor: "#5B6CFF",
+          width: 500,
+          customClass: {
+            popup: "rounded-3xl shadow-2xl",
+            title: "text-2xl font-bold text-slate-900",
+            confirmButton: "rounded-xl px-6 py-3 font-semibold",
+          },
+        });
 
-  return;
-}
+        return;
+      }
 
       router.push(`/pages/developer/ui-challenges-lists/${id}`);
     }
@@ -274,6 +285,9 @@ export default function UIChallengesPage() {
       case "completed":
         return "Resubmit";
 
+      case "running-resubmission":
+        return "Continue Resubmission";
+
       default:
         return "Start Now";
     }
@@ -281,132 +295,134 @@ export default function UIChallengesPage() {
   const handleRunningChallenge = (id: number) => {
     router.push(`/pages/developer/ui-challenges-lists/${id}`);
   };
-const handleResubmitChallenge = async (id: number) => {
-  const result = await MySwal.fire({
-    title: "Start Resubmission",
-    html: (
-      <div className="mt-2 text-left">
-        {/* Header */}
-        <div className="mb-5 flex items-center gap-3 rounded-xl border border-blue-100 bg-blue-50 p-4">
-          <div className="flex h-12 w-12 items-center justify-center rounded-full bg-[#5B6CFF] text-white">
-            <TiStopwatch size={28} />
+  const handleResubmitChallenge = async (id: number) => {
+    const result = await MySwal.fire({
+      title: "Start Resubmission",
+      html: (
+        <div className="mt-2 text-left">
+          {/* Header */}
+          <div className="mb-5 flex items-center gap-3 rounded-xl border border-blue-100 bg-blue-50 p-4">
+            <div className="flex h-12 w-12 items-center justify-center rounded-full bg-[#5B6CFF] text-white">
+              <TiStopwatch size={28} />
+            </div>
+
+            <div>
+              <h3 className="text-base font-semibold text-slate-900">
+                Resubmission timer starts immediately
+              </h3>
+              <p className="text-sm text-slate-500">
+                Your resubmission session will begin as soon as you continue.
+              </p>
+            </div>
           </div>
 
-          <div>
-            <h3 className="text-base font-semibold text-slate-900">
-              Resubmission timer starts immediately
-            </h3>
-            <p className="text-sm text-slate-500">
-              Your resubmission session will begin as soon as you continue.
-            </p>
+          {/* Rules */}
+          <div className="rounded-xl border border-slate-200 bg-slate-50 p-4">
+            <h4 className="mb-3 font-semibold text-slate-800">
+              Resubmission Rules
+            </h4>
+
+            <ul className="space-y-3 text-sm text-slate-600">
+              <li className="flex items-start gap-3">
+                <span className="mt-1 text-green-500">
+                  <IoCheckmarkDone />
+                </span>
+                <span>
+                  Your resubmission timer will start immediately after clicking
+                  <strong> Start Resubmission</strong>.
+                </span>
+              </li>
+
+              <li className="flex items-start gap-3">
+                <span className="mt-1 text-green-500">
+                  <IoCheckmarkDone />
+                </span>
+                <span>
+                  Update your previous solution and submit it when you are
+                  ready.
+                </span>
+              </li>
+
+              <li className="flex items-start gap-3">
+                <span className="mt-1 text-amber-500">
+                  <CiWarning />
+                </span>
+                <span>
+                  The resubmission timer{" "}
+                  <strong>cannot be paused or reset.</strong>
+                </span>
+              </li>
+
+              <li className="flex items-start gap-3 rounded-lg border border-red-200 bg-red-50 p-3">
+                <span className="mt-1 text-red-500">
+                  <RxCross2 />
+                </span>
+                <span className="font-medium text-red-700">
+                  Your resubmission time will be recorded and used during the
+                  evaluation process.
+                </span>
+              </li>
+            </ul>
           </div>
+
+          {/* Footer */}
+          <p className="mt-5 text-center text-sm font-medium text-[#5B6CFF]">
+            Ready to improve your previous submission?
+          </p>
         </div>
+      ),
 
-        {/* Rules */}
-        <div className="rounded-xl border border-slate-200 bg-slate-50 p-4">
-          <h4 className="mb-3 font-semibold text-slate-800">
-            Resubmission Rules
-          </h4>
+      icon: undefined,
 
-          <ul className="space-y-3 text-sm text-slate-600">
-            <li className="flex items-start gap-3">
-              <span className="mt-1 text-green-500">
-                <IoCheckmarkDone />
-              </span>
-              <span>
-                Your resubmission timer will start immediately after clicking
-                <strong> Start Resubmission</strong>.
-              </span>
-            </li>
+      showCancelButton: true,
+      reverseButtons: true,
+      focusCancel: true,
 
-            <li className="flex items-start gap-3">
-              <span className="mt-1 text-green-500">
-                <IoCheckmarkDone />
-              </span>
-              <span>
-                Update your previous solution and submit it when you are ready.
-              </span>
-            </li>
+      confirmButtonText: "Start Resubmission",
+      cancelButtonText: "Cancel",
 
-            <li className="flex items-start gap-3">
-              <span className="mt-1 text-amber-500">
-                <CiWarning />
-              </span>
-              <span>
-                The resubmission timer <strong>cannot be paused or reset.</strong>
-              </span>
-            </li>
+      confirmButtonColor: "#5B6CFF",
+      cancelButtonColor: "#E2E8F0",
 
-            <li className="flex items-start gap-3 rounded-lg border border-red-200 bg-red-50 p-3">
-              <span className="mt-1 text-red-500">
-                <RxCross2 />
-              </span>
-              <span className="font-medium text-red-700">
-                Your resubmission time will be recorded and used during the
-                evaluation process.
-              </span>
-            </li>
-          </ul>
-        </div>
+      width: 700,
+      background: "#FFFFFF",
 
-        {/* Footer */}
-        <p className="mt-5 text-center text-sm font-medium text-[#5B6CFF]">
-          Ready to improve your previous submission?
-        </p>
-      </div>
-    ),
-
-    icon: undefined,
-
-    showCancelButton: true,
-    reverseButtons: true,
-    focusCancel: true,
-
-    confirmButtonText: "Start Resubmission",
-    cancelButtonText: "Cancel",
-
-    confirmButtonColor: "#5B6CFF",
-    cancelButtonColor: "#E2E8F0",
-
-    width: 700,
-    background: "#FFFFFF",
-
-    customClass: {
-      popup: "rounded-3xl shadow-2xl",
-      title: "text-3xl font-bold text-slate-900 pt-4",
-      confirmButton: "rounded-xl px-6 py-3 font-semibold text-white",
-      cancelButton: "rounded-xl px-6 py-3 font-semibold text-slate-700",
-    },
-  });
-
-  if (result.isConfirmed) {
-    const response = await fetch("/api/submission/resubmit", {
-      method: "PUT",
-      headers: {
-        "Content-Type": "application/json",
+      customClass: {
+        popup: "rounded-3xl shadow-2xl",
+        title: "text-3xl font-bold text-slate-900 pt-4",
+        confirmButton: "rounded-xl px-6 py-3 font-semibold text-white",
+        cancelButton: "rounded-xl px-6 py-3 font-semibold text-slate-700",
       },
-      body: JSON.stringify({
-        userId: user.id,
-        challengeId: id,
-      }),
     });
 
-    const data = await response.json();
-
-    if (!response.ok) {
-      Swal.fire({
-        icon: "error",
-        title: "Unable to Start Resubmission",
-        text: data.message,
-        confirmButtonColor: "#5B6CFF",
+    if (result.isConfirmed) {
+      const response = await fetch("/api/submission/resubmit", {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          userId: user.id,
+          challengeId: id,
+        }),
       });
 
-      return;
-    }
+      const data = await response.json();
 
-    router.push(`/pages/developer/ui-challenges-lists/${id}`);
-  }
-};
+      if (!response.ok) {
+        Swal.fire({
+          icon: "error",
+          title: "Unable to Start Resubmission",
+          text: data.message,
+          confirmButtonColor: "#5B6CFF",
+        });
+
+        return;
+      }
+
+      router.push(`/pages/developer/ui-challenges-lists/${id}`);
+    }
+  };
   const handleAction = (challenge: Challenge) => {
     switch (challengeStatus) {
       case "running":
@@ -417,27 +433,85 @@ const handleResubmitChallenge = async (id: number) => {
         handleResubmitChallenge(challenge.id);
         break;
 
+      case "running-resubmission":
+        handleRunningChallenge(challenge.id);
+        break;
+
       default:
         handleStartChallenge(challenge.id);
     }
   };
 
+  const statusButtons = [
+    {
+      label: `All (${meta.counts.available})`,
+      value: "available",
+      show: true,
+    },
+    {
+      label: `Running (${meta.counts.running})`,
+      value: "running",
+      show: meta.counts.running > 0,
+    },
+    {
+      label: `Completed (${meta.counts.completed})`,
+      value: "completed",
+      show: meta.counts.completed > 0,
+    },
+    {
+      label: `Running Resubmission (${meta.counts.runningResubmission})`,
+      value: "running-resubmission",
+      show: meta.counts.runningResubmission > 0,
+    },
+  ];
+  const pageSubtitle = () => {
+    switch (challengeStatus) {
+      case "running":
+        return "Continue and submit your active challenges before the deadline.";
+
+      case "completed":
+        return "Review your submitted challenges and start a resubmission if needed.";
+      case "running-resubmission":
+        return "Continue working on your active resubmissions and submit  as soon as possible .";
+      default:
+        return "Browse all available challenges and start your next assessment.";
+    }
+  };
   if (loading) {
     return <div>Loading...</div>;
   }
 
   return (
     <div className="max-w-7xl mx-auto p-8">
-      <div className="mb-6 flex items-center justify-between">
-        <h1 className="text-3xl font-bold">Projects Challenges</h1>
-
-        <button
-          onClick={() => setShowFilter(!showFilter)}
-          className="flex items-center gap-2 rounded-lg border px-4 py-2"
-        >
-          <Filter size={18} />
-          Filter
-        </button>
+      <div className="mb-6  items-center justify-between">
+        <h1 className="text-3xl font-bold">Project Challenges</h1>
+        <p className="mt-2 text-gray-500">{pageSubtitle()}</p>
+        <div className="mb-5">
+          <div className="flex flex-wrap mt-5 gap-3">
+            {statusButtons
+              .filter((item) => item.show)
+              .map((item) => (
+                <button
+                  key={item.value}
+                  onClick={() => setChallengeStatus(item.value)}
+                  className={`rounded-full border px-4 py-2 text-sm transition ${
+                    challengeStatus === item.value
+                      ? "border-blue-600 bg-blue-600 text-white"
+                      : "border-gray-300 hover:border-blue-500"
+                  }`}
+                >
+                  {item.label}
+                </button>
+              ))}
+            <button
+              onClick={() => setShowFilter(!showFilter)}
+              className="flex items-center gap-2 rounded-lg border px-4 py-2"
+            >
+              <Filter size={18} />
+              Filter
+            </button>
+          </div>
+        </div>
       </div>
       {showFilter && (
         <div className="mb-6 rounded-2xl border bg-white p-6 shadow-sm">
@@ -454,40 +528,7 @@ const handleResubmitChallenge = async (id: number) => {
               <X className="h-5 w-5" />
             </button>
           </div>
-          <div className="mb-5">
-            <h3 className="mb-3 text-sm font-semibold text-gray-700">
-              Challenge Status
-            </h3>
 
-            <div className="flex flex-wrap gap-3">
-              {[
-                {
-                  label: "Available",
-                  value: "available",
-                },
-                {
-                  label: "Running",
-                  value: "running",
-                },
-                {
-                  label: "Completed",
-                  value: "completed",
-                },
-              ].map((item) => (
-                <button
-                  key={item.value}
-                  onClick={() => setChallengeStatus(item.value)}
-                  className={`rounded-full border px-4 py-2 text-sm transition ${
-                    challengeStatus === item.value
-                      ? "border-blue-600 bg-blue-600 text-white"
-                      : "border-gray-300 hover:border-blue-500"
-                  }`}
-                >
-                  {item.label}
-                </button>
-              ))}
-            </div>
-          </div>
           <div className="space-y-6">
             {/* Difficulty */}
             <div>
@@ -537,7 +578,6 @@ const handleResubmitChallenge = async (id: number) => {
             <div className="flex gap-3">
               <button
                 onClick={() => {
-                  setChallengeStatus("available");
                   setDifficultyFilter("All");
                   setTechnologyFilter("All");
                 }}
@@ -593,37 +633,39 @@ const handleResubmitChallenge = async (id: number) => {
 
                 <td className="p-4">{challenge.difficulty}</td>
 
-               <td className="p-4">
-  <div className="flex justify-center gap-3">
-    {challengeStatus === "completed" ? (
-      challenge.submit_attempts < challenge.maxAttempts ? (
-        <button
-          onClick={() => handleResubmitChallenge(challenge.id)}
-          className="px-4 py-2 rounded-lg text-white"
-          style={{
-            background: "var(--primary)",
-          }}
-        >
-          Resubmit {challenge.submit_attempts} / {challenge.maxAttempts}
-        </button>
-      ) : (
-        <span className="px-4 py-2 rounded-lg bg-red-100 text-red-600 font-medium">
-          Max Attempts Reached  {challenge.submit_attempts} / {challenge.maxAttempts}
-        </span>
-      )
-    ) : (
-      <button
-        onClick={() => handleAction(challenge)}
-        className="px-4 py-2 rounded-lg text-white"
-        style={{
-          background: "var(--primary)",
-        }}
-      >
-        {getButtonLabel()}
-      </button>
-    )}
-  </div>
-</td>
+                <td className="p-4">
+                  <div className="flex justify-center gap-3">
+                    {challengeStatus === "completed" ? (
+                      challenge.submit_attempts < challenge.maxAttempts ? (
+                        <button
+                          onClick={() => handleResubmitChallenge(challenge.id)}
+                          className="px-4 py-2 rounded-lg text-white"
+                          style={{
+                            background: "var(--primary)",
+                          }}
+                        >
+                          Resubmit {challenge.submit_attempts} /{" "}
+                          {challenge.maxAttempts}
+                        </button>
+                      ) : (
+                        <span className="px-4 py-2 rounded-lg bg-red-100 text-red-600 font-medium">
+                          Max Attempts Reached {challenge.submit_attempts} /{" "}
+                          {challenge.maxAttempts}
+                        </span>
+                      )
+                    ) : (
+                      <button
+                        onClick={() => handleAction(challenge)}
+                        className="px-4 py-2 rounded-lg text-white"
+                        style={{
+                          background: "var(--primary)",
+                        }}
+                      >
+                        {getButtonLabel()}
+                      </button>
+                    )}
+                  </div>
+                </td>
               </tr>
             ))}
           </tbody>
