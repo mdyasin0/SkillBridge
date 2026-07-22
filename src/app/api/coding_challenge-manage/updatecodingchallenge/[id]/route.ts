@@ -21,7 +21,7 @@ export async function PUT(
       starterCode,
       hint,
       rewardBadge,
-      testCases,
+     
     } = body;
 
     // Validation
@@ -32,8 +32,8 @@ export async function PUT(
       !category ||
       !allowedLanguages ||
       !timeLimit ||
-      !maxAttempt ||
-      !testCases
+      !maxAttempt
+      
     ) {
       return NextResponse.json(
         {
@@ -73,7 +73,7 @@ export async function PUT(
         starterCode || "",
         hint || "",
         rewardBadge || "",
-        JSON.stringify(testCases),
+       
         id,
       ]
     );

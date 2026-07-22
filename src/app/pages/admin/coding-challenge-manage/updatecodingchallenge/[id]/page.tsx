@@ -4,11 +4,7 @@ import { useParams, useRouter } from "next/navigation";
 
 import { useEffect, useState } from "react";
 
-type TestCase = {
-  input: string;
-  output: string;
-  visible: boolean;
-};
+
 
 export default function ProblemForm() {
   const params = useParams<{ id: string }>();
@@ -28,13 +24,7 @@ export default function ProblemForm() {
     rewardBadge: "",
   });
 
-  const [testCases, setTestCases] = useState<TestCase[]>([
-    {
-      input: "",
-      output: "",
-      visible: true,
-    },
-  ]);
+
   const handleChange = (
     e: React.ChangeEvent<
       HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement
@@ -73,7 +63,7 @@ export default function ProblemForm() {
           rewardBadge: data.rewardBadge,
         });
 
-        setTestCases(data.testCases);
+       
       } catch (err) {
         console.error(err);
       }
@@ -94,7 +84,7 @@ export default function ProblemForm() {
         },
         body: JSON.stringify({
           ...formData,
-          testCases,
+          
         }),
       });
       if (!res.ok) {
@@ -264,47 +254,7 @@ export default function ProblemForm() {
           />
         </div>
 
-        {/* Test Cases */}
-
-        <div>
-          <div className="flex justify-between items-center mb-5">
-            <h2 className="text-2xl font-bold">Test Cases</h2>
-          </div>
-
-          <div className="space-y-6">
-            {testCases.map((tc, index) => (
-              <div key={index}>
-                <input
-                  value={tc.input}
-                  onChange={(e) => {
-                    const updated = [...testCases];
-                    updated[index].input = e.target.value;
-                    setTestCases(updated);
-                  }}
-                />
-
-                <input
-                  value={tc.output}
-                  onChange={(e) => {
-                    const updated = [...testCases];
-                    updated[index].output = e.target.value;
-                    setTestCases(updated);
-                  }}
-                />
-
-                <input
-                  type="checkbox"
-                  checked={tc.visible}
-                  onChange={(e) => {
-                    const updated = [...testCases];
-                    updated[index].visible = e.target.checked;
-                    setTestCases(updated);
-                  }}
-                />
-              </div>
-            ))}
-          </div>
-        </div>
+     
 
         <button
           type="submit"

@@ -82,7 +82,7 @@ export default function ChallengesPage() {
           </thead>
 
           <tbody>
-            {data.map((item) => (
+            {data?.map((item) => (
               <tr
                 key={item.id}
                 className="border-t"

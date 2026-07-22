@@ -16,7 +16,7 @@ export async function POST(req: Request) {
       starterCode,
       hint,
       rewardBadge,
-      testCases,
+      
     } = body;
 
     // Validation
@@ -28,8 +28,7 @@ export async function POST(req: Request) {
       !category ||
       !allowedLanguages ||
       !timeLimit ||
-      !maxAttempt ||
-      !testCases
+      !maxAttempt 
     ) {
       return NextResponse.json(
         {
@@ -55,12 +54,11 @@ export async function POST(req: Request) {
         starterCode,
         hint,
         rewardBadge,
-        testCases,
         createdBy
       )
 
       VALUES
-      (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+      (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
       `,
       [
         title,
@@ -73,7 +71,7 @@ export async function POST(req: Request) {
         starterCode || "",
         hint || "",
         rewardBadge || "",
-        JSON.stringify(testCases),
+       
 
         // পরে login করলে session/user থেকে নিবে
         1,

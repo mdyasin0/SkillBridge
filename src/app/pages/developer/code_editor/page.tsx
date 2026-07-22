@@ -1,11 +1,14 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import Editor from "@monaco-editor/react";
 
-import { Play, Send, Clock, Maximize2, Minimize2 } from "lucide-react";
+import { Send, Clock, Maximize2, Minimize2 } from "lucide-react";
 
 import { Panel, PanelGroup, PanelResizeHandle } from "react-resizable-panels";
+import withReactContent from "sweetalert2-react-content";
+import Swal from "sweetalert2";
+import { useRouter } from "next/navigation";
 interface Challenge {
   id: number;
   title: string;
@@ -18,6 +21,17 @@ interface Challenge {
   starterCode: string;
   hint: string;
   rewardBadge: string;
+
+  solutionId: number | null;
+  score: number | null;
+  feedback: string | null;
+  check_status: string | null;
+  submit_attempts: number;
+  start_time: string | null;
+  submitted_at: string | null;
+  resubmit_start_at: string | null;
+  resubmit_submitted_at: string | null;
+
   testCases: {
     input: string;
     output: string;
@@ -30,12 +44,234 @@ interface Props {
 
 export default function ChallengeWorkspace({ challenge }: Props) {
   const [code, setCode] = useState(challenge.starterCode);
+  const [submitting, setSubmitting] = useState(false);
+  const router = useRouter();
 
+  const submittingRef = useRef(false);
+  const [isSubmitted, setIsSubmitted] = useState(false);
   const [isFullscreen, setIsFullscreen] = useState(false);
-const [output, setOutput] = useState("");
-const handleRun = () => {
+  const [timeLeft, setTimeLeft] = useState(challenge.timeLimit * 60);
+  const MySwal = useMemo(() => withReactContent(Swal), []);
+  const handleSubmit = async (isAutoSubmit = false) => {
+    if (submittingRef.current) return;
 
-};
+    submittingRef.current = true;
+    if (!isAutoSubmit) {
+      const result = await MySwal.fire({
+        title: "Submit Solution?",
+        html: `
+      <div style="text-align:left">
+        <p style="margin-bottom:12px;">
+          You are about to submit your solution for review.
+        </p>
+
+        <ul style="padding-left:18px;line-height:1.8;">
+          <li>Your current code will be saved.</li>
+          <li>The submission time will be recorded.</li>
+          <li>Your solution will be sent for manual review.</li>
+          <li>If you still have attempts remaining, you may resubmit later.</li>
+        </ul>
+
+        <p style="margin-top:16px;font-weight:600;color:#dc2626;">
+          Are you sure you want to continue?
+        </p>
+      </div>
+    `,
+        icon: "warning",
+        width: 650,
+        background: "var(--surface)",
+        showCancelButton: true,
+        reverseButtons: true,
+        focusCancel: true,
+        confirmButtonText: "Yes, Submit",
+        cancelButtonText: "Cancel",
+        confirmButtonColor: "#16a34a",
+        cancelButtonColor: "#6b7280",
+        customClass: {
+          popup: "rounded-3xl",
+          title: "text-2xl font-bold text-[var(--text)]",
+          confirmButton: "rounded-xl px-6 py-3 font-semibold",
+          cancelButton: "rounded-xl px-6 py-3 font-semibold",
+        },
+      });
+      if (!result.isConfirmed) return;
+    }
+
+    try {
+      setSubmitting(true);
+
+      const res = await fetch("/api/solution_code_submit", {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          solutionId: challenge.solutionId,
+          submitCode: code,
+        }),
+      });
+
+      const data = await res.json();
+
+      if (!res.ok) {
+        MySwal.fire({
+          icon: "error",
+          title: "Submission Failed",
+          text: data.message,
+        });
+        return;
+      }
+      setIsSubmitted(true);
+      if (!isAutoSubmit) {
+        await MySwal.fire({
+          icon: "success",
+          title: "Submitted Successfully",
+          text: "Your solution has been submitted for review.",
+          confirmButtonColor: "#16a34a",
+        });
+      }
+      router.replace("/pages/developer/coding_challenge_lists");
+      if (isAutoSubmit) {
+        setIsSubmitted(true);
+        router.replace("/pages/developer/coding_challenge_lists");
+        return;
+      }
+    } catch (error) {
+      console.error(error);
+
+      MySwal.fire({
+        icon: "error",
+        title: "Server Error",
+        text: "Something went wrong. Please try again.",
+      });
+    } finally {
+      setSubmitting(false);
+      submittingRef.current = false;
+    }
+  };
+  useEffect(() => {
+    const updateTimer = () => {
+      if (!challenge.start_time) return;
+
+      const startTime = new Date(challenge.start_time).getTime();
+
+      const duration = challenge.timeLimit * 60 * 1000;
+      const endTime = startTime + duration;
+
+      const remaining = Math.max(0, Math.floor((endTime - Date.now()) / 1000));
+
+      setTimeLeft(remaining);
+
+      if (remaining === 0 && !isSubmitted && !submitting) {
+        handleSubmit(true);
+      }
+    };
+
+    updateTimer();
+
+    const interval = setInterval(updateTimer, 1000);
+
+    return () => clearInterval(interval);
+  }, [challenge.start_time, challenge.timeLimit, isSubmitted, submitting]);
+  useEffect(() => {
+    const beforeUnload = (e: BeforeUnloadEvent) => {
+      if (isSubmitted) return;
+
+      e.preventDefault();
+      e.returnValue = "";
+    };
+
+    window.addEventListener("beforeunload", beforeUnload);
+
+    return () => {
+      window.removeEventListener("beforeunload", beforeUnload);
+    };
+  }, [isSubmitted]);
+  useEffect(() => {
+    const handleClick = async (e: MouseEvent) => {
+      if (isSubmitted) return;
+
+      const target = e.target as HTMLElement;
+
+      const link = target.closest("a");
+
+      if (!link) return;
+
+      e.preventDefault();
+
+      const result = await MySwal.fire({
+        title: "Leave Challenge?",
+        html: `
+      <p>
+      If you leave this page before submitting,
+      your current solution will be submitted automatically.
+      </p>
+
+      <br/>
+
+      <strong>
+      Are you sure you want to leave?
+      </strong>
+      `,
+        icon: "warning",
+        showCancelButton: true,
+        confirmButtonText: "Leave",
+        cancelButtonText: "Stay",
+        reverseButtons: true,
+      });
+
+      if (!result.isConfirmed) return;
+
+      await handleSubmit(true);
+
+      window.location.href = link.getAttribute("href")!;
+    };
+
+    document.addEventListener("click", handleClick);
+
+    return () => {
+      document.removeEventListener("click", handleClick);
+    };
+  }, [code, isSubmitted]);
+  useEffect(() => {
+    history.pushState(null, "", location.href);
+
+    const handlePopState = async () => {
+      if (isSubmitted) return;
+
+      history.pushState(null, "", location.href);
+
+      const result = await MySwal.fire({
+        title: "Leave Challenge?",
+        text: "Leaving this page will automatically submit your current solution.",
+        icon: "warning",
+        showCancelButton: true,
+        confirmButtonText: "Leave",
+        cancelButtonText: "Stay",
+      });
+
+      if (result.isConfirmed) {
+        await handleSubmit(true);
+
+        history.back();
+      }
+    };
+
+    window.addEventListener("popstate", handlePopState);
+
+    return () => {
+      window.removeEventListener("popstate", handlePopState);
+    };
+  }, [isSubmitted]);
+  const formatTime = (seconds: number) => {
+    const minutes = Math.floor(seconds / 60);
+    const secs = seconds % 60;
+
+    return `${minutes.toString().padStart(2, "0")}:${secs
+      .toString()
+      .padStart(2, "0")}`;
+  };
+
   return (
     <div className="h-screen flex flex-col bg-zinc-950 text-white">
       {/* Main Layout */}
@@ -135,85 +371,22 @@ const handleRun = () => {
                 <div className="flex items-center gap-3">
                   <div className="flex items-center gap-2 text-yellow-400">
                     <Clock size={18} />
-                    <span>{challenge.timeLimit}</span>
+                    <span>{formatTime(timeLeft)}</span>
                   </div>
 
                   <button
-                    onClick={handleRun}
-                    className="bg-zinc-800 px-3 py-2 rounded-lg flex items-center gap-2 hover:bg-zinc-700"
+                    onClick={handleSubmit}
+                    disabled={submitting}
+                    className="bg-green-600 px-3 py-2 rounded-lg flex items-center gap-2 hover:bg-green-500 disabled:opacity-50"
                   >
-                    <Play size={16} />
-                    Run Code
-                  </button>
-
-                  <button className="bg-green-600 px-3 py-2 rounded-lg flex items-center gap-2 hover:bg-green-500">
                     <Send size={16} />
-                    Submit
+                    {submitting ? "Submitting..." : "Submit"}
                   </button>
                 </div>
               </div>
 
               {/* Bottom Panel */}
-              <div className="h-64 border-t border-zinc-800 grid grid-cols-2">
-                {/* Console */}
-                <div className="border-r border-zinc-800 p-4">
-                  <h3 className="font-semibold text-lg mb-4">Console Output</h3>
-
-                  <div className="bg-black rounded-xl p-4 h-45 overflow-auto">
-                    <pre className="text-green-400 text-sm whitespace-pre-wrap">
-                          {output}
-                    </pre>
-                  </div>
-                </div>
-
-                {/* Test Cases */}
-                <div className="p-4 overflow-y-auto">
-                  <h3 className="font-semibold text-lg mb-4">
-                    Sample Test Cases
-                  </h3>
-
-                  <div className="space-y-4">
-                    {challenge.testCases.map((test, index) => (
-                      <div
-                        key={index}
-                        className="rounded-xl border border-zinc-700 bg-zinc-900 p-4"
-                      >
-                        <div className="flex items-center justify-between mb-3">
-                          <h4 className="font-semibold">
-                            Test Case #{index + 1}
-                          </h4>
-
-                          <span className="text-xs px-2 py-1 rounded-full bg-blue-600 text-white">
-                            Sample
-                          </span>
-                        </div>
-
-                        <div className="space-y-3">
-                          <div>
-                            <p className="text-xs uppercase text-zinc-400 mb-1">
-                              Input
-                            </p>
-
-                            <pre className="bg-black rounded-lg p-3 text-sm overflow-x-auto">
-                              {test.input}
-                            </pre>
-                          </div>
-
-                          <div>
-                            <p className="text-xs uppercase text-zinc-400 mb-1">
-                              Expected Output
-                            </p>
-
-                            <pre className="bg-black rounded-lg p-3 text-green-400 text-sm overflow-x-auto">
-                              {test.output}
-                            </pre>
-                          </div>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              </div>
+              <div className="h-64 border-t border-zinc-800 grid grid-cols-2"></div>
             </div>
           </Panel>
         </PanelGroup>

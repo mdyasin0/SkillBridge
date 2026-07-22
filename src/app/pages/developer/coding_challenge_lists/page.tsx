@@ -1,8 +1,14 @@
 "use client";
 
+import { useAuth } from "@/context/AuthContext";
 import { Filter, X } from "lucide-react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
+import { IoCheckmarkDone } from "react-icons/io5";
+import { LuClock3, LuShieldAlert, LuTimerReset } from "react-icons/lu";
+import Swal from "sweetalert2";
+import withReactContent from "sweetalert2-react-content";
 
 interface Challenge {
   id: number;
@@ -12,14 +18,31 @@ interface Challenge {
 }
 
 export default function ChallengesPage() {
-  const [data, setData] = useState<Challenge[]>([]);
-  const [loading, setLoading] = useState(true);
+  const [tableData, setTableData] = useState<Challenge[]>([]);
+  const [counts, setCounts] = useState({
+    all: 0,
+    available: 0,
+    completed: 0,
+  });
 
+  const [loading, setLoading] = useState(true);
+  const MySwal = withReactContent(Swal);
   const [difficultyFilter, setDifficultyFilter] = useState("All");
   const [categoryFilter, setCategoryFilter] = useState("All");
   const [showFilter, setShowFilter] = useState(false);
-  const categories = ["All", ...new Set(data.map((item) => item.category))];
-  const filteredData = data.filter((item) => {
+  const { user } = useAuth();
+  const [activeTab, setActiveTab] = useState<"available" | "completed">(
+  "available"
+);
+  const [apiData, setApiData] = useState({
+    available: [],
+    completed: [],
+  });
+  const categories = [
+    "All",
+    ...new Set(tableData.map((item) => item.category)),
+  ];
+  const filteredData = tableData.filter((item) => {
     const difficultyMatch =
       difficultyFilter === "All" || item.difficulty === difficultyFilter;
 
@@ -29,21 +52,208 @@ export default function ChallengesPage() {
     return difficultyMatch && categoryMatch;
   });
   useEffect(() => {
-    fetch("/api/coding_challenge-manage/all_coding_challenge")
+    if (!user?.id) return;
+
+    fetch(`/api/coding_challenge-manage/all_coding_challenge?userId=${user.id}`)
       .then((res) => res.json())
       .then((res) => {
-        setData(res.data);
+        setApiData(res.data);
+
+        setTableData(res.data.available);
+        setCounts(res.counts);
         setLoading(false);
       });
-  }, []);
+  }, [user]);
+  const router = useRouter();
 
+  const handleStartChallenge = async (id: number) => {
+    const result = await MySwal.fire({
+      title: "Start Coding Challenge",
+
+      html: (
+        <div className="mt-3 text-left">
+          {/* Hero */}
+          <div className="mb-5 flex items-center gap-4 rounded-2xl border border-(--border) bg-(--surface-hover) p-5">
+            <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-(--primary) text-white shadow-lg">
+              <LuClock3 size={30} />
+            </div>
+
+            <div>
+              <h3 className="text-lg font-semibold text-(--text)">
+                Your timer starts instantly
+              </h3>
+
+              <p className="mt-1 text-sm text-(--text-muted)">
+                Once you begin, the countdown cannot be paused or restarted.
+              </p>
+            </div>
+          </div>
+
+          {/* Rules */}
+          <div className="rounded-2xl border border-(--border) bg-(--surface-hover) p-5">
+            <h4 className="mb-4 text-base font-semibold text-(--text)">
+              Before you continue
+            </h4>
+
+            <div className="space-y-4">
+              <div className="flex items-start gap-3">
+                <div className="mt-0.5 rounded-full bg-green-100 p-1 text-green-600">
+                  <IoCheckmarkDone size={18} />
+                </div>
+
+                <p className="text-sm text-(--text-muted)">
+                  The challenge timer starts immediately after clicking{" "}
+                  <span className="font-semibold text-(--text)">
+                    Start Challenge
+                  </span>
+                  .
+                </p>
+              </div>
+
+              <div className="flex items-start gap-3">
+                <div className="mt-0.5 rounded-full bg-green-100 p-1 text-green-600">
+                  <IoCheckmarkDone size={18} />
+                </div>
+
+                <p className="text-sm text-(--text-muted)">
+                  Submit your solution before the allocated time expires.
+                </p>
+              </div>
+
+              <div className="flex items-start gap-3">
+                <div className="mt-0.5 rounded-full bg-amber-100 p-1 text-amber-600">
+                  <LuTimerReset size={18} />
+                </div>
+
+                <p className="text-sm text-(--text-muted)">
+                  The timer{" "}
+                  <strong>cannot be paused, restarted, or reset.</strong>
+                </p>
+              </div>
+
+              <div className="flex items-start gap-3 rounded-xl border border-red-200 bg-red-50 p-4">
+                <div className="mt-0.5 rounded-full bg-red-100 p-1 text-red-600">
+                  <LuShieldAlert size={18} />
+                </div>
+
+                <p className="text-sm font-medium text-red-700">
+                  If the time limit expires, your solution will be submitted
+                  automatically. If no valid solution is submitted, you will
+                  receive <strong>0 score</strong>.
+                </p>
+              </div>
+            </div>
+          </div>
+
+          <p className="mt-5 text-center text-sm font-medium text-(--primary)">
+            Make sure you are ready before starting.
+          </p>
+        </div>
+      ),
+
+      icon: undefined,
+
+      width: 720,
+      background: "var(--surface)",
+
+      showCancelButton: true,
+      reverseButtons: true,
+      focusCancel: true,
+
+      confirmButtonText: "Start Challenge",
+      cancelButtonText: "Cancel",
+
+      confirmButtonColor: "#5B6CFF",
+      cancelButtonColor: "#CBD5E1",
+
+      customClass: {
+        popup: "rounded-3xl shadow-2xl",
+        title: "pt-4 text-3xl font-bold text-[var(--text)]",
+        confirmButton:
+          "rounded-xl px-7 py-3 font-semibold text-white flex items-center gap-2",
+        cancelButton: "rounded-xl px-7 py-3 font-semibold text-slate-700",
+      },
+    });
+
+    if (!result.isConfirmed) return;
+
+    try {
+      const res = await fetch("/api/solution_submit", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          userId: user.id, // তোমার login user id
+          challengeId: id,
+        }),
+      });
+
+      const data = await res.json();
+
+      if (!res.ok) {
+        MySwal.fire({
+          icon: "error",
+          title: "Unable to Start",
+          text: data.message,
+        });
+
+        return;
+      }
+
+      router.push(`/pages/developer/code_editor/${id}?userId=${user.id}`);
+    } catch (error) {
+      console.error(error);
+
+      MySwal.fire({
+        icon: "error",
+        title: "Server Error",
+        text: "Something went wrong. Please try again.",
+      });
+    }
+  };
   if (loading) return <div className="p-10 text-center">Loading...</div>;
 
   return (
     <div className="max-w-7xl mx-auto p-8">
-      <div className="mb-6 flex items-center justify-between">
+      <div className="mb-6  items-center justify-between">
         <h1 className="text-3xl font-bold">Coding Challenge Lists</h1>
+        <p className="mt-2 text-sm text-gray-500">
+  {activeTab === "available"
+    ? "Explore all available coding challenges and complete the ones that match your skills and interests."
+    : "Review your completed coding challenges and resubmit them if you still have attempts remaining."}
+</p>
+<div className="flex mt-5 gap-5 ">
+  <button
+  className={`px-4 py-2 rounded-lg ${
+    activeTab === "available"
+      ? "bg-blue-600 text-white"
+      : "border"
+  }`}
+  onClick={() => {
+    setActiveTab("available");
+    setTableData(apiData.available);
+  }}
+>
+  All ({counts.available})
+</button>
 
+    
+{counts.completed > 0 && (
+  <button
+    className={`px-4 py-2 rounded-lg ${
+      activeTab === "completed"
+        ? "bg-blue-600 text-white"
+        : "border"
+    }`}
+    onClick={() => {
+      setActiveTab("completed");
+      setTableData(apiData.completed);
+    }}
+  >
+    Completed ({counts.completed})
+  </button>
+)}
         <button
           onClick={() => setShowFilter(!showFilter)}
           className="flex items-center gap-2 rounded-lg border px-4 py-2 transition hover:bg-gray-100"
@@ -51,6 +261,9 @@ export default function ChallengesPage() {
           <Filter className="h-5 w-5" />
           <span>Filters</span>
         </button>
+
+</div>
+     
       </div>
       {showFilter && (
         <div className="mb-6 rounded-2xl border border-gray-200 bg-white p-6 shadow-sm">
@@ -180,15 +393,15 @@ export default function ChallengesPage() {
                 <td className="p-4">{item.category}</td>
 
                 <td className="p-4 text-center">
-                  <Link
-                    href={`/pages/developer/code_editor/${item.id}`}
-                    className="px-4 py-2 rounded-lg text-white"
-                    style={{
-                      background: "var(--primary)",
-                    }}
-                  >
-                    Complete Challenge
-                  </Link>
+                 <button
+  onClick={() => handleStartChallenge(item.id)}
+  className="px-4 py-2 rounded-lg text-white"
+  style={{ background: "var(--primary)" }}
+>
+  {activeTab === "available"
+    ? "Complete Challenge"
+    : "View Submission"}
+</button>
                 </td>
               </tr>
             ))}
