@@ -20,6 +20,7 @@ export async function PUT(req: NextRequest) {
       UPDATE solution_submit
       SET
         submitCode = ?,
+        status = 'submitted',
         submitted_at = NOW(),
         updated_at = NOW()
       WHERE id = ?

@@ -35,7 +35,7 @@ export async function GET(req: NextRequest) {
         ss.id AS solutionId,
         ss.score,
         ss.feedback,
-        ss.check_status,
+        ss.status,
         ss.submit_attempts,
         ss.start_time,
         ss.submitted_at,
@@ -58,16 +58,17 @@ export async function GET(req: NextRequest) {
       allowedLanguages: JSON.parse(item.allowedLanguages || "[]"),
     }));
 
-    // User যেগুলো submit করেনি
-    const available = allChallenges.filter(
-      (item: any) => item.solutionId === null
-    );
+   const available = allChallenges.filter(
+  (item: any) =>
+    item.solutionId === null ||
+    item.status !== "submitted"
+);
 
-    // User যেগুলো submit করেছে
-    const completed = allChallenges.filter(
-      (item: any) => item.solutionId !== null
-    );
-
+const completed = allChallenges.filter(
+  (item: any) =>
+    item.solutionId !== null &&
+    item.status === "submitted"
+);
     return NextResponse.json({
       success: true,
 

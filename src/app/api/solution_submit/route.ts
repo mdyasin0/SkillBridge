@@ -19,8 +19,6 @@ export async function POST(req: Request) {
       );
     }
 
- 
-    // Create challenge session
     const [result]: any = await db.query(
       `
       INSERT INTO solution_submit
@@ -33,20 +31,39 @@ export async function POST(req: Request) {
       )
       VALUES
       (?, ?, NOW(), 'pending', 1)
+
+      ON DUPLICATE KEY UPDATE
+        start_time = start_time,
+        check_status = 'pending'
       `,
       [userId, challengeId]
     );
+
+
+    // Existing row হলে id পাওয়া যাবে না, তাই id বের করছি
+    const [rows]: any = await db.query(
+      `
+      SELECT id
+      FROM solution_submit
+      WHERE user_id = ?
+      AND challenge_id = ?
+      LIMIT 1
+      `,
+      [userId, challengeId]
+    );
+
 
     return NextResponse.json(
       {
         success: true,
         message: "Challenge started successfully.",
-        solutionId: result.insertId,
+        solutionId: rows[0].id,
       },
       {
-        status: 201,
+        status: 200,
       }
     );
+
   } catch (error) {
     console.log(error);
 

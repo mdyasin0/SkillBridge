@@ -44,22 +44,26 @@ interface Props {
 
 export default function ChallengeWorkspace({ challenge }: Props) {
   const [code, setCode] = useState(challenge.starterCode);
-  const [submitting, setSubmitting] = useState(false);
-  const router = useRouter();
 
+  const router = useRouter();
+  const autoSubmittedRef = useRef(false);
   const submittingRef = useRef(false);
   const [isSubmitted, setIsSubmitted] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const [isFullscreen, setIsFullscreen] = useState(false);
   const [timeLeft, setTimeLeft] = useState(challenge.timeLimit * 60);
   const MySwal = useMemo(() => withReactContent(Swal), []);
-  const handleSubmit = async (isAutoSubmit = false) => {
-    if (submittingRef.current) return;
+  const handleSubmit = async (
+    autoSubmit = false,
+    reason: "timeout" | "leave" = "timeout",
+  ) => {
+    if (submittingRef.current || isSubmitted) return;
 
-    submittingRef.current = true;
-    if (!isAutoSubmit) {
-      const result = await MySwal.fire({
-        title: "Submit Solution?",
-        html: `
+    try {
+      if (!autoSubmit) {
+        const result = await MySwal.fire({
+          title: "Submit Solution?",
+          html: `
       <div style="text-align:left">
         <p style="margin-bottom:12px;">
           You are about to submit your solution for review.
@@ -77,29 +81,28 @@ export default function ChallengeWorkspace({ challenge }: Props) {
         </p>
       </div>
     `,
-        icon: "warning",
-        width: 650,
-        background: "var(--surface)",
-        showCancelButton: true,
-        reverseButtons: true,
-        focusCancel: true,
-        confirmButtonText: "Yes, Submit",
-        cancelButtonText: "Cancel",
-        confirmButtonColor: "#16a34a",
-        cancelButtonColor: "#6b7280",
-        customClass: {
-          popup: "rounded-3xl",
-          title: "text-2xl font-bold text-[var(--text)]",
-          confirmButton: "rounded-xl px-6 py-3 font-semibold",
-          cancelButton: "rounded-xl px-6 py-3 font-semibold",
-        },
-      });
-      if (!result.isConfirmed) return;
-    }
+          icon: "warning",
+          width: 650,
+          background: "var(--surface)",
+          showCancelButton: true,
+          reverseButtons: true,
+          focusCancel: true,
+          confirmButtonText: "Yes, Submit",
+          cancelButtonText: "Cancel",
+          confirmButtonColor: "#16a34a",
+          cancelButtonColor: "#6b7280",
+          customClass: {
+            popup: "rounded-3xl",
+            title: "text-2xl font-bold text-[var(--text)]",
+            confirmButton: "rounded-xl px-6 py-3 font-semibold",
+            cancelButton: "rounded-xl px-6 py-3 font-semibold",
+          },
+        });
 
-    try {
-      setSubmitting(true);
-
+        if (!result.isConfirmed) return;
+      }
+      submittingRef.current = true;
+      setIsSubmitting(true);
       const res = await fetch("/api/solution_code_submit", {
         method: "PUT",
         headers: {
@@ -122,7 +125,18 @@ export default function ChallengeWorkspace({ challenge }: Props) {
         return;
       }
       setIsSubmitted(true);
-      if (!isAutoSubmit) {
+
+      if (autoSubmit) {
+        await MySwal.fire({
+          icon: "info",
+          title: reason === "leave" ? "Submitted" : "Time's Up!",
+          text:
+            reason === "leave"
+              ? "Your solution has been automatically submitted because you left the challenge."
+              : "Your time has ended. Your solution was automatically submitted.",
+          confirmButtonColor: "#2563eb",
+        });
+      } else {
         await MySwal.fire({
           icon: "success",
           title: "Submitted Successfully",
@@ -130,12 +144,10 @@ export default function ChallengeWorkspace({ challenge }: Props) {
           confirmButtonColor: "#16a34a",
         });
       }
+
       router.replace("/pages/developer/coding_challenge_lists");
-      if (isAutoSubmit) {
-        setIsSubmitted(true);
-        router.replace("/pages/developer/coding_challenge_lists");
-        return;
-      }
+
+      return;
     } catch (error) {
       console.error(error);
 
@@ -145,8 +157,8 @@ export default function ChallengeWorkspace({ challenge }: Props) {
         text: "Something went wrong. Please try again.",
       });
     } finally {
-      setSubmitting(false);
       submittingRef.current = false;
+      setIsSubmitting(false);
     }
   };
   useEffect(() => {
@@ -154,7 +166,6 @@ export default function ChallengeWorkspace({ challenge }: Props) {
       if (!challenge.start_time) return;
 
       const startTime = new Date(challenge.start_time).getTime();
-
       const duration = challenge.timeLimit * 60 * 1000;
       const endTime = startTime + duration;
 
@@ -162,8 +173,14 @@ export default function ChallengeWorkspace({ challenge }: Props) {
 
       setTimeLeft(remaining);
 
-      if (remaining === 0 && !isSubmitted && !submitting) {
-        handleSubmit(true);
+      if (
+        remaining === 0 &&
+        !autoSubmittedRef.current &&
+        !isSubmitted &&
+        !isSubmitting
+      ) {
+        handleSubmit(true, "timeout");
+        autoSubmittedRef.current = true;
       }
     };
 
@@ -172,97 +189,8 @@ export default function ChallengeWorkspace({ challenge }: Props) {
     const interval = setInterval(updateTimer, 1000);
 
     return () => clearInterval(interval);
-  }, [challenge.start_time, challenge.timeLimit, isSubmitted, submitting]);
-  useEffect(() => {
-    const beforeUnload = (e: BeforeUnloadEvent) => {
-      if (isSubmitted) return;
+  }, [challenge, isSubmitted, isSubmitting]);
 
-      e.preventDefault();
-      e.returnValue = "";
-    };
-
-    window.addEventListener("beforeunload", beforeUnload);
-
-    return () => {
-      window.removeEventListener("beforeunload", beforeUnload);
-    };
-  }, [isSubmitted]);
-  useEffect(() => {
-    const handleClick = async (e: MouseEvent) => {
-      if (isSubmitted) return;
-
-      const target = e.target as HTMLElement;
-
-      const link = target.closest("a");
-
-      if (!link) return;
-
-      e.preventDefault();
-
-      const result = await MySwal.fire({
-        title: "Leave Challenge?",
-        html: `
-      <p>
-      If you leave this page before submitting,
-      your current solution will be submitted automatically.
-      </p>
-
-      <br/>
-
-      <strong>
-      Are you sure you want to leave?
-      </strong>
-      `,
-        icon: "warning",
-        showCancelButton: true,
-        confirmButtonText: "Leave",
-        cancelButtonText: "Stay",
-        reverseButtons: true,
-      });
-
-      if (!result.isConfirmed) return;
-
-      await handleSubmit(true);
-
-      window.location.href = link.getAttribute("href")!;
-    };
-
-    document.addEventListener("click", handleClick);
-
-    return () => {
-      document.removeEventListener("click", handleClick);
-    };
-  }, [code, isSubmitted]);
-  useEffect(() => {
-    history.pushState(null, "", location.href);
-
-    const handlePopState = async () => {
-      if (isSubmitted) return;
-
-      history.pushState(null, "", location.href);
-
-      const result = await MySwal.fire({
-        title: "Leave Challenge?",
-        text: "Leaving this page will automatically submit your current solution.",
-        icon: "warning",
-        showCancelButton: true,
-        confirmButtonText: "Leave",
-        cancelButtonText: "Stay",
-      });
-
-      if (result.isConfirmed) {
-        await handleSubmit(true);
-
-        history.back();
-      }
-    };
-
-    window.addEventListener("popstate", handlePopState);
-
-    return () => {
-      window.removeEventListener("popstate", handlePopState);
-    };
-  }, [isSubmitted]);
   const formatTime = (seconds: number) => {
     const minutes = Math.floor(seconds / 60);
     const secs = seconds % 60;
@@ -271,6 +199,23 @@ export default function ChallengeWorkspace({ challenge }: Props) {
       .toString()
       .padStart(2, "0")}`;
   };
+
+  // page refresh
+  useEffect(() => {
+    const handleBeforeUnload = (e: BeforeUnloadEvent) => {
+      if (!isSubmitted && code !== challenge.starterCode) {
+        e.preventDefault();
+
+        e.returnValue = "";
+      }
+    };
+
+    window.addEventListener("beforeunload", handleBeforeUnload);
+
+    return () => {
+      window.removeEventListener("beforeunload", handleBeforeUnload);
+    };
+  }, [code, isSubmitted, challenge.starterCode]);
 
   return (
     <div className="h-screen flex flex-col bg-zinc-950 text-white">
@@ -375,12 +320,12 @@ export default function ChallengeWorkspace({ challenge }: Props) {
                   </div>
 
                   <button
-                    onClick={handleSubmit}
-                    disabled={submitting}
-                    className="bg-green-600 px-3 py-2 rounded-lg flex items-center gap-2 hover:bg-green-500 disabled:opacity-50"
+                    onClick={() => handleSubmit()}
+                    disabled={isSubmitting || isSubmitted}
+                    className="bg-green-600 px-3 py-2 rounded-lg flex items-center gap-2 hover:bg-green-500 disabled:opacity-50 disabled:cursor-not-allowed"
                   >
                     <Send size={16} />
-                    {submitting ? "Submitting..." : "Submit"}
+                    {isSubmitting ? "Submitting..." : "Submit"}
                   </button>
                 </div>
               </div>
