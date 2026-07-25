@@ -1,6 +1,7 @@
 "use client";
 
 import { useAuth } from "@/context/AuthContext";
+import { data } from "framer-motion/client";
 import { Filter, X } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
@@ -15,6 +16,8 @@ interface Challenge {
   title: string;
   difficulty: string;
   category: string;
+  submit_attempts: number;
+  maxAttempt: number;
 }
 
 export default function ChallengesPage() {
@@ -32,8 +35,8 @@ export default function ChallengesPage() {
   const [showFilter, setShowFilter] = useState(false);
   const { user } = useAuth();
   const [activeTab, setActiveTab] = useState<"available" | "completed">(
-  "available"
-);
+    "available",
+  );
   const [apiData, setApiData] = useState({
     available: [],
     completed: [],
@@ -212,6 +215,158 @@ export default function ChallengesPage() {
       });
     }
   };
+  const handleResubmitChallenge = async (
+    id: number,
+    submit_attempts: number,
+    maxAttempt: number,
+  ) => {
+    const result = await MySwal.fire({
+      title: "Start Challenge Resubmission",
+
+      html: (
+        <div className="mt-3 text-left">
+          {/* Hero */}
+          <div className="mb-5 flex items-center gap-4 rounded-2xl border border-(--border) bg-(--surface-hover) p-5">
+            <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-(--primary) text-white shadow-lg">
+              <LuClock3 size={30} />
+            </div>
+
+            <div>
+              <h3 className="text-lg font-semibold text-(--text)">
+                Your resubmission timer starts immediately
+              </h3>
+
+              <p className="mt-1 text-sm text-(--text-muted)">
+                Once you begin, the countdown cannot be paused or restarted.
+              </p>
+            </div>
+          </div>
+
+          {/* Rules */}
+          <div className="rounded-2xl border border-(--border) bg-(--surface-hover) p-5">
+            <h4 className="mb-4 text-base font-semibold text-(--text)">
+              Before you continue
+            </h4>
+
+            <div className="space-y-4">
+              <div className="flex items-start gap-3">
+                <div className="mt-0.5 rounded-full bg-green-100 p-1 text-green-600">
+                  <IoCheckmarkDone size={18} />
+                </div>
+
+                <p className="text-sm text-(--text-muted)">
+                  The timer starts immediately after you click{" "}
+                  <span className="font-semibold text-(--text)">
+                    Start Resubmission
+                  </span>
+                  .
+                </p>
+              </div>
+
+              <div className="flex items-start gap-3">
+                <div className="mt-0.5 rounded-full bg-amber-100 p-1 text-amber-600">
+                  <LuTimerReset size={18} />
+                </div>
+
+                <p className="text-sm text-(--text-muted)">
+                  The timer{" "}
+                  <strong>cannot be paused, restarted, or reset.</strong>
+                </p>
+              </div>
+
+              <div className="flex items-start gap-3 rounded-xl border border-red-200 bg-red-50 p-4">
+                <div className="mt-0.5 rounded-full bg-red-100 p-1 text-red-600">
+                  <LuShieldAlert size={18} />
+                </div>
+
+                <p className="text-sm font-medium text-red-700">
+                  Starting a resubmission will use{" "}
+                  <strong>1 additional attempt</strong>. You have used{" "}
+                  <strong>{submit_attempts}</strong> of{" "}
+                  <strong>{maxAttempt}</strong> attempts. After confirming, your
+                  remaining attempts will decrease by 1.
+                </p>
+              </div>
+            </div>
+          </div>
+
+          <p className="mt-5 text-center text-sm font-medium text-(--primary)">
+            Make sure you are ready before starting your resubmission.
+          </p>
+        </div>
+      ),
+
+      icon: undefined,
+
+      width: 720,
+      background: "var(--surface)",
+
+      showCancelButton: true,
+      reverseButtons: true,
+      focusCancel: true,
+
+      confirmButtonText: "Start Resubmission",
+      cancelButtonText: "Cancel",
+
+      confirmButtonColor: "#5B6CFF",
+      cancelButtonColor: "#CBD5E1",
+
+      customClass: {
+        popup: "rounded-3xl shadow-2xl",
+        title: "pt-4 text-3xl font-bold text-[var(--text)]",
+        confirmButton:
+          "rounded-xl px-7 py-3 font-semibold text-white flex items-center gap-2",
+        cancelButton: "rounded-xl px-7 py-3 font-semibold text-slate-700",
+      },
+    });
+
+    if (!result.isConfirmed) return;
+
+    try {
+      const res = await fetch("/api/solution_resubmit-start", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          userId: user.id, // তোমার login user id
+          challengeId: id,
+        }),
+      });
+
+      const data = await res.json();
+
+      if (!res.ok) {
+        if (data.code === "MAX_ATTEMPTS_REACHED") {
+          await MySwal.fire({
+            icon: "warning",
+            title: "Maximum Attempts Reached",
+            text: data.message,
+          });
+
+          return;
+        }
+
+        await MySwal.fire({
+          icon: "error",
+          title: "Unable to Start",
+          text: data.message,
+        });
+
+        return;
+      }
+
+      router.push(`/pages/developer/recode_editor/${id}?userId=${user.id}`);
+    } catch (error) {
+      console.error(error);
+
+      MySwal.fire({
+        icon: "error",
+        title: "Server Error",
+        text: "Something went wrong. Please try again.",
+      });
+    }
+  };
   if (loading) return <div className="p-10 text-center">Loading...</div>;
 
   return (
@@ -219,51 +374,44 @@ export default function ChallengesPage() {
       <div className="mb-6  items-center justify-between">
         <h1 className="text-3xl font-bold">Coding Challenge Lists</h1>
         <p className="mt-2 text-sm text-gray-500">
-  {activeTab === "available"
-    ? "Explore all available coding challenges and complete the ones that match your skills and interests."
-    : "Review your completed coding challenges and resubmit them if you still have attempts remaining."}
-</p>
-<div className="flex mt-5 gap-5 ">
-  <button
-  className={`px-4 py-2 rounded-lg ${
-    activeTab === "available"
-      ? "bg-blue-600 text-white"
-      : "border"
-  }`}
-  onClick={() => {
-    setActiveTab("available");
-    setTableData(apiData.available);
-  }}
->
-  All ({counts.available})
-</button>
+          {activeTab === "available"
+            ? "Explore all available coding challenges and complete the ones that match your skills and interests."
+            : "Review your completed coding challenges and resubmit them if you still have attempts remaining."}
+        </p>
+        <div className="flex mt-5 gap-5 ">
+          <button
+            className={`px-4 py-2 rounded-lg ${
+              activeTab === "available" ? "bg-blue-600 text-white" : "border"
+            }`}
+            onClick={() => {
+              setActiveTab("available");
+              setTableData(apiData.available);
+            }}
+          >
+            All ({counts.available})
+          </button>
 
-    
-{counts.completed > 0 && (
-  <button
-    className={`px-4 py-2 rounded-lg ${
-      activeTab === "completed"
-        ? "bg-blue-600 text-white"
-        : "border"
-    }`}
-    onClick={() => {
-      setActiveTab("completed");
-      setTableData(apiData.completed);
-    }}
-  >
-    Completed ({counts.completed})
-  </button>
-)}
-        <button
-          onClick={() => setShowFilter(!showFilter)}
-          className="flex items-center gap-2 rounded-lg border px-4 py-2 transition hover:bg-gray-100"
-        >
-          <Filter className="h-5 w-5" />
-          <span>Filters</span>
-        </button>
-
-</div>
-     
+          {counts.completed > 0 && (
+            <button
+              className={`px-4 py-2 rounded-lg ${
+                activeTab === "completed" ? "bg-blue-600 text-white" : "border"
+              }`}
+              onClick={() => {
+                setActiveTab("completed");
+                setTableData(apiData.completed);
+              }}
+            >
+              Completed ({counts.completed})
+            </button>
+          )}
+          <button
+            onClick={() => setShowFilter(!showFilter)}
+            className="flex items-center gap-2 rounded-lg border px-4 py-2 transition hover:bg-gray-100"
+          >
+            <Filter className="h-5 w-5" />
+            <span>Filters</span>
+          </button>
+        </div>
       </div>
       {showFilter && (
         <div className="mb-6 rounded-2xl border border-gray-200 bg-white p-6 shadow-sm">
@@ -393,15 +541,42 @@ export default function ChallengesPage() {
                 <td className="p-4">{item.category}</td>
 
                 <td className="p-4 text-center">
-                 <button
-  onClick={() => handleStartChallenge(item.id)}
-  className="px-4 py-2 rounded-lg text-white"
-  style={{ background: "var(--primary)" }}
->
-  {activeTab === "available"
-    ? "Complete Challenge"
-    : "View Submission"}
-</button>
+                  {activeTab === "available" ? (
+                    <button
+                      onClick={() => handleStartChallenge(item.id)}
+                      className="px-4 py-2 rounded-lg text-white"
+                      style={{ background: "var(--primary)" }}
+                    >
+                      Complete Challenge
+                    </button>
+                  ) : (
+                    <div className=" items-center gap-2">
+                      {item.submit_attempts >= item.maxAttempt ? (
+                        <button
+                          disabled
+                          className="px-4 py-2 rounded-lg bg-red-600 text-white cursor-not-allowed opacity-80"
+                        >
+                          Maximum Attempts Reached {item.submit_attempts} /{" "}
+                          {item.maxAttempt}
+                        </button>
+                      ) : (
+                        <button
+                          onClick={() =>
+                            handleResubmitChallenge(
+                              item.id,
+                              item.submit_attempts,
+                              item.maxAttempt,
+                            )
+                          }
+                          className="px-4 py-2 rounded-lg text-white"
+                          style={{ background: "var(--primary)" }}
+                        >
+                          Resubmit Challenge {item.submit_attempts} /{" "}
+                          {item.maxAttempt}
+                        </button>
+                      )}
+                    </div>
+                  )}
                 </td>
               </tr>
             ))}
