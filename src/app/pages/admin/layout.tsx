@@ -22,6 +22,10 @@ const routes = [
     name: "Ui-challenges-lists",
     path: "/pages/admin/ui-challenge-manage/ui-challenges-lists",
   },
+   {
+    name: "works-review",
+    path: "/pages/admin/work_types_selection",
+  },
 ];
 
 export default function AdminLayout({

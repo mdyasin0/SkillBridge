@@ -23,7 +23,7 @@
   --border: #1F2A44;
   --primary: #5B6CFF;
   --primary-hover: #7C8BFF;
-  --shadow: 0 10px 30px rgba(0, 0, 0, 0.35);
+  --shadow: 0 10px 30px rgba(5, 2, 2, 0.35);
 }
 
 body {
