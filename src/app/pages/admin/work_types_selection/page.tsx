@@ -18,7 +18,7 @@ export default function SelectOptionPage() {
   const router = useRouter();
   
 const challengeRoutes = {
-  logic: "/pages/developer/coding_challenge_lists",
+  logic: "/pages/admin/problem_solving_works",
   project: "/pages/admin/project-works",
 };
 

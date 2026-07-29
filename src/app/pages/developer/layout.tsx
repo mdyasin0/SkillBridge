@@ -7,6 +7,8 @@ const routes = [
   { name: "Home", path: "/" },
   { name: "Profile", path: "/pages/developer/create-profile" },
   { name: "Challenge", path: "/pages/developer/challenge_select" },
+  { name: "Main_Profile", path: "/pages/developer/main_profile" },
+  
  
 ];
 
