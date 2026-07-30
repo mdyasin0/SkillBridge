@@ -8,12 +8,60 @@ import PerformanceOverview from "../all_profile_pages/PerformanceOvervie/page";
 import ChallengeStatistics from "../all_profile_pages/ChallengeStatistics/page";
 import ChallengeHistorySection from "../all_profile_pages/ChallengeHistorySection/page";
 import Achievements from "../all_profile_pages/Achievements/page";
-
+import { useEffect, useState } from "react";
+import { useAuth } from "@/context/AuthContext";
+interface DeveloperProfileResponse {
+  success: boolean;
+  data: {
+    user_id: number;
+    name: string;
+    fullName: string;
+    user_photo: string;
+    developer_photo: string;
+    bio: string;
+  };
+  ranking: {
+    rank: number;
+    averageScore: string;
+  };
+  badgeSystem: {
+    totalBadgeNumber: number;
+  };
+}
 export default function DeveloperProfilePage() {
+  const [profile, setProfile] = useState<DeveloperProfileResponse | null>(null);
+  const { user } = useAuth();
+  const [loading, setLoading] = useState(true);
+  const userId = user.id;
+  useEffect(() => {
+    const fetchDeveloper = async () => {
+      try {
+        const res = await fetch(
+          `http://localhost:3000/api/developer_profile?userId=${userId}`,
+        );
+
+        const data = await res.json();
+
+        setProfile(data);
+      } catch (error) {
+        console.log(error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchDeveloper();
+  }, [userId]);
+  const developer = profile?.data;
+  const ranking = profile?.ranking;
+  const badge = profile?.badgeSystem;
+  if (loading) {
+    return <div>Loading...</div>;
+  }
   return (
     <div className="min-h-screen bg-slate-100">
       {/* Cover */}
-      <div className="relative h-96  w-full overflow-hidden bg-gradient-to-r from-indigo-700 via-blue-600 to-cyan-500">
+      <div className="relative h-96  w-full overflow-hidden bg-linear-to-r from-indigo-700 via-blue-600 to-cyan-500">
         <div className="absolute  inset-0 bg-black/20" />
 
         <div className=" mx-auto max-w-7xl px-6">
@@ -22,33 +70,41 @@ export default function DeveloperProfilePage() {
               {/* Left */}
               <div className="flex flex-col items-center gap-5 sm:flex-row">
                 <Image
-                  src="https://i.pravatar.cc/250"
-                  alt="profile"
+                  src={
+                    developer?.developer_photo ||
+                    developer?.user_photo ||
+                    "/default-user.png"
+                  }
+                  alt={developer?.fullName || "Developer"}
                   width={130}
                   height={130}
                   className="rounded-full border-4 border-white shadow-lg"
                 />
 
                 <div>
-                  <h1 className="text-3xl font-bold text-slate-900">
-                    Md Yasin
+                  <h1 className="text-3xl font-bold">
+                    {developer?.fullName || developer?.name}
                   </h1>
 
                   <div className="mt-2 flex flex-wrap items-center gap-2">
-                    <span className="flex items-center gap-1 rounded-full bg-green-100 px-3 py-1 text-sm font-medium text-green-700">
-                      <CheckCircle2 size={16} />
-                      Verified Full Stack Developer
-                    </span>
+                    {badge?.totalBadgeNumber > 0 ? (
+                      <span className="flex items-center gap-1 rounded-full bg-green-100 px-3 py-1 text-sm font-medium text-green-700">
+                        <CheckCircle2 size={16} />
+                        Verified Developer
+                      </span>
+                    ) : (
+                      <span className="rounded-full bg-gray-100 px-3 py-1 text-sm font-medium text-gray-600">
+                        Not Verified
+                      </span>
+                    )}
 
                     <span className="rounded-full bg-indigo-100 px-3 py-1 text-sm font-medium text-indigo-700">
-                      Rank #27
+                      Rank #{ranking?.rank}
                     </span>
                   </div>
 
                   <p className="mt-4 max-w-xl text-slate-600">
-                    Passionate Full Stack Developer focused on React, Next.js,
-                    Node.js and Problem Solving. Building real-world
-                    applications with scalable architecture.
+                    {developer?.bio}
                   </p>
                 </div>
               </div>
