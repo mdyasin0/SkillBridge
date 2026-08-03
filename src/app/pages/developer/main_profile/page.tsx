@@ -1,17 +1,31 @@
 "use client";
 
 import Image from "next/image";
-import { Pencil, Trophy, Star, Award, Flame, CheckCircle2 } from "lucide-react";
-import SkillAnalytics from "../all_profile_pages/SkillAnalytics/page";
+import {
+  Pencil,
+  Trophy,
+  CheckCircle2,
+  LoaderCircle,
+  FolderKanban,
+  Brain,
+  Target,
+  BadgeCheck,
+} from "lucide-react";
+
 import ProfileSectionThree from "../all_profile_pages/ProfileSectionThree/page";
 import PerformanceOverview from "../all_profile_pages/PerformanceOvervie/page";
 import ChallengeStatistics from "../all_profile_pages/ChallengeStatistics/page";
 import ChallengeHistorySection from "../all_profile_pages/ChallengeHistorySection/page";
-import Achievements from "../all_profile_pages/Achievements/page";
+
 import { useEffect, useState } from "react";
 import { useAuth } from "@/context/AuthContext";
 interface DeveloperProfileResponse {
   success: boolean;
+  completedChallenges: number;
+  pendingChallenges: number;
+  successRate: number;
+  project_challenge_average_score: string;
+  problem_solving_average_score: string;
   data: {
     user_id: number;
     name: string;
@@ -27,12 +41,22 @@ interface DeveloperProfileResponse {
   badgeSystem: {
     totalBadgeNumber: number;
   };
+  overallSkillScore: {
+    score: number;
+    maxScore: number;
+    breakdown: {
+      average: number;
+      difficulty: number;
+      badge: number;
+    };
+  };
 }
 export default function DeveloperProfilePage() {
   const [profile, setProfile] = useState<DeveloperProfileResponse | null>(null);
   const { user } = useAuth();
   const [loading, setLoading] = useState(true);
   const userId = user.id;
+  const overallSkillScore = profile?.overallSkillScore;
   useEffect(() => {
     const fetchDeveloper = async () => {
       try {
@@ -113,14 +137,17 @@ export default function DeveloperProfilePage() {
               <div className="flex flex-col items-center gap-5">
                 <div className="text-center">
                   <h2 className="text-sm text-slate-500">
-                    Overall Skill Score
+                    Overall Platform Performance Score
                   </h2>
 
                   <h1 className="mt-2 text-6xl font-extrabold text-indigo-600">
-                    91
+                    {overallSkillScore?.score ?? 0}
                   </h1>
 
-                  <p className="font-medium text-slate-500">out of 100</p>
+                  <p className="font-medium text-slate-500">
+                    {" "}
+                    out of {overallSkillScore?.maxScore ?? 100}{" "}
+                  </p>
                 </div>
 
                 <button className="flex items-center gap-2 rounded-xl bg-indigo-600 px-5 py-3 font-semibold text-white transition hover:bg-indigo-700">
@@ -140,42 +167,40 @@ export default function DeveloperProfilePage() {
       <div className="mx-auto grid max-w-7xl gap-6 px-6 md:grid-cols-2 xl:grid-cols-3">
         <StatCard
           title="Completed Challenges"
-          value="54"
+          value={String(profile?.completedChallenges ?? 0)}
           icon={<Trophy className="text-yellow-500" />}
         />
 
         <StatCard
           title="Running Challenges"
-          value="2"
-          icon={<Flame className="text-orange-500" />}
+          value={String(profile?.pendingChallenges ?? 0)}
+          icon={<LoaderCircle className="text-orange-500" />}
         />
 
         <StatCard
-          title="Average Score"
-          value="91%"
-          icon={<Star className="text-indigo-600" />}
+          title="Project Avg. Score"
+          value={`${profile?.project_challenge_average_score ?? "0"} / 100`}
+          icon={<FolderKanban className="text-indigo-600" />}
         />
-
+        <StatCard
+          title="Problem Solving Avg."
+          value={`${profile?.problem_solving_average_score ?? "0"} / 100`}
+          icon={<Brain className="text-cyan-600" />}
+        />
         <StatCard
           title="Success Rate"
-          value="96%"
-          icon={<CheckCircle2 className="text-green-600" />}
+          value={`${profile?.successRate ?? "0"}%`}
+          icon={<Target className="text-green-600" />}
         />
 
         <StatCard
           title="Verified Badges"
-          value="8"
-          icon={<Award className="text-pink-500" />}
-        />
-
-        <StatCard
-          title="Current Streak"
-          value="17 Days"
-          icon={<Flame className="text-red-500" />}
+          value={String(profile?.badgeSystem?.totalBadgeNumber ?? 0)}
+          icon={<BadgeCheck className="text-pink-500" />}
         />
       </div>
       {/* 1 */}
-      <SkillAnalytics />
+
       {/* 2 */}
       <ProfileSectionThree />
       {/* 3 */}
@@ -185,7 +210,6 @@ export default function DeveloperProfilePage() {
       {/* 5 */}
       <ChallengeHistorySection />
       {/* 6 */}
-      <Achievements />
     </div>
   );
 }
