@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { db } from "@/lib/db";
 
+
 export async function GET(req: NextRequest) {
   try {
     const { searchParams } = new URL(req.url);
@@ -170,6 +171,47 @@ export async function GET(req: NextRequest) {
 
 // succes rate system end
 
+// recent activity system start for submissions table
+const [recentProjectChallenges]: any = await db.query(
+  `
+  SELECT
+    uc.title,
+    s.score,
+        s.feedback,
+    s.updated_at
+  FROM submissions s
+  INNER JOIN uichallenge uc
+    ON uc.id = s.challenge_id
+  WHERE s.user_id = ?
+    AND s.status = 'submitted'
+    AND s.check_status = 'approved'
+  ORDER BY s.updated_at DESC
+  LIMIT 2
+  `,
+  [userId]
+  );
+// end
+// recent activity system for solution_submit table start 
+const [recentProblemSolving]: any = await db.query(
+  `
+  SELECT
+    c.title,
+      ss.score,
+        ss.feedback,
+    ss.updated_at
+    
+  FROM solution_submit ss
+  INNER JOIN challenges c
+    ON c.id = ss.challenge_id
+  WHERE ss.user_id = ?
+    AND ss.status = 'submitted'
+    AND ss.check_status = 'approved'
+  ORDER BY ss.updated_at DESC
+  LIMIT 2
+  `,
+  [userId]
+);
+// end
 
 
 
@@ -362,7 +404,23 @@ u.created_at ASC
     const rank =
       rankRows.findIndex((item: any) => item.id == Number(userId)) + 1;
     //   ranks system end
+
+
     //  badge system start
+    const [technologyBadges]: any = await db.query(`
+  SELECT
+    id,
+    title,
+    icon,
+    short_description
+  FROM technology_badges
+`);
+const badgeMap = new Map(
+  technologyBadges.map((badge: any) => [
+    badge.title.trim().toLowerCase(),
+    badge,
+  ])
+);
     const calculateBadges = (rows: any[], type: "project" | "problem") => {
       const approvedRows = rows.filter((item) => {
         return item.check_status === "approved";
@@ -382,37 +440,40 @@ u.created_at ASC
       });
 
       return Object.entries(grouped).map(([badgeName, list]) => {
-        const scores = list.map((item) => Number(item.score));
+  const scores = list.map((item) => Number(item.score));
 
-        const totalCompletedChallenges = list.length;
+  const totalCompletedChallenges = list.length;
 
-        const averageScore =
-          scores.reduce((sum, score) => sum + score, 0) / scores.length;
+  const averageScore =
+    scores.reduce((sum, score) => sum + score, 0) / scores.length;
 
-        const lowestScore = Math.min(...scores);
+  const lowestScore = Math.min(...scores);
 
-        const reviewStatus = true; // approved filter করা হয়েছে
+  const minimumCompleted = totalCompletedChallenges >= 5;
+  const averageCompleted = averageScore >= 80;
+  const minimumScore = lowestScore >= 80;
 
-        const minimumCompleted = totalCompletedChallenges >= 5;
+  const verified =
+    minimumCompleted &&
+    averageCompleted &&
+    minimumScore;
 
-        const averageCompleted = averageScore >= 80;
+  const badgeInfo =
+    badgeMap.get(badgeName.trim().toLowerCase()) ?? null;
 
-        const minimumScore = lowestScore >= 80;
+  return {
+    id: badgeInfo?.id ?? null,
+    badgeName,
+    icon: badgeInfo?.icon ?? null,
+    title: badgeInfo?.title ?? null,
+    short_description: badgeInfo?.short_description ?? null,
 
-        const verified =
-          reviewStatus && minimumCompleted && averageCompleted && minimumScore;
-
-        return {
-          badgeName,
-          totalCompletedChallenges,
-          averageScore: Number(averageScore.toFixed(2)),
-          minimumScore: minimumScore,
-          reviewStatus,
-          verified,
-        };
-      });
+    totalCompletedChallenges,
+    averageScore: Number(averageScore.toFixed(2)),
+    verified,
+  };
+});
     };
-
     const projectBadges = calculateBadges(submissions, "project");
 
     const problemBadges = calculateBadges(solutions, "problem");
@@ -542,7 +603,9 @@ successRate: Number(
         projectBadges,
         problemBadges,
       },
+recentProjectChallenges,
 
+recentProblemSolving,
       overallSkillScore: {
         score: overallSkillScore,
         maxScore: 100,

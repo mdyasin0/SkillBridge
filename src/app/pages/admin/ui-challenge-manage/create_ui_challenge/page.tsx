@@ -14,6 +14,18 @@ type FormData = {
 };
 
 export default function ChallengeForm() {
+  const technologies = [
+  "React",
+  "Next.js",
+  "Angular",
+  "Vue.js",
+  "Express.js",
+  "NestJS",
+  "Docker",
+  "Kubernetes",
+  "AWS",
+  "Git",
+];
   const [loading, setLoading] = useState(false);
   const [formData, setFormData] = useState<FormData>({
     title: "",
@@ -141,24 +153,30 @@ export default function ChallengeForm() {
           {/* Grid */}
           <div className="grid md:grid-cols-2 gap-6">
             {/* Technology */}
-            <div>
-              <label className="block mb-2 font-medium">
-                Technology
-              </label>
+          <div>
+  <label className="mb-2 block font-medium">
+    Technology
+  </label>
 
-              <input
-                type="text"
-                name="technology"
-                value={formData.technology}
-                onChange={handleChange}
-                placeholder="React / Node / Python"
-                className="w-full rounded-xl border px-4 py-3 outline-none"
-                style={{
-                  background: "var(--bg-secondary)",
-                  borderColor: "var(--border)",
-                }}
-              />
-            </div>
+  <select
+    name="technology"
+    value={formData.technology}
+    onChange={handleChange}
+    className="w-full rounded-xl border px-4 py-3 outline-none"
+    style={{
+      background: "var(--bg-secondary)",
+      borderColor: "var(--border)",
+    }}
+  >
+    <option value="">Select Technology</option>
+
+    {technologies.map((tech) => (
+      <option key={tech} value={tech}>
+        {tech}
+      </option>
+    ))}
+  </select>
+</div>
 
             {/* Difficulty */}
             <div>

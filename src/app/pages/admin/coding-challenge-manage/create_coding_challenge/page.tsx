@@ -139,10 +139,16 @@ export default function ProblemForm() {
               onChange={handleChange}
               className="w-full rounded-xl border border-(--border) bg-(--bg) p-3"
             >
-              <option value="React">React</option>
-              <option value="Node.js">Node.js</option>
-              <option value="Algorithm">Algorithm</option>
-              <option value="Database">Database</option>
+              <option value="React">JavaScript</option>
+              <option value="Node.js">TypeScript</option>
+              <option value="Algorithm">Python</option>
+              <option value="Database">Java</option>
+              <option value="React">C++</option>
+              <option value="Node.js">Go</option>
+              <option value="Algorithm">SQL</option>
+              <option value="Database">MongoDB</option>
+              <option value="Algorithm">Node.js</option>
+              <option value="Database">Data Structures & Algorithms</option>
             </select>
           </div>
 

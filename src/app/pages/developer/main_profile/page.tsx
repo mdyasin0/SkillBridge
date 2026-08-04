@@ -10,40 +10,90 @@ import {
   Brain,
   Target,
   BadgeCheck,
+  Star,
+  Award,
+  Activity,
+  Briefcase,
+  MapPin,
+  GraduationCap,
+  BriefcaseBusiness,
+  Globe,
+  Code2,
+  UserRound,
 } from "lucide-react";
-
-import ProfileSectionThree from "../all_profile_pages/ProfileSectionThree/page";
-import PerformanceOverview from "../all_profile_pages/PerformanceOvervie/page";
-import ChallengeStatistics from "../all_profile_pages/ChallengeStatistics/page";
-import ChallengeHistorySection from "../all_profile_pages/ChallengeHistorySection/page";
 
 import { useEffect, useState } from "react";
 import { useAuth } from "@/context/AuthContext";
+import { BsGithub } from "react-icons/bs";
+import { LiaLinkedin } from "react-icons/lia";
 interface DeveloperProfileResponse {
   success: boolean;
   completedChallenges: number;
   pendingChallenges: number;
-  successRate: number;
+  successRate: string;
   project_challenge_average_score: string;
   problem_solving_average_score: string;
+
   data: {
     user_id: number;
+    developer_profile_id: number;
+
     name: string;
     fullName: string;
+    email: string;
+    role: string;
+
     user_photo: string;
     developer_photo: string;
+
+    user_status: string;
+
     bio: string;
+
+    experienceYears: number;
+    experienceMonths: number;
+
+    country: string;
+    education: string;
+
+    skills: string;
+    techStack: string;
+    languages: string;
+
+    github: string;
+    portfolio: string;
+    linkedin: string;
+
+    user_created_at: string;
+    developer_created_at: string;
+    developer_updated_at: string;
   };
+
   ranking: {
     rank: number;
+    totalDevelopers: number;
+    approved: number;
     averageScore: string;
+    hard: number;
+    medium: number;
+    easy: number;
   };
+
   badgeSystem: {
-    totalBadgeNumber: number;
+    totalBadgeNumber: number | null | undefined;
+
+    projectBadges: Badge[];
+    problemBadges: Badge[];
   };
+
+  recentProjectChallenges: Challenge[];
+
+  recentProblemSolving: Challenge[];
+
   overallSkillScore: {
     score: number;
     maxScore: number;
+
     breakdown: {
       average: number;
       difficulty: number;
@@ -51,12 +101,92 @@ interface DeveloperProfileResponse {
     };
   };
 }
+
+interface Badge {
+  id: number | null;
+  badgeName: string;
+  title: string | null;
+  icon: string | null;
+  short_description: string | null;
+  totalCompletedChallenges: number;
+  averageScore: number;
+  verified: boolean;
+}
+
+interface Challenge {
+  title: string;
+  score: number | string;
+  feedback: string;
+  updated_at: string;
+}
 export default function DeveloperProfilePage() {
   const [profile, setProfile] = useState<DeveloperProfileResponse | null>(null);
   const { user } = useAuth();
   const [loading, setLoading] = useState(true);
   const userId = user.id;
   const overallSkillScore = profile?.overallSkillScore;
+  const getTimeAgo = (date: string) => {
+    const now = new Date();
+    const updated = new Date(date);
+
+    const seconds = Math.floor((now.getTime() - updated.getTime()) / 1000);
+
+    if (seconds < 60) return `${seconds} seconds ago`;
+
+    const minutes = Math.floor(seconds / 60);
+
+    if (minutes < 60) return `${minutes} minutes ago`;
+
+    const hours = Math.floor(minutes / 60);
+
+    if (hours < 24) return `${hours} hours ago`;
+
+    const days = Math.floor(hours / 24);
+
+    if (days < 30) return `${days} days ago`;
+
+    const months = Math.floor(days / 30);
+
+    if (months < 12) return `${months} months ago`;
+
+    const years = Math.floor(months / 12);
+
+    return `${years} years ago`;
+  };
+  const recentActivities = [
+    ...(profile?.recentProjectChallenges ?? []).map((item) => ({
+      ...item,
+      type: "Project Challenge",
+    })),
+
+    ...(profile?.recentProblemSolving ?? []).map((item) => ({
+      ...item,
+      type: "Problem Solving",
+    })),
+  ].sort(
+    (a, b) =>
+      new Date(b.updated_at).getTime() - new Date(a.updated_at).getTime(),
+  );
+  const latestFeedbacks = [
+    ...(profile?.recentProjectChallenges ?? []).map((item) => ({
+      ...item,
+      type: "Project Challenge",
+    })),
+
+    ...(profile?.recentProblemSolving ?? []).map((item) => ({
+      ...item,
+      type: "Problem Solving",
+    })),
+  ]
+    .filter((item) => item.feedback)
+    .sort(
+      (a, b) =>
+        new Date(b.updated_at).getTime() - new Date(a.updated_at).getTime(),
+    );
+  const verifiedBadges = [
+    ...(profile?.badgeSystem.projectBadges ?? []),
+    ...(profile?.badgeSystem.problemBadges ?? []),
+  ].filter((item) => item.verified);
   useEffect(() => {
     const fetchDeveloper = async () => {
       try {
@@ -83,13 +213,26 @@ export default function DeveloperProfilePage() {
     return <div>Loading...</div>;
   }
   return (
-    <div className="min-h-screen bg-slate-100">
+    <div className="pb-10 bg-slate-100">
       {/* Cover */}
-      <div className="relative h-96  w-full overflow-hidden bg-linear-to-r from-indigo-700 via-blue-600 to-cyan-500">
+      <div
+        className="relative h-90  w-full overflow-hidden "
+        style={{
+          background:
+            "linear-gradient(135deg,var(--primary),var(--primary-hover))",
+        }}
+      >
         <div className="absolute  inset-0 bg-black/20" />
 
         <div className=" mx-auto max-w-7xl px-6">
-          <div className="translate-y-20 rounded-3xl border border-white/20 bg-white p-6 shadow-2xl">
+          <div
+            className="translate-y-20 rounded-3xl border p-8 backdrop-blur-sm"
+            style={{
+              background: "color-mix(in srgb,var(--surface) 94%,transparent)",
+              borderColor: "var(--border)",
+              boxShadow: "var(--shadow)",
+            }}
+          >
             <div className="flex flex-col gap-6 lg:flex-row lg:items-center lg:justify-between">
               {/* Left */}
               <div className="flex flex-col items-center gap-5 sm:flex-row">
@@ -102,32 +245,61 @@ export default function DeveloperProfilePage() {
                   alt={developer?.fullName || "Developer"}
                   width={130}
                   height={130}
-                  className="rounded-full border-4 border-white shadow-lg"
+                  className="rounded-full border-4"
+                  style={{
+                    borderColor: "var(--surface)",
+                    boxShadow: "var(--shadow)",
+                  }}
                 />
 
                 <div>
-                  <h1 className="text-3xl font-bold">
+                  <h1
+                    className="text-4xl font-bold tracking-tight"
+                    style={{ color: "var(--text)" }}
+                  >
                     {developer?.fullName || developer?.name}
                   </h1>
 
                   <div className="mt-2 flex flex-wrap items-center gap-2">
-                    {badge?.totalBadgeNumber > 0 ? (
-                      <span className="flex items-center gap-1 rounded-full bg-green-100 px-3 py-1 text-sm font-medium text-green-700">
+                    {(profile?.badgeSystem?.totalBadgeNumber ?? 0) > 0 ? (
+                      <span
+                        className="flex items-center gap-2 rounded-full px-4 py-2 text-sm font-semibold"
+                        style={{
+                          background: "#DCFCE7",
+                          color: "#166534",
+                        }}
+                      >
                         <CheckCircle2 size={16} />
-                        Verified Developer
+                        Verified skills {badge?.totalBadgeNumber}
                       </span>
                     ) : (
-                      <span className="rounded-full bg-gray-100 px-3 py-1 text-sm font-medium text-gray-600">
+                      <span
+                        className="rounded-full  px-3 py-1 text-sm font-medium "
+                        style={{
+                          background: "var(--surface-hover)",
+                          color: "var(--text-muted)",
+                        }}
+                      >
                         Not Verified
                       </span>
                     )}
 
-                    <span className="rounded-full bg-indigo-100 px-3 py-1 text-sm font-medium text-indigo-700">
+                    <span
+                      className="rounded-full  px-3 py-1 text-sm font-medium "
+                      style={{
+                        background:
+                          "color-mix(in srgb,var(--primary) 12%,white)",
+                        color: "var(--primary)",
+                      }}
+                    >
                       Rank #{ranking?.rank}
                     </span>
                   </div>
 
-                  <p className="mt-4 max-w-xl text-slate-600">
+                  <p
+                    className="mt-4 max-w-xl "
+                    style={{ color: "var(--text-muted)" }}
+                  >
                     {developer?.bio}
                   </p>
                 </div>
@@ -150,7 +322,13 @@ export default function DeveloperProfilePage() {
                   </p>
                 </div>
 
-                <button className="flex items-center gap-2 rounded-xl bg-indigo-600 px-5 py-3 font-semibold text-white transition hover:bg-indigo-700">
+                <button
+                  className="flex items-center var(--primary-hover) gap-2 rounded-xl px-5 py-3 font-semibold  transition "
+                  style={{
+                    background: "var(--primary)",
+                    color: "#fff",
+                  }}
+                >
                   <Pencil size={18} />
                   Edit Profile
                 </button>
@@ -160,60 +338,735 @@ export default function DeveloperProfilePage() {
         </div>
       </div>
 
-      {/* spacing */}
-      <div className="h-28" />
-
+   
+      
+      {/* ===================== */}
+     
       {/* Quick Stats */}
-      <div className="mx-auto grid max-w-7xl gap-6 px-6 md:grid-cols-2 xl:grid-cols-3">
+      <div className="mx-auto pt-10 grid max-w-7xl gap-6 px-6 md:grid-cols-2 xl:grid-cols-3">
         <StatCard
           title="Completed Challenges"
           value={String(profile?.completedChallenges ?? 0)}
-          icon={<Trophy className="text-yellow-500" />}
+          icon={<Trophy />}
         />
 
         <StatCard
           title="Running Challenges"
           value={String(profile?.pendingChallenges ?? 0)}
-          icon={<LoaderCircle className="text-orange-500" />}
+          icon={<LoaderCircle />}
         />
 
         <StatCard
           title="Project Avg. Score"
           value={`${profile?.project_challenge_average_score ?? "0"} / 100`}
-          icon={<FolderKanban className="text-indigo-600" />}
+          icon={<FolderKanban />}
         />
         <StatCard
           title="Problem Solving Avg."
           value={`${profile?.problem_solving_average_score ?? "0"} / 100`}
-          icon={<Brain className="text-cyan-600" />}
+          icon={<Brain />}
         />
         <StatCard
           title="Success Rate"
           value={`${profile?.successRate ?? "0"}%`}
-          icon={<Target className="text-green-600" />}
+          icon={<Target />}
         />
 
         <StatCard
           title="Verified Badges"
           value={String(profile?.badgeSystem?.totalBadgeNumber ?? 0)}
-          icon={<BadgeCheck className="text-pink-500" />}
+          icon={<BadgeCheck />}
         />
       </div>
-      {/* 1 */}
+{/* ========================== */}
 
-      {/* 2 */}
-      <ProfileSectionThree />
-      {/* 3 */}
-      <PerformanceOverview />
-      {/* 4 */}
-      <ChallengeStatistics />
-      {/* 5 */}
-      <ChallengeHistorySection />
-      {/* 6 */}
+ <section
+        className="rounded-3xl max-w-6xl mx-auto mt-10 border p-8"
+        style={{
+          background: "var(--surface)",
+          borderColor: "var(--border)",
+          boxShadow: "var(--shadow)",
+        }}
+      >
+        <div
+          className="mb-8 flex items-center justify-between border-b pb-6"
+          style={{ borderColor: "var(--border)" }}
+        >
+          <div>
+            <h2 className="text-2xl font-bold" style={{ color: "var(--text)" }}>
+              Experience & Background
+            </h2>
+
+            <p style={{ color: "var(--text-muted)" }}>
+              Professional experience and education.
+            </p>
+          </div>
+
+          <UserRound size={28} style={{ color: "var(--primary)" }} />
+        </div>
+
+        <div className="grid gap-5 md:grid-cols-2">
+          <InfoCard
+            icon={<Briefcase />}
+            title="Experience"
+            value={`${developer?.experienceYears} Years ${developer?.experienceMonths} Months`}
+          />
+
+          <InfoCard
+            icon={<MapPin />}
+            title="Country"
+            value={developer?.country ?? "Not provided"}
+          />
+
+          <InfoCard
+            icon={<GraduationCap />}
+            title="Education"
+            value={developer?.education ?? "Not provided"}
+          />
+
+          <InfoCard
+            icon={<Award />}
+            title="Role"
+            value={developer?.role ?? "Developer"}
+          />
+        </div>
+      </section>
+
+      {/* ================== */}
+         {/* =============================== */}
+
+      <section
+        className="rounded-3xl mt-10 max-w-6xl mx-auto border p-8"
+        style={{
+          background: "var(--surface)",
+          borderColor: "var(--border)",
+          boxShadow: "var(--shadow)",
+        }}
+      >
+        <div
+          className="mb-8 flex items-center justify-between border-b pb-6"
+          style={{ borderColor: "var(--border)" }}
+        >
+          <div>
+            <h2 className="text-2xl font-bold" style={{ color: "var(--text)" }}>
+              Skills & Technologies
+            </h2>
+
+            <p className="mt-1" style={{ color: "var(--text-muted)" }}>
+              Technical expertise and programming skills.
+            </p>
+          </div>
+
+          <Code2 size={28} style={{ color: "var(--primary)" }} />
+        </div>
+
+        <div className="space-y-7">
+          <div>
+            <h4 className="mb-3 font-semibold" style={{ color: "var(--text)" }}>
+              Skills
+            </h4>
+
+            <div className="flex flex-wrap gap-3">
+              {JSON.parse(developer?.skills || "[]").map((skill: string) => (
+                <span
+                  key={skill}
+                  className="rounded-full px-4 py-2 text-sm font-medium"
+                  style={{
+                    background:
+                      "color-mix(in srgb,var(--primary) 10%,transparent)",
+                    color: "var(--primary)",
+                  }}
+                >
+                  {skill}
+                </span>
+              ))}
+            </div>
+          </div>
+
+          <div>
+            <h4 className="mb-2 font-semibold" style={{ color: "var(--text)" }}>
+              Tech Stack
+            </h4>
+
+            <p style={{ color: "var(--text-muted)" }}>{developer?.techStack}</p>
+          </div>
+
+          <div>
+            <h4 className="mb-3 font-semibold" style={{ color: "var(--text)" }}>
+              Languages
+            </h4>
+
+            <div className="flex flex-wrap gap-3">
+              {JSON.parse(developer?.languages || "[]").map((lang: string) => (
+                <span
+                  key={lang}
+                  className="rounded-full px-4 py-2 text-sm"
+                  style={{
+                    background: "var(--surface-hover)",
+                    color: "var(--text)",
+                  }}
+                >
+                  {lang}
+                </span>
+              ))}
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* ========================= */}
+      {/* =================== */}
+      <section
+        className="rounded-3xl mt-10  max-w-6xl mx-auto border p-8"
+        style={{
+          background: "var(--surface)",
+          borderColor: "var(--border)",
+          boxShadow: "var(--shadow)",
+        }}
+      >
+        <div
+          className="mb-8 flex items-center justify-between border-b pb-6"
+          style={{ borderColor: "var(--border)" }}
+        >
+          <div>
+            <h2 className="text-2xl font-bold" style={{ color: "var(--text)" }}>
+              Professional Links
+            </h2>
+
+            <p style={{ color: "var(--text-muted)" }}>
+              Connect through professional platforms.
+            </p>
+          </div>
+
+          <Globe size={28} style={{ color: "var(--primary)" }} />
+        </div>
+
+        <div className="grid gap-5 md:grid-cols-3">
+          <a
+            href={developer?.github}
+            target="_blank"
+            className="rounded-2xl border p-5 transition hover:-translate-y-1"
+            style={{
+              borderColor: "var(--border)",
+            }}
+          >
+            <BsGithub className="mb-4" />
+
+            <h4>GitHub</h4>
+
+            <p className="mt-2 text-sm" style={{ color: "var(--text-muted)" }}>
+              View repositories
+            </p>
+          </a>
+
+          <a
+            href={developer?.portfolio}
+            target="_blank"
+            className="rounded-2xl border p-5 transition hover:-translate-y-1"
+            style={{
+              borderColor: "var(--border)",
+            }}
+          >
+            <BriefcaseBusiness className="mb-4" />
+
+            <h4>Portfolio</h4>
+
+            <p className="mt-2 text-sm" style={{ color: "var(--text-muted)" }}>
+              Visit portfolio
+            </p>
+          </a>
+
+          <a
+            href={developer?.linkedin}
+            target="_blank"
+            className="rounded-2xl border p-5 transition hover:-translate-y-1"
+            style={{
+              borderColor: "var(--border)",
+            }}
+          >
+            <LiaLinkedin className="mb-4" />
+
+            <h4>LinkedIn</h4>
+
+            <p className="mt-2 text-sm" style={{ color: "var(--text-muted)" }}>
+              Professional profile
+            </p>
+          </a>
+        </div>
+      </section>
+      {/* ========================= */}
+      <div className="mx-auto mt-10 max-w-7xl space-y-8 px-6">
+        {/* ================= VERIFIED BADGES ================= */}
+
+        <section
+          className="rounded-3xl  p-8 shadow-sm"
+          style={{
+            background: "var(--surface)",
+            borderColor: "var(--border)",
+            boxShadow: "var(--shadow)",
+          }}
+        >
+          <div className="mb-8 flex items-center justify-between">
+            <div>
+              <h2
+                className="text-2xl font-bold "
+                style={{ color: "var(--text)" }}
+              >
+                Verified Badges ({verifiedBadges.length})
+              </h2>
+
+              <p className="mt-1" style={{ color: "var(--text-muted)" }}>
+                Badges earned from verified assessments.
+              </p>
+            </div>
+
+            <Award className="text-indigo-600" size={34} />
+          </div>
+
+          <div className="grid gap-5 md:grid-cols-2 xl:grid-cols-5">
+            {verifiedBadges.length > 0 ? (
+              verifiedBadges.map((badge) => (
+                <div
+                  key={`${badge.badgeName}-${badge.id}`}
+                  className="rounded-2xl border  p-6 transition hover:-translate-y-1 hover:shadow-lg"
+                  style={{
+                    background: "var(--surface)",
+                    borderColor: "var(--border)",
+                    boxShadow: "var(--shadow)",
+                  }}
+                >
+                  <div
+                    className="mb-4 flex h-16 w-16 items-center justify-center rounded-xl "
+                    style={{
+                      background:
+                        "color-mix(in srgb,var(--primary) 10%,transparent)",
+                    }}
+                  >
+                    <Image
+                      src={badge.icon || "/default-badge.png"}
+                      alt={badge.title || badge.badgeName}
+                      width={40}
+                      height={40}
+                    />
+                  </div>
+
+                  <h3
+                    className="mt-5 text-lg font-semibold"
+                    style={{ color: "var(--text)" }}
+                  >
+                    {badge.title || badge.badgeName}
+                  </h3>
+
+                  <p
+                    className="mt-3 text-sm leading-6"
+                    style={{ color: "var(--text-muted)" }}
+                  >
+                    {badge.short_description ??
+                      "Successfully verified by completing platform assessments."}
+                  </p>
+                </div>
+              ))
+            ) : (
+              <div
+                className="col-span-full rounded-3xl border border-dashed py-14 text-center"
+                style={{
+                  borderColor: "var(--border)",
+                }}
+              >
+                <div
+                  className="mx-auto flex h-20 w-20 items-center justify-center rounded-full"
+                  style={{
+                    background:
+                      "color-mix(in srgb,var(--primary) 10%,transparent)",
+                    color: "var(--primary)",
+                  }}
+                >
+                  <Award size={38} />
+                </div>
+
+                <h3
+                  className="mt-6 text-xl font-semibold"
+                  style={{ color: "var(--text)" }}
+                >
+                  No Verified Badges Yet
+                </h3>
+
+                <p
+                  className="mx-auto mt-3 max-w-md leading-7"
+                  style={{ color: "var(--text-muted)" }}
+                >
+                  Complete more verified challenges and maintain strong
+                  performance to unlock your first badge.
+                </p>
+              </div>
+            )}
+          </div>
+        </section>
+
+        {/* ================= RECENT ACTIVITY ================= */}
+
+        <section
+          className="rounded-3xl border p-8"
+          style={{
+            background: "var(--surface)",
+            borderColor: "var(--border)",
+            boxShadow: "var(--shadow)",
+          }}
+        >
+          {/* Header */}
+          <div
+            className="mb-8 flex items-center justify-between border-b pb-6"
+            style={{ borderColor: "var(--border)" }}
+          >
+            <div>
+              <h2
+                className="text-2xl font-bold"
+                style={{ color: "var(--text)" }}
+              >
+                Recent Activity
+              </h2>
+
+              <p
+                className="mt-1 text-sm"
+                style={{ color: "var(--text-muted)" }}
+              >
+                Your latest approved challenge activities.
+              </p>
+            </div>
+
+            <div
+              className="flex h-12 w-12 items-center justify-center rounded-2xl"
+              style={{
+                background: "rgba(91,108,255,.12)",
+              }}
+            >
+              <Activity size={24} style={{ color: "var(--primary)" }} />
+            </div>
+          </div>
+
+          {/* Activity List */}
+
+          <div className="space-y-4">
+            {recentActivities.length > 0 ? (
+              recentActivities.map((item, index) => (
+                <div
+                  key={index}
+                  className="flex items-start gap-4 rounded-2xl border p-5 transition-all hover:bg-(--surface-hover)
+hover:shadow-lg duration-300 hover:-translate-y-1"
+                  style={{
+                    background: "var(--surface)",
+                    borderColor: "var(--border)",
+                  }}
+                >
+                  {/* Icon */}
+
+                  <div
+                    className="flex h-11 w-11 items-center justify-center rounded-xl shrink-0"
+                    style={{
+                      background: "rgba(34,197,94,.12)",
+                    }}
+                  >
+                    <CheckCircle2 size={20} className="text-green-600" />
+                  </div>
+
+                  {/* Content */}
+
+                  <div className="flex-1">
+                    <h3
+                      className="font-semibold"
+                      style={{ color: "var(--text)" }}
+                    >
+                      {item.title}
+                    </h3>
+
+                    <div className="mt-3 flex flex-wrap items-center gap-2">
+                      <span
+                        className="rounded-full px-3 py-1 text-xs font-semibold"
+                        style={{
+                          background: "rgba(91,108,255,.12)",
+                          color: "var(--primary)",
+                        }}
+                      >
+                        {item.type}
+                      </span>
+
+                      <span style={{ color: "var(--text-muted)" }}>•</span>
+
+                      <span
+                        className="text-sm"
+                        style={{ color: "var(--text-muted)" }}
+                      >
+                        {getTimeAgo(item.updated_at)}
+                      </span>
+                    </div>
+                  </div>
+                </div>
+              ))
+            ) : (
+              <div
+                className="rounded-2xl border border-dashed py-16 text-center"
+                style={{
+                  borderColor: "var(--border)",
+                }}
+              >
+                <div
+                  className="mx-auto mb-5 flex h-16 w-16 items-center justify-center rounded-2xl"
+                  style={{
+                    background: "rgba(91,108,255,.10)",
+                  }}
+                >
+                  <Activity size={30} style={{ color: "var(--primary)" }} />
+                </div>
+
+                <h3
+                  className="text-lg font-semibold"
+                  style={{ color: "var(--text)" }}
+                >
+                  No Recent Activity
+                </h3>
+
+                <p className="mt-2" style={{ color: "var(--text-muted)" }}>
+                  Your approved submissions will appear here once they are
+                  reviewed.
+                </p>
+              </div>
+            )}
+          </div>
+        </section>
+      </div>
+
+      {/* ================= LATEST ADMIN FEEDBACK ================= */}
+
+      <section
+        className="mx-auto mt-10 max-w-6xl rounded-3xl border"
+        style={{
+          background: "var(--surface)",
+          borderColor: "var(--border)",
+          boxShadow: "var(--shadow)",
+        }}
+      >
+        {/* Header */}
+
+        <div
+          className="flex items-center justify-between border-b px-8 py-6"
+          style={{ borderColor: "var(--border)" }}
+        >
+          <div>
+            <h2 className="text-2xl font-bold" style={{ color: "var(--text)" }}>
+              Latest Admin Feedback
+            </h2>
+
+            <p className="mt-1 text-sm" style={{ color: "var(--text-muted)" }}>
+              Feedback received from approved challenge reviews.
+            </p>
+          </div>
+        </div>
+
+        {/* Feedback Cards */}
+
+        <div className="grid gap-6 p-8 md:grid-cols-2">
+          {latestFeedbacks.length > 0 ? (
+            latestFeedbacks.map((item, index) => (
+              <div
+                key={index}
+                className="rounded-2xl border hover:bg-(--surface-hover)
+hover:shadow-lg p-6 transition-all duration-300 hover:-translate-y-1"
+                style={{
+                  background: "var(--surface)",
+                  borderColor: "var(--border)",
+                }}
+              >
+                {/* Top */}
+
+                <div className="flex items-start justify-between gap-5">
+                  <div className="flex-1">
+                    <h3
+                      className="text-lg font-semibold"
+                      style={{ color: "var(--text)" }}
+                    >
+                      {item.title}
+                    </h3>
+
+                    <div className="mt-3 flex flex-wrap items-center gap-2">
+                      <span
+                        className="rounded-full px-3 py-1 text-xs font-semibold"
+                        style={{
+                          background: "rgba(91,108,255,.12)",
+                          color: "var(--primary)",
+                        }}
+                      >
+                        {item.type}
+                      </span>
+
+                      <span
+                        className="text-sm"
+                        style={{
+                          color: "var(--text-muted)",
+                        }}
+                      >
+                        {getTimeAgo(item.updated_at)}
+                      </span>
+                    </div>
+                  </div>
+
+                  {/* Score */}
+
+                  <div
+                    className=" flex items-center gap-2 rounded-2xl px-4 py-3 text-center"
+                    style={{
+                      background: "rgba(245,158,11,.12)",
+                    }}
+                  >
+                    <p
+                      className="text-xl font-bold"
+                      style={{
+                        color: "var(--text)",
+                      }}
+                    >
+                      {Number(item.score).toFixed(0)}
+                    </p>
+
+                    <span
+                      className="text-xs"
+                      style={{
+                        color: "var(--text-muted)",
+                      }}
+                    >
+                      Score
+                    </span>
+                  </div>
+                </div>
+
+                {/* Feedback */}
+
+                <div
+                  className="mt-6 rounded-2xl p-4"
+                  style={{
+                    background: "var(--surface-hover)",
+                  }}
+                >
+                  <p
+                    className="line-clamp-4 leading-7"
+                    style={{
+                      color: "var(--text-muted)",
+                    }}
+                  >
+                    {item.feedback}
+                  </p>
+                </div>
+
+                {/* Footer */}
+
+                <div
+                  className="mt-6 flex items-center justify-between border-t pt-4"
+                  style={{
+                    borderColor: "var(--border)",
+                  }}
+                >
+                  <span
+                    className="text-sm"
+                    style={{
+                      color: "var(--text-muted)",
+                    }}
+                  >
+                    Reviewed By
+                  </span>
+
+                  <span
+                    className="font-semibold"
+                    style={{
+                      color: "var(--primary)",
+                    }}
+                  >
+                    Platform Admin
+                  </span>
+                </div>
+              </div>
+            ))
+          ) : (
+            <div
+              className="col-span-full rounded-2xl border border-dashed py-16 text-center"
+              style={{
+                borderColor: "var(--border)",
+              }}
+            >
+              <div
+                className="mx-auto mb-5 flex h-16 w-16 items-center justify-center rounded-2xl"
+                style={{
+                  background: "rgba(91,108,255,.10)",
+                }}
+              >
+                <Star
+                  size={28}
+                  style={{
+                    color: "var(--primary)",
+                  }}
+                />
+              </div>
+
+              <h3
+                className="text-lg font-semibold"
+                style={{
+                  color: "var(--text)",
+                }}
+              >
+                No Feedback Yet
+              </h3>
+
+              <p
+                className="mt-2"
+                style={{
+                  color: "var(--text-muted)",
+                }}
+              >
+                Feedback from reviewers will appear here after your submissions
+                are evaluated.
+              </p>
+            </div>
+          )}
+        </div>
+      </section>
     </div>
   );
 }
+function InfoCard({
+  icon,
+  title,
+  value,
+}: {
+  icon: React.ReactNode;
+  title: string;
+  value: string;
+}) {
+  return (
+    <div
+      className="flex items-center gap-4 rounded-2xl border p-5"
+      style={{
+        borderColor: "var(--border)",
+      }}
+    >
+      <div
+        className="flex h-12 w-12 items-center justify-center rounded-xl"
+        style={{
+          background: "color-mix(in srgb,var(--primary) 10%,transparent)",
+          color: "var(--primary)",
+        }}
+      >
+        {icon}
+      </div>
 
+      <div>
+        <p className="text-sm" style={{ color: "var(--text-muted)" }}>
+          {title}
+        </p>
+
+        <h3 className="font-semibold" style={{ color: "var(--text)" }}>
+          {value}
+        </h3>
+      </div>
+    </div>
+  );
+}
 type CardProps = {
   title: string;
   value: string;
@@ -222,14 +1075,39 @@ type CardProps = {
 
 function StatCard({ title, value, icon }: CardProps) {
   return (
-    <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm transition hover:-translate-y-1 hover:shadow-xl">
+    <div
+      className="group rounded-3xl border p-6 transition-all duration-300 hover:-translate-y-1"
+      style={{
+        background: "var(--surface)",
+        borderColor: "var(--border)",
+        boxShadow: "var(--shadow)",
+      }}
+    >
       <div className="flex items-center justify-between">
-        <div className="rounded-xl bg-slate-100 p-3">{icon}</div>
+        <div
+          className="flex h-14 w-14 items-center justify-center rounded-2xl transition-all duration-300 group-hover:scale-105"
+          style={{
+            background: "color-mix(in srgb,var(--primary) 10%,transparent)",
+            color: "var(--primary)",
+          }}
+        >
+          {icon}
+        </div>
 
         <div className="text-right">
-          <p className="text-sm text-slate-500">{title}</p>
+          <p
+            className="text-sm font-medium"
+            style={{ color: "var(--text-muted)" }}
+          >
+            {title}
+          </p>
 
-          <h2 className="mt-1 text-3xl font-bold text-slate-900">{value}</h2>
+          <h2
+            className="mt-2 text-4xl font-black tracking-tight"
+            style={{ color: "var(--text)" }}
+          >
+            {value}
+          </h2>
         </div>
       </div>
     </div>
