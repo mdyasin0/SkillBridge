@@ -5,14 +5,14 @@ import { usePathname } from "next/navigation";
 
 const routes = [
   { name: "Home", path: "/" },
-  { name: "Profile", path: "/pages/developer/create-profile" },
+  { name: "profile-setup", path: "/pages/recruiter/profile-setup" },
   { name: "Challenge", path: "/pages/developer/challenge_select" },
   { name: "Main_Profile", path: "/pages/developer/main_profile" },
   
  
 ];
 
-export default function Developerayout({
+export default function RecruiterLayout({
   children,
 }: {
   children: React.ReactNode;
@@ -29,7 +29,7 @@ export default function Developerayout({
           borderColor: "var(--border)",
         }}
       >
-        <h2 className="text-xl font-semibold mb-6">Developer Panel</h2>
+        <h2 className="text-xl font-semibold mb-6">Recruiter Panel</h2>
 
         <nav className="flex flex-col gap-2">
           {routes.map((route) => {

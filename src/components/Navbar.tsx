@@ -48,7 +48,7 @@ const Navbar = () => {
           <div className="w-px h-5 bg-(--border) mx-2" />
 
           <Link href="/dashboard">Dashboard</Link>
-          <Link href="/recruiter/dashboard">Recruiter</Link>
+          <Link href="/pages/recruiter">Recruiter</Link>
           
            <Link href="/pages/developer">Developer</Link>
           <Link href="/pages/admin">Admin</Link>
