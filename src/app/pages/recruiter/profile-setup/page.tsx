@@ -2,7 +2,7 @@
 
 import { useAuth } from "@/context/AuthContext";
 import Image from "next/image";
-import { ChangeEvent, FormEvent, useEffect, useMemo, useState } from "react";
+import { ChangeEvent, FormEvent, useMemo, useState } from "react";
 
 type FormData = {
   profilePhoto: File | string | null;
@@ -1015,7 +1015,7 @@ const handleSubmit = async (e: FormEvent) => {
                   <div className="flex items-center gap-5">
                     <div className="flex h-20 w-20 shrink-0 items-center justify-center overflow-hidden rounded-xl border border-slate-200 bg-slate-100">
                       {companyLogoPreview ? (
-                        <img
+                        <Image
                           src={companyLogoPreview}
                           alt="Company logo preview"
                           className="h-full w-full object-cover"

@@ -12,6 +12,7 @@ const profileSchema = z.object({
     message: "Profile photo is required",
   }),
   fullName: z.string().trim().min(3, "Full name is required"),
+  title: z.string().trim().min(3, "Title is required"),
   bio: z
     .string()
     .min(20, "Bio must be at least 20 characters")
@@ -57,6 +58,7 @@ export default function CompleteProfilePage() {
 
     defaultValues: {
       fullName: "",
+      title: "",
       bio: "",
       experienceYears: 0,
 
@@ -109,6 +111,7 @@ export default function CompleteProfilePage() {
         userId,
         photo: photoURL,
         fullName: data.fullName,
+         title: data.title,
         bio: data.bio,
         experienceYears: data.experienceYears,
         experienceMonths: data.experienceMonths,
@@ -263,6 +266,22 @@ export default function CompleteProfilePage() {
             {errors.fullName && (
               <p className="mt-1 text-sm text-red-500">
                 {errors.fullName.message}
+              </p>
+            )}
+          </div>
+              {/* Title */}
+          <div>
+            <label className="mb-2 block font-medium">Title</label>
+
+            <input
+              {...register("title")}
+              placeholder="Enter your full name"
+              className="w-full rounded-lg border border-(--border) bg-(--bg-secondary) p-3 outline-none focus:border-(--primary)"
+            />
+
+            {errors.title && (
+              <p className="mt-1 text-sm text-red-500">
+                {errors.title.message}
               </p>
             )}
           </div>

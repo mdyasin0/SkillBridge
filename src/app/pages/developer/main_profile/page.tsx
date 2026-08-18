@@ -338,10 +338,8 @@ export default function DeveloperProfilePage() {
         </div>
       </div>
 
-   
-      
       {/* ===================== */}
-     
+
       {/* Quick Stats */}
       <div className="mx-auto pt-10 grid max-w-7xl gap-6 px-6 md:grid-cols-2 xl:grid-cols-3">
         <StatCard
@@ -378,9 +376,9 @@ export default function DeveloperProfilePage() {
           icon={<BadgeCheck />}
         />
       </div>
-{/* ========================== */}
+      {/* ========================== */}
 
- <section
+      <section
         className="rounded-3xl max-w-6xl mx-auto mt-10 border p-8"
         style={{
           background: "var(--surface)",
@@ -433,7 +431,7 @@ export default function DeveloperProfilePage() {
       </section>
 
       {/* ================== */}
-         {/* =============================== */}
+      {/* =============================== */}
 
       <section
         className="rounded-3xl mt-10 max-w-6xl mx-auto border p-8"

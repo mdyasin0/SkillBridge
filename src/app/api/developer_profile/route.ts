@@ -1,7 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { db } from "@/lib/db";
 
-
 export async function GET(req: NextRequest) {
   try {
     const { searchParams } = new URL(req.url);
@@ -121,10 +120,10 @@ export async function GET(req: NextRequest) {
 
     // completed challenges count end
 
-  //  success rate system start
+    //  success rate system start
 
-  const [[successRate]]: any = await db.query(
-  `
+    const [[successRate]]: any = await db.query(
+      `
   SELECT
     (
       (
@@ -165,15 +164,14 @@ export async function GET(req: NextRequest) {
       0
     ) AS success_rate
   `,
-  [userId, userId, userId, userId],
-);
+      [userId, userId, userId, userId],
+    );
 
+    // succes rate system end
 
-// succes rate system end
-
-// recent activity system start for submissions table
-const [recentProjectChallenges]: any = await db.query(
-  `
+    // recent activity system start for submissions table
+    const [recentProjectChallenges]: any = await db.query(
+      `
   SELECT
     uc.title,
     s.score,
@@ -188,12 +186,12 @@ const [recentProjectChallenges]: any = await db.query(
   ORDER BY s.updated_at DESC
   LIMIT 2
   `,
-  [userId]
-  );
-// end
-// recent activity system for solution_submit table start 
-const [recentProblemSolving]: any = await db.query(
-  `
+      [userId],
+    );
+    // end
+    // recent activity system for solution_submit table start
+    const [recentProblemSolving]: any = await db.query(
+      `
   SELECT
     c.title,
       ss.score,
@@ -209,17 +207,13 @@ const [recentProblemSolving]: any = await db.query(
   ORDER BY ss.updated_at DESC
   LIMIT 2
   `,
-  [userId]
-);
-// end
+      [userId],
+    );
+    // end
 
-
-
-
-
-  // Average Challenge Scores start
-const [[averageChallengeScore]]: any = await db.query(
-  `
+    // Average Challenge Scores start
+    const [[averageChallengeScore]]: any = await db.query(
+      `
   SELECT
     (
       COALESCE(
@@ -265,10 +259,9 @@ const [[averageChallengeScore]]: any = await db.query(
       )
     ) AS problem_solving_average_score
   `,
-  [userId, userId, userId, userId],
-);
-// Average Challenge Scores end
-    
+      [userId, userId, userId, userId],
+    );
+    // Average Challenge Scores end
 
     // ranks system start
 
@@ -405,7 +398,6 @@ u.created_at ASC
       rankRows.findIndex((item: any) => item.id == Number(userId)) + 1;
     //   ranks system end
 
-
     //  badge system start
     const [technologyBadges]: any = await db.query(`
   SELECT
@@ -415,12 +407,12 @@ u.created_at ASC
     short_description
   FROM technology_badges
 `);
-const badgeMap = new Map(
-  technologyBadges.map((badge: any) => [
-    badge.title.trim().toLowerCase(),
-    badge,
-  ])
-);
+    const badgeMap = new Map(
+      technologyBadges.map((badge: any) => [
+        badge.title.trim().toLowerCase(),
+        badge,
+      ]),
+    );
     const calculateBadges = (rows: any[], type: "project" | "problem") => {
       const approvedRows = rows.filter((item) => {
         return item.check_status === "approved";
@@ -440,39 +432,35 @@ const badgeMap = new Map(
       });
 
       return Object.entries(grouped).map(([badgeName, list]) => {
-  const scores = list.map((item) => Number(item.score));
+        const scores = list.map((item) => Number(item.score));
 
-  const totalCompletedChallenges = list.length;
+        const totalCompletedChallenges = list.length;
 
-  const averageScore =
-    scores.reduce((sum, score) => sum + score, 0) / scores.length;
+        const averageScore =
+          scores.reduce((sum, score) => sum + score, 0) / scores.length;
 
-  const lowestScore = Math.min(...scores);
+        const lowestScore = Math.min(...scores);
 
-  const minimumCompleted = totalCompletedChallenges >= 5;
-  const averageCompleted = averageScore >= 80;
-  const minimumScore = lowestScore >= 80;
+        const minimumCompleted = totalCompletedChallenges >= 5;
+        const averageCompleted = averageScore >= 80;
+        const minimumScore = lowestScore >= 80;
 
-  const verified =
-    minimumCompleted &&
-    averageCompleted &&
-    minimumScore;
+        const verified = minimumCompleted && averageCompleted && minimumScore;
 
-  const badgeInfo =
-    badgeMap.get(badgeName.trim().toLowerCase()) ?? null;
+        const badgeInfo = badgeMap.get(badgeName.trim().toLowerCase()) ?? null;
 
-  return {
-    id: badgeInfo?.id ?? null,
-    badgeName,
-    icon: badgeInfo?.icon ?? null,
-    title: badgeInfo?.title ?? null,
-    short_description: badgeInfo?.short_description ?? null,
+        return {
+          id: badgeInfo?.id ?? null,
+          badgeName,
+          icon: badgeInfo?.icon ?? null,
+          title: badgeInfo?.title ?? null,
+          short_description: badgeInfo?.short_description ?? null,
 
-    totalCompletedChallenges,
-    averageScore: Number(averageScore.toFixed(2)),
-    verified,
-  };
-});
+          totalCompletedChallenges,
+          averageScore: Number(averageScore.toFixed(2)),
+          verified,
+        };
+      });
     };
     const projectBadges = calculateBadges(submissions, "project");
 
@@ -577,16 +565,14 @@ GROUP BY difficulty
       completedChallenges: challengeStats?.totalCompletedChallenges ?? 0,
 
       pendingChallenges: challengeStats?.totalPendingChallenges ?? 0,
-    project_challenge_average_score: Number(
-  averageChallengeScore?.project_challenge_average_score ?? 0,
-).toFixed(2),
+      project_challenge_average_score: Number(
+        averageChallengeScore?.project_challenge_average_score ?? 0,
+      ).toFixed(2),
 
-problem_solving_average_score: Number(
-  averageChallengeScore?.problem_solving_average_score ?? 0,
-).toFixed(2),
-successRate: Number(
-  successRate?.success_rate ?? 0
-).toFixed(2),
+      problem_solving_average_score: Number(
+        averageChallengeScore?.problem_solving_average_score ?? 0,
+      ).toFixed(2),
+      successRate: Number(successRate?.success_rate ?? 0).toFixed(2),
       data: profile,
 
       ranking: {
@@ -603,9 +589,9 @@ successRate: Number(
         projectBadges,
         problemBadges,
       },
-recentProjectChallenges,
+      recentProjectChallenges,
 
-recentProblemSolving,
+      recentProblemSolving,
       overallSkillScore: {
         score: overallSkillScore,
         maxScore: 100,

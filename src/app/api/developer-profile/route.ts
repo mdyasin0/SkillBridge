@@ -9,6 +9,7 @@ export async function POST(req: Request) {
       userId,
       photo,
       fullName,
+      title,
       bio,
       experienceYears,
       experienceMonths,
@@ -27,6 +28,7 @@ export async function POST(req: Request) {
       !userId ||
       !photo ||
       !fullName ||
+      !title ||
       !bio ||
       experienceYears === undefined ||
       experienceMonths === undefined ||
@@ -42,14 +44,14 @@ export async function POST(req: Request) {
         },
         {
           status: 400,
-        }
+        },
       );
     }
 
     // Check profile already exists
     const [existing]: any = await db.query(
       "SELECT id FROM developerprofiles WHERE userId = ?",
-      [userId]
+      [userId],
     );
 
     if (existing.length > 0) {
@@ -59,7 +61,7 @@ export async function POST(req: Request) {
         },
         {
           status: 409,
-        }
+        },
       );
     }
 
@@ -70,6 +72,7 @@ export async function POST(req: Request) {
         userId,
         photo,
         fullName,
+         title,
         bio,
         experienceYears,
         experienceMonths,
@@ -84,12 +87,13 @@ export async function POST(req: Request) {
       )
 
       VALUES
-      (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+      (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ? , ?)
       `,
       [
         userId,
         photo,
         fullName,
+        title,
         bio,
         experienceYears,
         experienceMonths,
@@ -101,7 +105,7 @@ export async function POST(req: Request) {
         github || "",
         portfolio || "",
         linkedin || "",
-      ]
+      ],
     );
 
     return NextResponse.json(
@@ -110,7 +114,7 @@ export async function POST(req: Request) {
       },
       {
         status: 201,
-      }
+      },
     );
   } catch (error) {
     console.error(error);
@@ -121,7 +125,7 @@ export async function POST(req: Request) {
       },
       {
         status: 500,
-      }
+      },
     );
   }
 }
