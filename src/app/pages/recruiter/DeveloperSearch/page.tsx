@@ -2,15 +2,20 @@
 
 import { useEffect, useState } from "react";
 import {
+  ArrowUpDown,
   Bookmark,
   BookmarkCheck,
   BriefcaseBusiness,
+  ChevronDown,
   ChevronRight,
   Code2,
   ExternalLink,
   MapPin,
+  Search,
+  SlidersHorizontal,
   Star,
   Trophy,
+  X,
 } from "lucide-react";
 
 import Image from "next/image";
@@ -150,14 +155,25 @@ function mapDeveloperData(developer: DeveloperApiData): Developer {
 }
 
 export default function DeveloperSearch() {
-  const [developer, setDeveloper] = useState<Developer | null>(null);
+ const [developers, setDevelopers] = useState<Developer[]>([]);
 
   const [saved, setSaved] = useState(false);
 
   const [loading, setLoading] = useState(true);
 
   const [error, setError] = useState("");
+  const [showFilters, setShowFilters] = useState(false);
+  const [showSorting, setShowSorting] = useState(false);
 
+  function toggleFilters() {
+    setShowFilters((value) => !value);
+    setShowSorting(false);
+  }
+
+  function toggleSorting() {
+    setShowSorting((value) => !value);
+    setShowFilters(false);
+  }
   useEffect(() => {
     loadDeveloper();
   }, []);
@@ -167,15 +183,15 @@ export default function DeveloperSearch() {
       setLoading(true);
       setError("");
 
-      const data = await fetchDevelopers();
+     const data = await fetchDevelopers();
 
-      if (!data.length) {
-        throw new Error("No developer found");
-      }
+if (!data.length) {
+  throw new Error("No developers found");
+}
 
-      const mappedDeveloper = mapDeveloperData(data[0]);
+const mappedDevelopers = data.map(mapDeveloperData);
 
-      setDeveloper(mappedDeveloper);
+setDevelopers(mappedDevelopers);
     } catch (error) {
       console.error("Developer fetch error:", error);
 
@@ -195,7 +211,7 @@ export default function DeveloperSearch() {
     );
   }
 
-  if (error || !developer) {
+ if (error || !developers.length) {
     return (
       <main className="min-h-screen bg-(--bg) px-4 py-10 text-(--text) sm:px-6 lg:px-8">
         <div className="mx-auto max-w-3xl">
@@ -203,7 +219,7 @@ export default function DeveloperSearch() {
             <h2 className="text-lg font-bold">Unable to load developer</h2>
 
             <p className="mt-2 text-sm text-(--text-muted)">
-              {error || "Developer not found."}
+              {error || "No developers found."}
             </p>
 
             <button
@@ -221,13 +237,219 @@ export default function DeveloperSearch() {
 
   return (
     <main className="min-h-screen bg-(--bg) px-4 py-10 text-(--text) sm:px-6 lg:px-8">
-      <div className="mx-auto max-w-3xl">
-        <DeveloperCard
-          developer={developer}
-          saved={saved}
-          onSave={() => setSaved((value) => !value)}
-        />
-      </div>
+      {" "}
+      {/* ================================================================== */}{" "}
+      {/* Search / Filter Layer */}{" "}
+      {/* ================================================================== */}{" "}
+      <section className="mb-6">
+        {" "}
+        {/* ---------------------------------------------------------------- */}{" "}
+        {/* Heading */}{" "}
+        {/* ---------------------------------------------------------------- */}{" "}
+        <div className="mb-6">
+          {" "}
+          <h1 className="text-2xl font-bold tracking-tight sm:text-3xl">
+            {" "}
+            Find the Right Developer{" "}
+          </h1>{" "}
+          <p className="mt-2 max-w-2xl text-sm leading-6 text-(--text-muted)">
+            {" "}
+            Discover skilled developers based on their experience, technology
+            stack, skills, ranking, and availability.{" "}
+          </p>{" "}
+        </div>{" "}
+        {/* ---------------------------------------------------------------- */}{" "}
+        {/* Search + Filter + Sort */}{" "}
+        {/* ---------------------------------------------------------------- */}{" "}
+        <div className="flex items-center gap-3">
+          {" "}
+          {/* Search */}{" "}
+          <div className=" flex min-w-0 flex-1 items-center gap-3 rounded-2xl border border-(--border) bg-(--surface) px-4 py-3 shadow-(--shadow) transition focus-within:border-(--primary)/40 focus-within:ring-2 focus-within:ring-(--primary)/10 ">
+            {" "}
+            <Search size={19} className="shrink-0 text-(--text-muted)" />{" "}
+            <input
+              type="text"
+              placeholder="Search developers by name, title, skill..."
+              className=" min-w-0 flex-1 bg-transparent text-sm outline-none placeholder:text-(--text-muted) "
+            />{" "}
+          </div>{" "}
+          {/* Filter + Sort */}{" "}
+          <div className="flex shrink-0 items-center gap-3">
+            {" "}
+            {/* Filter Button */}{" "}
+            <button
+              type="button"
+              onClick={toggleFilters}
+              aria-expanded={showFilters}
+              className={` flex items-center justify-center gap-2 rounded-xl border px-4 py-2.5 text-sm font-semibold transition ${showFilters ? "border-(--primary)/30 bg-(--primary)/10 text-(--primary)" : "border-(--border) bg-(--surface) hover:bg-(--surface-hover)"} `}
+            >
+              {" "}
+              <SlidersHorizontal size={16} /> Filters{" "}
+              <ChevronDown
+                size={15}
+                className={` ml-1 text-(--text-muted) transition-transform duration-200 ${showFilters ? "rotate-180" : ""} `}
+              />{" "}
+            </button>{" "}
+            {/* Sort Button */}{" "}
+            <button
+              type="button"
+              onClick={toggleSorting}
+              aria-expanded={showSorting}
+              className={` flex items-center justify-center gap-2 rounded-xl border px-4 py-2.5 text-sm font-semibold transition ${showSorting ? "border-(--primary)/30 bg-(--primary)/10 text-(--primary)" : "border-(--border) bg-(--surface) hover:bg-(--surface-hover)"} `}
+            >
+              {" "}
+              <ArrowUpDown size={16} /> Sort{" "}
+              <ChevronDown
+                size={15}
+                className={` ml-1 text-(--text-muted) transition-transform duration-200 ${showSorting ? "rotate-180" : ""} `}
+              />{" "}
+            </button>{" "}
+          </div>{" "}
+        </div>{" "}
+        {/* ---------------------------------------------------------------- */}{" "}
+        {/* Filter Panel */}{" "}
+        {/* ---------------------------------------------------------------- */}{" "}
+        {showFilters && (
+          <div className=" mt-4 rounded-2xl border border-(--border) bg-(--surface) p-5 shadow-(--shadow) animate-in fade-in slide-in-from-top-2 duration-200 ">
+            {" "}
+            <div className="flex items-center justify-between gap-3">
+              {" "}
+              <div>
+                {" "}
+                <h2 className="text-sm font-bold"> Filter Developers </h2>{" "}
+                <p className="mt-1 text-xs text-(--text-muted)">
+                  {" "}
+                  Narrow down developers using their profile data.{" "}
+                </p>{" "}
+              </div>{" "}
+              <button
+                type="button"
+                className=" flex items-center gap-1 text-xs font-semibold text-(--text-muted) transition hover:text-(--text) "
+              >
+                {" "}
+                <X size={14} /> Clear{" "}
+              </button>{" "}
+            </div>{" "}
+            <div className="mt-5 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+              {" "}
+              <FilterSelect
+                label="Technology"
+                placeholder="All technologies"
+                options={[
+                  "React",
+                  "Next.js",
+                  "Node.js",
+                  "TypeScript",
+                  "Python",
+                  "PHP",
+                ]}
+              />{" "}
+              <FilterSelect
+                label="Country"
+                placeholder="All countries"
+                options={[
+                  "Bangladesh",
+                  "India",
+                  "Pakistan",
+                  "United States",
+                  "United Kingdom",
+                ]}
+              />{" "}
+              <FilterSelect
+                label="Experience"
+                placeholder="Any experience"
+                options={[
+                  "0–1 years",
+                  "1–3 years",
+                  "3–5 years",
+                  "5–10 years",
+                  "10+ years",
+                ]}
+              />{" "}
+              <FilterSelect
+                label="Badge"
+                placeholder="Any badges"
+                options={[
+                  "1+ badges",
+                  "5+ badges",
+                  "10+ badges",
+                  "20+ badges",
+                  "50+ badges",
+                ]}
+              />{" "}
+              <FilterSelect
+                label="Rank"
+                placeholder="Any rank"
+                options={["Top 10", "Top 50", "Top 100", "Top 500", "Top 1000"]}
+              />{" "}
+              <FilterSelect
+                label="Available for Work"
+                placeholder="Any availability"
+                options={["Available", "Not available"]}
+              />{" "}
+            </div>{" "}
+          </div>
+        )}{" "}
+        {/* ---------------------------------------------------------------- */}{" "}
+        {/* Sorting Panel */}{" "}
+        {/* ---------------------------------------------------------------- */}{" "}
+        {showSorting && (
+          <div className=" mt-4 rounded-2xl border border-(--border) bg-(--surface) p-5 shadow-(--shadow) animate-in fade-in slide-in-from-top-2 duration-200 ">
+            {" "}
+            <div>
+              {" "}
+              <h2 className="text-sm font-bold"> Sort Developers </h2>{" "}
+              <p className="mt-1 text-xs text-(--text-muted)">
+                {" "}
+                Choose how developer results should be ordered.{" "}
+              </p>{" "}
+            </div>{" "}
+            <div className="mt-4 flex flex-wrap gap-2">
+              {" "}
+              <SortOption label="Highest Score" active />{" "}
+              <SortOption label="Highest Rank" />{" "}
+              <SortOption label="Most Experienced" />{" "}
+              <SortOption label="Most Challenges" />{" "}
+            </div>{" "}
+          </div>
+        )}{" "}
+      </section>{" "}
+      {/* ================================================================== */}{" "}
+      {/* Result Layer Divider */}{" "}
+      {/* ================================================================== */}{" "}
+      <div className="mb-7 flex items-center gap-4">
+        {" "}
+        <div className="h-px flex-1 bg-(--border)" />{" "}
+        <span className=" rounded-full border border-(--border) bg-(--surface) px-3 py-1 text-[10px] font-bold uppercase tracking-wider text-(--text-muted) ">
+          {" "}
+          Developer Results{" "}
+        </span>{" "}
+        <div className="h-px flex-1 bg-(--border)" />{" "}
+      </div>{" "}
+      {/* ================================================================== */}{" "}
+      {/* Result Layer */}{" "}
+      {/* ================================================================== */}{" "}
+      <section>
+  <div
+    className="
+      grid
+      grid-cols-1
+      gap-5
+      lg:grid-cols-2
+    "
+  >
+    {developers.map((developer) => (
+      <DeveloperCard
+        key={developer.id}
+        developer={developer}
+        saved={saved}
+        onSave={() => setSaved((value) => !value)}
+      />
+    ))}
+  </div>
+
+  <DeveloperPagination />
+</section>{" "}
     </main>
   );
 }
@@ -615,5 +837,172 @@ function AvailabilityBadge({
     >
       {availability}
     </span>
+  );
+}
+
+/* -------------------------------------------------------------------------- */
+/* Filter Select                                                              */
+/* -------------------------------------------------------------------------- */
+
+function FilterSelect({
+  label,
+  placeholder,
+  options,
+}: {
+  label: string;
+  placeholder: string;
+  options: string[];
+}) {
+  return (
+    <label className="block">
+      <span className="mb-2 block text-[11px] font-bold uppercase tracking-wider text-(--text-muted)">
+        {label}
+      </span>
+
+      <div className="relative">
+        <select
+          defaultValue=""
+          className="
+            w-full
+            appearance-none
+            rounded-xl
+            border
+            border-(--border)
+            bg-(--surface-hover)/60
+            px-3.5
+            py-2.5
+            pr-9
+            text-sm
+            outline-none
+            transition
+            focus:border-(--primary)/40
+            focus:ring-2
+            focus:ring-(--primary)/10
+          "
+        >
+          <option value="" disabled>
+            {placeholder}
+          </option>
+
+          {options.map((option) => (
+            <option key={option} value={option}>
+              {option}
+            </option>
+          ))}
+        </select>
+
+        <ChevronDown
+          size={15}
+          className="
+            pointer-events-none
+            absolute
+            right-3
+            top-1/2
+            -translate-y-1/2
+            text-(--text-muted)
+          "
+        />
+      </div>
+    </label>
+  );
+}
+
+/* -------------------------------------------------------------------------- */
+/* Sort Option                                                                */
+/* -------------------------------------------------------------------------- */
+
+function SortOption({
+  label,
+  active = false,
+}: {
+  label: string;
+  active?: boolean;
+}) {
+  return (
+    <button
+      type="button"
+      className={`
+        rounded-xl
+        border
+        px-3.5
+        py-2
+        text-xs
+        font-semibold
+        transition
+        ${
+          active
+            ? "border-(--primary)/30 bg-(--primary)/10 text-(--primary)"
+            : "border-(--border) bg-(--surface-hover)/60 text-(--text-muted) hover:bg-(--surface-hover) hover:text-(--text)"
+        }
+      `}
+    >
+      {label}
+    </button>
+  );
+}
+
+/* -------------------------------------------------------------------------- */ /* Developer Pagination */ /* -------------------------------------------------------------------------- */
+
+function DeveloperPagination() {
+  return (
+    <div className="mx-auto mt-8 flex max-w-3xl items-center justify-center">
+      {" "}
+      <div className=" flex items-center gap-1 rounded-2xl border border-(--border) bg-(--surface) p-1.5 shadow-(--shadow) ">
+        {" "}
+        {/* Previous */}{" "}
+        <button
+          type="button"
+          className=" flex h-9 items-center justify-center rounded-xl px-3 text-xs font-semibold text-(--text-muted) transition hover:bg-(--surface-hover) hover:text-(--text) "
+        >
+          {" "}
+          Previous{" "}
+        </button>{" "}
+        {/* Page 1 */}{" "}
+        <button
+          type="button"
+          className=" flex h-9 w-9 items-center justify-center rounded-xl bg-(--primary) text-xs font-bold text-white "
+        >
+          {" "}
+          1{" "}
+        </button>{" "}
+        {/* Page 2 */}{" "}
+        <button
+          type="button"
+          className=" flex h-9 w-9 items-center justify-center rounded-xl text-xs font-semibold text-(--text-muted) transition hover:bg-(--surface-hover) hover:text-(--text) "
+        >
+          {" "}
+          2{" "}
+        </button>{" "}
+        {/* Page 3 */}{" "}
+        <button
+          type="button"
+          className=" flex h-9 w-9 items-center justify-center rounded-xl text-xs font-semibold text-(--text-muted) transition hover:bg-(--surface-hover) hover:text-(--text) "
+        >
+          {" "}
+          3{" "}
+        </button>{" "}
+        {/* Ellipsis */}{" "}
+        <span className=" flex h-9 w-8 items-center justify-center text-xs text-(--text-muted) ">
+          {" "}
+          ...{" "}
+        </span>{" "}
+        {/* Page 10 */}{" "}
+        <button
+          type="button"
+          className=" flex h-9 w-9 items-center justify-center rounded-xl text-xs font-semibold text-(--text-muted) transition hover:bg-(--surface-hover) hover:text-(--text) "
+        >
+          {" "}
+          10{" "}
+        </button>{" "}
+        {/* Next */}{" "}
+        <button
+          type="button"
+          className=" flex h-9 items-center justify-center rounded-xl px-3 text-xs font-semibold text-(--text-muted) transition hover:bg-(--surface-hover) hover:text-(--text) "
+        >
+          {" "}
+          Next{" "}
+        </button>{" "}
+      </div>{" "}
+    </div>
   );
 }
