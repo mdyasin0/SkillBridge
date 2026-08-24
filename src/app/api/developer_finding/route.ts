@@ -189,6 +189,39 @@ export async function GET() {
     `);
 
     // =========================================================
+    // Completed challenges for ALL developers
+    // Same calculation as single developer API
+    // =========================================================
+
+    const [completedChallengeRows]: any = await db.query(`
+  SELECT
+    user_id,
+    COUNT(*) AS completed_count
+  FROM (
+    SELECT
+      user_id
+    FROM submissions
+    WHERE status = 'submitted'
+
+    UNION ALL
+
+    SELECT
+      user_id
+    FROM solution_submit
+    WHERE status = 'submitted'
+  ) AS completed_challenges
+  GROUP BY user_id
+`);
+
+    const completedChallengeMap = new Map<number, number>();
+
+    completedChallengeRows.forEach((row: any) => {
+      completedChallengeMap.set(
+        Number(row.user_id),
+        Number(row.completed_count),
+      );
+    });
+    // =========================================================
     // 3. Create rank map
     // =========================================================
 
@@ -303,7 +336,10 @@ export async function GET() {
 
     const developersWithScore = developers.map((developer: any) => {
       const userId = Number(developer.userId);
+
       const totalBadgeNumber = badgeCountMap.get(userId) ?? 0;
+
+      const completedChallenges = completedChallengeMap.get(userId) ?? 0;
       // -----------------------------------------
       // Get ranking/scoring data
       // -----------------------------------------
@@ -383,7 +419,7 @@ export async function GET() {
         ...developer,
 
         rank: rankMap.get(userId) ?? null,
-
+        completedChallenges,
         overallSkillScore,
         totalBadgeNumber,
         // Optional: score breakdown

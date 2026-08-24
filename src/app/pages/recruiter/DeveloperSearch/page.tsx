@@ -20,6 +20,7 @@ import {
 
 import Image from "next/image";
 import { FaGithub } from "react-icons/fa";
+import Link from "next/link";
 
 type DeveloperApiData = {
   id: number;
@@ -39,12 +40,15 @@ type DeveloperApiData = {
   github: string | null;
   portfolio: string | null;
   rank: number | null;
+  completedChallenges: number | null;
   overallSkillScore: number | null;
+
   totalBadgeNumber: number | null;
 };
 
 type Developer = {
   id: number;
+  userId: number;
   name: string;
   avatar: string | null;
   country: string;
@@ -61,7 +65,7 @@ type Developer = {
   portfolio: string | null;
   rank: number | null;
   score: number | null;
-
+  completedChallenges: number;
   badges: number | null;
   availability: "Available" | "Not available";
 };
@@ -121,7 +125,7 @@ function mapDeveloperData(developer: DeveloperApiData): Developer {
   return {
     // REAL API DATA
     id: developer.id,
-
+    userId: developer.userId,
     name: developer.fullName,
 
     avatar: developer.photo,
@@ -149,21 +153,29 @@ function mapDeveloperData(developer: DeveloperApiData): Developer {
     rank: developer.rank,
 
     score: developer.overallSkillScore,
-
+    completedChallenges: developer.completedChallenges ?? 0,
     badges: developer.totalBadgeNumber,
   };
 }
 
 export default function DeveloperSearch() {
- const [developers, setDevelopers] = useState<Developer[]>([]);
-
+  const [developers, setDevelopers] = useState<Developer[]>([]);
+  const [showCount, setShowCount] = useState(20);
+  const ITEMS_PER_LOAD = 20;
+  const [searchQuery, setSearchQuery] = useState("");
+  const [selectedTechnology, setSelectedTechnology] = useState("");
+  const [selectedCountry, setSelectedCountry] = useState("");
+  const [selectedExperience, setSelectedExperience] = useState("");
+  const [selectedBadge, setSelectedBadge] = useState("");
+  const [selectedRank, setSelectedRank] = useState("");
+  const [selectedAvailability, setSelectedAvailability] = useState("");
   const [saved, setSaved] = useState(false);
-
+  const [showSorting, setShowSorting] = useState(false);
+  const [selectedSort, setSelectedSort] = useState("Highest Score");
   const [loading, setLoading] = useState(true);
 
   const [error, setError] = useState("");
   const [showFilters, setShowFilters] = useState(false);
-  const [showSorting, setShowSorting] = useState(false);
 
   function toggleFilters() {
     setShowFilters((value) => !value);
@@ -183,15 +195,15 @@ export default function DeveloperSearch() {
       setLoading(true);
       setError("");
 
-     const data = await fetchDevelopers();
+      const data = await fetchDevelopers();
 
-if (!data.length) {
-  throw new Error("No developers found");
-}
+      if (!data.length) {
+        throw new Error("No developers found");
+      }
 
-const mappedDevelopers = data.map(mapDeveloperData);
+      const mappedDevelopers = data.map(mapDeveloperData);
 
-setDevelopers(mappedDevelopers);
+      setDevelopers(mappedDevelopers);
     } catch (error) {
       console.error("Developer fetch error:", error);
 
@@ -201,6 +213,183 @@ setDevelopers(mappedDevelopers);
     }
   }
 
+  const technologyOptions = Array.from(
+    new Set(
+      developers.flatMap((developer) =>
+        developer.skills.map((skill) => skill.trim()).filter(Boolean),
+      ),
+    ),
+  ).sort((a, b) => a.localeCompare(b));
+
+  const countryOptions = Array.from(
+    new Set(
+      developers.map((developer) => developer.country.trim()).filter(Boolean),
+    ),
+  ).sort((a, b) => a.localeCompare(b));
+
+  const filteredDevelopers = developers.filter((developer) => {
+    /* ---------------------------------------------------------------------- */
+    /* Technology                                                             */
+    /* ---------------------------------------------------------------------- */
+
+    const matchesTechnology =
+      !selectedTechnology ||
+      developer.skills.some(
+        (skill) =>
+          skill.trim().toLowerCase() ===
+          selectedTechnology.trim().toLowerCase(),
+      );
+
+    /* ---------------------------------------------------------------------- */
+    /* Country                                                                */
+    /* ---------------------------------------------------------------------- */
+
+    const matchesCountry =
+      !selectedCountry ||
+      developer.country.trim().toLowerCase() ===
+        selectedCountry.trim().toLowerCase();
+
+    /* ---------------------------------------------------------------------- */
+    /* Experience                                                             */
+    /* ---------------------------------------------------------------------- */
+
+    const totalExperience =
+      developer.experienceYears + developer.experienceMonths / 12;
+
+    let matchesExperience = true;
+
+    if (selectedExperience === "0–1 years") {
+      matchesExperience = totalExperience < 1;
+    } else if (selectedExperience === "1–3 years") {
+      matchesExperience = totalExperience >= 1 && totalExperience < 3;
+    } else if (selectedExperience === "3–5 years") {
+      matchesExperience = totalExperience >= 3 && totalExperience < 5;
+    } else if (selectedExperience === "5–10 years") {
+      matchesExperience = totalExperience >= 5 && totalExperience < 10;
+    } else if (selectedExperience === "10+ years") {
+      matchesExperience = totalExperience >= 10;
+    }
+
+    /* ---------------------------------------------------------------------- */
+    /* Badge                                                                   */
+    /* ---------------------------------------------------------------------- */
+
+    const badgeCount = developer.badges ?? 0;
+
+    let matchesBadge = true;
+
+    if (selectedBadge === "1+ badges") {
+      matchesBadge = badgeCount >= 1;
+    } else if (selectedBadge === "5+ badges") {
+      matchesBadge = badgeCount >= 5;
+    } else if (selectedBadge === "10+ badges") {
+      matchesBadge = badgeCount >= 10;
+    } else if (selectedBadge === "20+ badges") {
+      matchesBadge = badgeCount >= 20;
+    } else if (selectedBadge === "50+ badges") {
+      matchesBadge = badgeCount >= 50;
+    }
+
+    /* ---------------------------------------------------------------------- */
+    /* Rank                                                                    */
+    /* ---------------------------------------------------------------------- */
+
+    const developerRank = developer.rank ?? Infinity;
+
+    let matchesRank = true;
+
+    if (selectedRank === "Top 10") {
+      matchesRank = developerRank <= 10;
+    } else if (selectedRank === "Top 50") {
+      matchesRank = developerRank <= 50;
+    } else if (selectedRank === "Top 100") {
+      matchesRank = developerRank <= 100;
+    } else if (selectedRank === "Top 500") {
+      matchesRank = developerRank <= 500;
+    } else if (selectedRank === "Top 1000") {
+      matchesRank = developerRank <= 1000;
+    }
+    const search = searchQuery.trim().toLowerCase();
+
+    const searchableText = [
+      developer.title,
+      developer.country,
+      developer.bio,
+      ...developer.skills,
+    ]
+      .join(" ")
+      .toLowerCase();
+
+    const matchesSearch = !search || searchableText.includes(search);
+    /* ---------------------------------------------------------------------- */
+    /* Availability                                                            */
+    /* ---------------------------------------------------------------------- */
+
+    const matchesAvailability =
+      !selectedAvailability || developer.availability === selectedAvailability;
+
+    /* ---------------------------------------------------------------------- */
+    /* Final result                                                            */
+    /* ---------------------------------------------------------------------- */
+    return (
+      matchesSearch &&
+      matchesTechnology &&
+      matchesCountry &&
+      matchesExperience &&
+      matchesBadge &&
+      matchesRank &&
+      matchesAvailability
+    );
+  });
+
+  const sortedDevelopers = [...filteredDevelopers].sort((a, b) => {
+    switch (selectedSort) {
+      case "Highest Score": {
+        const scoreA = a.score ?? 0;
+        const scoreB = b.score ?? 0;
+
+        return scoreB - scoreA;
+      }
+
+      case "Highest Rank": {
+        const rankA = a.rank ?? Infinity;
+        const rankB = b.rank ?? Infinity;
+
+        return rankA - rankB;
+      }
+
+      case "Most Experienced": {
+        const experienceA = a.experienceYears + a.experienceMonths / 12;
+
+        const experienceB = b.experienceYears + b.experienceMonths / 12;
+
+        return experienceB - experienceA;
+      }
+
+      case "Most Challenges": {
+        return b.completedChallenges - a.completedChallenges;
+      }
+
+      default:
+        return 0;
+    }
+  });
+
+  const visibleDevelopers = sortedDevelopers.slice(0, showCount);
+
+  const hasMoreDevelopers = showCount < sortedDevelopers.length;
+  useEffect(() => {
+    setShowCount(20);
+  }, [
+    searchQuery,
+    selectedTechnology,
+    selectedCountry,
+    selectedExperience,
+    selectedBadge,
+    selectedRank,
+    selectedAvailability,
+    selectedSort,
+  ]);
   if (loading) {
     return (
       <main className="min-h-screen bg-(--bg) px-4 py-10 text-(--text) sm:px-6 lg:px-8">
@@ -211,7 +400,7 @@ setDevelopers(mappedDevelopers);
     );
   }
 
- if (error || !developers.length) {
+  if (error || !developers.length) {
     return (
       <main className="min-h-screen bg-(--bg) px-4 py-10 text-(--text) sm:px-6 lg:px-8">
         <div className="mx-auto max-w-3xl">
@@ -269,8 +458,10 @@ setDevelopers(mappedDevelopers);
             <Search size={19} className="shrink-0 text-(--text-muted)" />{" "}
             <input
               type="text"
-              placeholder="Search developers by name, title, skill..."
-              className=" min-w-0 flex-1 bg-transparent text-sm outline-none placeholder:text-(--text-muted) "
+              value={searchQuery}
+              onChange={(event) => setSearchQuery(event.target.value)}
+              placeholder="Search developers by name, title, skill, country, bio..."
+              className="min-w-0 flex-1 bg-transparent text-sm outline-none placeholder:text-(--text-muted)"
             />{" "}
           </div>{" "}
           {/* Filter + Sort */}{" "}
@@ -324,37 +515,46 @@ setDevelopers(mappedDevelopers);
               </div>{" "}
               <button
                 type="button"
-                className=" flex items-center gap-1 text-xs font-semibold text-(--text-muted) transition hover:text-(--text) "
+                onClick={() => {
+                  setSelectedTechnology("");
+                  setSelectedCountry("");
+                  setSelectedExperience("");
+                  setSelectedBadge("");
+                  setSelectedRank("");
+                  setSelectedAvailability("");
+                }}
+                className="
+    flex
+    items-center
+    gap-1
+    text-xs
+    font-semibold
+    text-(--text-muted)
+    transition
+    hover:text-(--text)
+  "
               >
-                {" "}
-                <X size={14} /> Clear{" "}
+                <X size={14} />
+                Clear
               </button>{" "}
             </div>{" "}
             <div className="mt-5 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-              {" "}
               <FilterSelect
                 label="Technology"
                 placeholder="All technologies"
-                options={[
-                  "React",
-                  "Next.js",
-                  "Node.js",
-                  "TypeScript",
-                  "Python",
-                  "PHP",
-                ]}
-              />{" "}
+                options={technologyOptions}
+                value={selectedTechnology}
+                onChange={setSelectedTechnology}
+              />
+
               <FilterSelect
                 label="Country"
                 placeholder="All countries"
-                options={[
-                  "Bangladesh",
-                  "India",
-                  "Pakistan",
-                  "United States",
-                  "United Kingdom",
-                ]}
-              />{" "}
+                options={countryOptions}
+                value={selectedCountry}
+                onChange={setSelectedCountry}
+              />
+
               <FilterSelect
                 label="Experience"
                 placeholder="Any experience"
@@ -365,7 +565,10 @@ setDevelopers(mappedDevelopers);
                   "5–10 years",
                   "10+ years",
                 ]}
-              />{" "}
+                value={selectedExperience}
+                onChange={setSelectedExperience}
+              />
+
               <FilterSelect
                 label="Badge"
                 placeholder="Any badges"
@@ -376,17 +579,25 @@ setDevelopers(mappedDevelopers);
                   "20+ badges",
                   "50+ badges",
                 ]}
-              />{" "}
+                value={selectedBadge}
+                onChange={setSelectedBadge}
+              />
+
               <FilterSelect
                 label="Rank"
                 placeholder="Any rank"
                 options={["Top 10", "Top 50", "Top 100", "Top 500", "Top 1000"]}
-              />{" "}
+                value={selectedRank}
+                onChange={setSelectedRank}
+              />
+
               <FilterSelect
                 label="Available for Work"
                 placeholder="Any availability"
                 options={["Available", "Not available"]}
-              />{" "}
+                value={selectedAvailability}
+                onChange={setSelectedAvailability}
+              />
             </div>{" "}
           </div>
         )}{" "}
@@ -406,10 +617,26 @@ setDevelopers(mappedDevelopers);
             </div>{" "}
             <div className="mt-4 flex flex-wrap gap-2">
               {" "}
-              <SortOption label="Highest Score" active />{" "}
-              <SortOption label="Highest Rank" />{" "}
-              <SortOption label="Most Experienced" />{" "}
-              <SortOption label="Most Challenges" />{" "}
+              <SortOption
+                label="Highest Score"
+                active={selectedSort === "Highest Score"}
+                onClick={() => setSelectedSort("Highest Score")}
+              />
+              <SortOption
+                label="Highest Rank"
+                active={selectedSort === "Highest Rank"}
+                onClick={() => setSelectedSort("Highest Rank")}
+              />
+              <SortOption
+                label="Most Experienced"
+                active={selectedSort === "Most Experienced"}
+                onClick={() => setSelectedSort("Most Experienced")}
+              />
+              <SortOption
+                label="Most Challenges"
+                active={selectedSort === "Most Challenges"}
+                onClick={() => setSelectedSort("Most Challenges")}
+              />
             </div>{" "}
           </div>
         )}{" "}
@@ -430,26 +657,108 @@ setDevelopers(mappedDevelopers);
       {/* Result Layer */}{" "}
       {/* ================================================================== */}{" "}
       <section>
-  <div
-    className="
-      grid
-      grid-cols-1
-      gap-5
-      lg:grid-cols-2
-    "
-  >
-    {developers.map((developer) => (
-      <DeveloperCard
-        key={developer.id}
-        developer={developer}
-        saved={saved}
-        onSave={() => setSaved((value) => !value)}
-      />
-    ))}
-  </div>
+        {filteredDevelopers.length > 0 ? (
+          <div
+            className="
+        grid
+        grid-cols-1
+        gap-5
+        lg:grid-cols-2
+      "
+          >
+            {visibleDevelopers.map((developer) => (
+              <DeveloperCard
+                key={developer.id}
+                developer={developer}
+                saved={saved}
+                onSave={() => setSaved((value) => !value)}
+              />
+            ))}
+          </div>
+        ) : (
+          <div
+            className="
+        rounded-3xl
+        border
+        border-(--border)
+        bg-(--surface)
+        px-6
+        py-14
+        text-center
+        shadow-(--shadow)
+      "
+          >
+            <h2 className="text-lg font-bold">No developers found</h2>
 
-  <DeveloperPagination />
-</section>{" "}
+            <p className="mx-auto mt-2 max-w-md text-sm leading-6 text-(--text-muted)">
+              No developers match your selected filters. Try changing or
+              clearing one or more filters.
+            </p>
+
+            <button
+              type="button"
+              onClick={() => {
+                setSelectedTechnology("");
+                setSelectedCountry("");
+                setSelectedExperience("");
+                setSelectedBadge("");
+                setSelectedRank("");
+                setSelectedAvailability("");
+              }}
+              className="
+          mt-5
+          rounded-xl
+          bg-(--primary)
+          px-5
+          py-2.5
+          text-sm
+          font-semibold
+          text-white
+          transition
+          hover:bg-(--primary-hover)
+        "
+            >
+              Clear Filters
+            </button>
+          </div>
+        )}
+        {sortedDevelopers.length > 20 && (
+          <div className="mt-8 flex flex-col items-center gap-3">
+            <p className="text-xs text-(--text-muted)">
+              Showing {visibleDevelopers.length} of {sortedDevelopers.length}{" "}
+              developers
+            </p>
+
+            <button
+              type="button"
+              onClick={() => {
+                if (hasMoreDevelopers) {
+                  setShowCount((current) =>
+                    Math.min(current + ITEMS_PER_LOAD, sortedDevelopers.length),
+                  );
+                } else {
+                  setShowCount(20);
+                }
+              }}
+              className="
+        rounded-xl
+        border
+        border-(--border)
+        bg-(--surface)
+        px-6
+        py-2.5
+        text-sm
+        font-semibold
+        shadow-(--shadow)
+        transition
+        hover:bg-(--surface-hover)
+      "
+            >
+              {hasMoreDevelopers ? "See More" : "See Less"}
+            </button>
+          </div>
+        )}
+      </section>{" "}
     </main>
   );
 }
@@ -690,11 +999,12 @@ function DeveloperCard({
         {/* External links */}
         <div className="flex items-center gap-2">
           {developer.github && (
-            <a
-              href={developer.github}
-              target="_blank"
-              rel="noreferrer"
-              className="
+            <div className="tooltip" data-tip="github">
+              <a
+                href={developer.github}
+                target="_blank"
+                rel="noreferrer"
+                className="
                 flex
                 h-9
                 w-9
@@ -707,18 +1017,20 @@ function DeveloperCard({
                 transition
                 hover:bg-(--surface-hover)
               "
-              aria-label="GitHub"
-            >
-              <FaGithub size={16} />
-            </a>
+                aria-label="GitHub"
+              >
+                <FaGithub size={16} />
+              </a>
+            </div>
           )}
 
           {developer.portfolio && (
-            <a
-              href={developer.portfolio}
-              target="_blank"
-              rel="noreferrer"
-              className="
+            <div className="tooltip" data-tip="portfolio">
+              <a
+                href={developer.portfolio}
+                target="_blank"
+                rel="noreferrer"
+                className="
                 flex
                 h-9
                 w-9
@@ -731,38 +1043,36 @@ function DeveloperCard({
                 transition
                 hover:bg-(--surface-hover)
               "
-              aria-label="Portfolio"
-            >
-              <ExternalLink size={16} />
-            </a>
+                aria-label="Portfolio"
+              >
+                <ExternalLink size={16} />
+              </a>
+            </div>
           )}
         </div>
 
         {/* View Profile */}
-        <button
-          type="button"
-          onClick={() => {
-            console.log("View developer:", developer.id);
-          }}
+        <Link
+          href={`/pages/recruiter/DeveloperSearch/${developer.userId}`}
           className="
-            flex
-            items-center
-            justify-center
-            gap-2
-            rounded-xl
-            bg-(--primary)
-            px-5
-            py-2.5
-            text-sm
-            font-bold
-            text-white
-            transition
-            hover:bg-(--primary-hover)
-          "
+    flex
+    items-center
+    justify-center
+    gap-2
+    rounded-xl
+    bg-(--primary)
+    px-5
+    py-2.5
+    text-sm
+    font-bold
+    text-white
+    transition
+    hover:bg-(--primary-hover)
+  "
         >
           View Profile
           <ChevronRight size={16} />
-        </button>
+        </Link>
       </div>
     </article>
   );
@@ -816,8 +1126,6 @@ function AvailabilityBadge({
 }) {
   const isAvailable = availability === "Available";
 
-  const isOpenToOffers = availability === "Open to offers";
-
   return (
     <span
       className={`
@@ -826,13 +1134,11 @@ function AvailabilityBadge({
         py-1
         text-[10px]
         font-semibold
-        ${
-          isAvailable
-            ? "bg-emerald-500/10 text-emerald-600"
-            : isOpenToOffers
-              ? "bg-amber-500/10 text-amber-600"
+          ${
+            isAvailable
+              ? "bg-emerald-500/10 text-emerald-600"
               : "bg-slate-500/10 text-slate-500"
-        }
+          }
       `}
     >
       {availability}
@@ -848,10 +1154,14 @@ function FilterSelect({
   label,
   placeholder,
   options,
+  value,
+  onChange,
 }: {
   label: string;
   placeholder: string;
   options: string[];
+  value: string;
+  onChange: (value: string) => void;
 }) {
   return (
     <label className="block">
@@ -861,7 +1171,8 @@ function FilterSelect({
 
       <div className="relative">
         <select
-          defaultValue=""
+          value={value}
+          onChange={(event) => onChange(event.target.value)}
           className="
             w-full
             appearance-none
@@ -880,9 +1191,7 @@ function FilterSelect({
             focus:ring-(--primary)/10
           "
         >
-          <option value="" disabled>
-            {placeholder}
-          </option>
+          <option value="">{placeholder}</option>
 
           {options.map((option) => (
             <option key={option} value={option}>
@@ -914,13 +1223,16 @@ function FilterSelect({
 function SortOption({
   label,
   active = false,
+  onClick,
 }: {
   label: string;
   active?: boolean;
+  onClick: () => void;
 }) {
   return (
     <button
       type="button"
+      onClick={onClick}
       className={`
         rounded-xl
         border
@@ -938,71 +1250,5 @@ function SortOption({
     >
       {label}
     </button>
-  );
-}
-
-/* -------------------------------------------------------------------------- */ /* Developer Pagination */ /* -------------------------------------------------------------------------- */
-
-function DeveloperPagination() {
-  return (
-    <div className="mx-auto mt-8 flex max-w-3xl items-center justify-center">
-      {" "}
-      <div className=" flex items-center gap-1 rounded-2xl border border-(--border) bg-(--surface) p-1.5 shadow-(--shadow) ">
-        {" "}
-        {/* Previous */}{" "}
-        <button
-          type="button"
-          className=" flex h-9 items-center justify-center rounded-xl px-3 text-xs font-semibold text-(--text-muted) transition hover:bg-(--surface-hover) hover:text-(--text) "
-        >
-          {" "}
-          Previous{" "}
-        </button>{" "}
-        {/* Page 1 */}{" "}
-        <button
-          type="button"
-          className=" flex h-9 w-9 items-center justify-center rounded-xl bg-(--primary) text-xs font-bold text-white "
-        >
-          {" "}
-          1{" "}
-        </button>{" "}
-        {/* Page 2 */}{" "}
-        <button
-          type="button"
-          className=" flex h-9 w-9 items-center justify-center rounded-xl text-xs font-semibold text-(--text-muted) transition hover:bg-(--surface-hover) hover:text-(--text) "
-        >
-          {" "}
-          2{" "}
-        </button>{" "}
-        {/* Page 3 */}{" "}
-        <button
-          type="button"
-          className=" flex h-9 w-9 items-center justify-center rounded-xl text-xs font-semibold text-(--text-muted) transition hover:bg-(--surface-hover) hover:text-(--text) "
-        >
-          {" "}
-          3{" "}
-        </button>{" "}
-        {/* Ellipsis */}{" "}
-        <span className=" flex h-9 w-8 items-center justify-center text-xs text-(--text-muted) ">
-          {" "}
-          ...{" "}
-        </span>{" "}
-        {/* Page 10 */}{" "}
-        <button
-          type="button"
-          className=" flex h-9 w-9 items-center justify-center rounded-xl text-xs font-semibold text-(--text-muted) transition hover:bg-(--surface-hover) hover:text-(--text) "
-        >
-          {" "}
-          10{" "}
-        </button>{" "}
-        {/* Next */}{" "}
-        <button
-          type="button"
-          className=" flex h-9 items-center justify-center rounded-xl px-3 text-xs font-semibold text-(--text-muted) transition hover:bg-(--surface-hover) hover:text-(--text) "
-        >
-          {" "}
-          Next{" "}
-        </button>{" "}
-      </div>{" "}
-    </div>
   );
 }
