@@ -27,6 +27,7 @@ import { useEffect, useState } from "react";
 import { BsGithub } from "react-icons/bs";
 import { LiaLinkedin } from "react-icons/lia";
 import { useParams } from "next/navigation";
+import ContactDeveloperButton from "../../contact_button/page";
 interface DeveloperProfileResponse {
   success: boolean;
   completedChallenges: number;
@@ -36,9 +37,9 @@ interface DeveloperProfileResponse {
   problem_solving_average_score: string;
 
   data: {
-    user_id: number;
+    user_id: number| string;
     developer_profile_id: number;
-
+    title: string;
     name: string;
     fullName: string;
     email: string;
@@ -121,13 +122,13 @@ interface Challenge {
   updated_at: string;
 }
 export default function DeveloperProfilePage() {
-  const params = useParams<{ id: string }>();;
+  const params = useParams<{ id: string }>();
 
   const userId = params.id;
   const [profile, setProfile] = useState<DeveloperProfileResponse | null>(null);
- 
+
   const [loading, setLoading] = useState(true);
- 
+
   const overallSkillScore = profile?.overallSkillScore;
   const getTimeAgo = (date: string) => {
     const now = new Date();
@@ -194,7 +195,6 @@ export default function DeveloperProfilePage() {
   useEffect(() => {
     const fetchDeveloper = async () => {
       try {
-  
         const res = await fetch(
           `http://localhost:3000/api/developer_profile?userId=${userId}`,
         );
@@ -219,6 +219,9 @@ export default function DeveloperProfilePage() {
   }
   return (
     <div className="pb-10 bg-slate-100">
+    <ContactDeveloperButton
+  developerId={developer?.user_id}
+/>
       {/* Cover */}
       <div
         className="relative h-90  w-full overflow-hidden "
@@ -264,7 +267,9 @@ export default function DeveloperProfilePage() {
                   >
                     {developer?.fullName || developer?.name}
                   </h1>
-
+                  <p className="mt-1 text-lg text-(--text-muted)">
+                    {developer?.title}
+                  </p>
                   <div className="mt-2 flex flex-wrap items-center gap-2">
                     {(profile?.badgeSystem?.totalBadgeNumber ?? 0) > 0 ? (
                       <span

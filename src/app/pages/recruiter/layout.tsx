@@ -7,8 +7,8 @@ const routes = [
   { name: "Home", path: "/" },
   { name: "profile-setup", path: "/pages/recruiter/profile-setup" },
   { name: "DeveloperSearch", path: "/pages/recruiter/DeveloperSearch" },
-  { name: "Main_Profile", path: "/pages/developer/main_profile" },
-  
+ 
+   { name: "Inbox", path: "/pages/recruiter/inbox" },
  
 ];
 

@@ -1050,10 +1050,9 @@ function DeveloperCard({
             </div>
           )}
         </div>
-
         {/* View Profile */}
         <Link
-          href={`/pages/recruiter/DeveloperSearch/${developer.userId}`}
+          href={`/pages/recruiter/developer_profile_details/${developer.userId}`}
           className="
     flex
     items-center
