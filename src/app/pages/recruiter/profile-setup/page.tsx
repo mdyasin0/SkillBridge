@@ -1015,7 +1015,9 @@ const handleSubmit = async (e: FormEvent) => {
                   <div className="flex items-center gap-5">
                     <div className="flex h-20 w-20 shrink-0 items-center justify-center overflow-hidden rounded-xl border border-slate-200 bg-slate-100">
                       {companyLogoPreview ? (
-                        <Image
+                        <Image 
+                        width={20}
+                        height={20}
                           src={companyLogoPreview}
                           alt="Company logo preview"
                           className="h-full w-full object-cover"

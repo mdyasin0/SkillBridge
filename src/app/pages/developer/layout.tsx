@@ -8,8 +8,7 @@ const routes = [
   { name: "Profile", path: "/pages/developer/create-profile" },
   { name: "Challenge", path: "/pages/developer/challenge_select" },
   { name: "Main_Profile", path: "/pages/developer/main_profile" },
-  
- 
+  { name: "Inbox", path: "/pages/developer/inbox" },
 ];
 
 export default function Developerayout({

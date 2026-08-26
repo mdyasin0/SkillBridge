@@ -73,9 +73,7 @@ export default function ContactDeveloperButton({
         />
       </span>
 
-      <span className="whitespace-nowrap">
-        Contact Developer
-      </span>
+      <span className="whitespace-nowrap">Contact Developer</span>
 
       <ArrowRight
         size={16}

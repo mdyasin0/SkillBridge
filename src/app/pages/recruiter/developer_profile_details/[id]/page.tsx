@@ -37,7 +37,7 @@ interface DeveloperProfileResponse {
   problem_solving_average_score: string;
 
   data: {
-    user_id: number| string;
+    user_id: number | string;
     developer_profile_id: number;
     title: string;
     name: string;
@@ -219,9 +219,7 @@ export default function DeveloperProfilePage() {
   }
   return (
     <div className="pb-10 bg-slate-100">
-    <ContactDeveloperButton
-  developerId={developer?.user_id}
-/>
+      <ContactDeveloperButton developerId={developer?.user_id} />
       {/* Cover */}
       <div
         className="relative h-90  w-full overflow-hidden "

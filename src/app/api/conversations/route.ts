@@ -5,13 +5,7 @@ export async function POST(req: Request) {
   try {
     const body = await req.json();
 
-    const {
-      receiverName,
-      receiverId,
-      senderName,
-      senderId,
-      message,
-    } = body;
+    const { receiverName, receiverId, senderName, senderId, message } = body;
 
     // Validation
     if (
@@ -54,24 +48,17 @@ export async function POST(req: Request) {
       ORDER BY id ASC
       LIMIT 1
       `,
-      [
-        senderId,
-        receiverId,
-        receiverId,
-        senderId,
-      ],
+      [senderId, receiverId, receiverId, senderId],
     );
 
     let conversationId: string;
 
     if (existingConversation.length > 0) {
       // Existing conversation
-      conversationId =
-        existingConversation[0].conversationId;
+      conversationId = existingConversation[0].conversationId;
     } else {
       // New conversation
-      conversationId =
-        `conversation_${senderId}_${receiverId}_${Date.now()}`;
+      conversationId = `conversation_${senderId}_${receiverId}_${Date.now()}`;
     }
 
     // Insert message
@@ -168,12 +155,12 @@ export async function GET(req: Request) {
     }
 
     /*
-      --------------------------------------------------
-      CASE 1:
-      userId + otherUserId
+    ==================================================
+    CASE 1
+    userId + otherUserId
 
-      নির্দিষ্ট দুইজনের সম্পূর্ণ conversation
-      --------------------------------------------------
+    দুইজনের সম্পূর্ণ conversation
+    ==================================================
     */
 
     if (otherUserId) {
@@ -192,10 +179,12 @@ export async function GET(req: Request) {
           \`read\`,
           edited
         FROM conversations
+
         WHERE
           (senderId = ? AND receiverId = ?)
           OR
           (senderId = ? AND receiverId = ?)
+
         ORDER BY createdAt ASC, id ASC
         `,
         [
@@ -218,13 +207,19 @@ export async function GET(req: Request) {
     }
 
     /*
-      --------------------------------------------------
-      CASE 2:
-      শুধু userId
+    ==================================================
+    CASE 2
+    শুধু userId
 
-      Current user যেসব developer-এর সাথে message করেছে,
-      প্রত্যেক developer-এর latest message + photo return করবে।
-      --------------------------------------------------
+    Inbox list
+
+    প্রতিটি developer-এর:
+    - latest message
+    - developer photo
+    - unreadCount
+
+    return করবে
+    ==================================================
     */
 
     const [conversations]: any = await db.query(
@@ -247,7 +242,8 @@ export async function GET(req: Request) {
         c.edited,
 
         /*
-          Current user বাদ দিয়ে অপর user-এর ID বের করছি
+          Current user বাদ দিয়ে
+          opposite user ID
         */
         CASE
           WHEN c.senderId = ? THEN c.receiverId
@@ -255,16 +251,42 @@ export async function GET(req: Request) {
         END AS developerId,
 
         /*
-          developerprofiles থেকে photo
+          Developer photo
         */
-        dp.photo AS developerPhoto
+        dp.photo AS developerPhoto,
+
+        /*
+          ==================================================
+          UNREAD MESSAGE COUNT
+          
+          শুধু তখনই count হবে যখন:
+          
+          receiverId = current user
+          senderId = developer
+          read = 0
+          ==================================================
+        */
+        (
+          SELECT COUNT(*)
+          FROM conversations unread
+          WHERE
+            unread.receiverId = ?
+            AND unread.senderId =
+              CASE
+                WHEN c.senderId = ? THEN c.receiverId
+                ELSE c.senderId
+              END
+            AND unread.\`read\` = 0
+        ) AS unreadCount
 
       FROM conversations c
 
+      /*
+        ==================================================
+        প্রতিটি developer-এর latest message
+        ==================================================
+      */
       INNER JOIN (
-        /*
-          প্রতিটি developer-এর latest message বের করছি
-        */
         SELECT
           CASE
             WHEN senderId = ? THEN receiverId
@@ -289,7 +311,9 @@ export async function GET(req: Request) {
       ON c.id = latest.latestId
 
       /*
-        Developer profile-এর সাথে JOIN
+        ==================================================
+        Developer profile
+        ==================================================
       */
       LEFT JOIN developerprofiles dp
         ON dp.userId =
@@ -301,22 +325,44 @@ export async function GET(req: Request) {
       ORDER BY c.createdAt DESC
       `,
       [
-        // SELECT → developerId
+        /*
+          developerId
+        */
         userId,
 
-        // INNER JOIN → CASE
+        /*
+          unread.receiverId = current user
+        */
         userId,
 
-        // WHERE senderId
+        /*
+          unread sender = opposite user
+        */
         userId,
 
-        // WHERE receiverId
+        /*
+          INNER JOIN CASE
+        */
         userId,
 
-        // GROUP BY CASE
+        /*
+          WHERE senderId
+        */
         userId,
 
-        // LEFT JOIN → developer ID
+        /*
+          WHERE receiverId
+        */
+        userId,
+
+        /*
+          GROUP BY CASE
+        */
+        userId,
+
+        /*
+          developer profile JOIN
+        */
         userId,
       ],
     );
