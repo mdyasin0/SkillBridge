@@ -3,15 +3,19 @@
 import { useEffect, useRef, useState } from "react";
 import {
   ArrowLeft,
+  Check,
+  Edit3,
   MoreVertical,
   Paperclip,
   RefreshCw,
   Send,
   Smile,
+  X,
 } from "lucide-react";
 import { useSearchParams } from "next/navigation";
 import Image from "next/image";
 import { useAuth } from "@/context/AuthContext";
+import Link from "next/link";
 
 interface DeveloperProfileResponse {
   data: {
@@ -31,6 +35,8 @@ type Message = {
   senderId: string | number;
   text: string;
   createdAt: string;
+  updatedAt?: string;
+  edited?: number;
 };
 
 type SendMessageData = {
@@ -107,8 +113,7 @@ export default function MessagePage() {
 
   const { user } = useAuth();
 
-  const [profile, setProfile] =
-    useState<DeveloperProfileResponse | null>(null);
+  const [profile, setProfile] = useState<DeveloperProfileResponse | null>(null);
 
   const [loading, setLoading] = useState(true);
 
@@ -120,7 +125,8 @@ export default function MessagePage() {
   const [showEmojiPicker, setShowEmojiPicker] = useState(false);
 
   const [refreshing, setRefreshing] = useState(false);
-
+  const [editingMessageId, setEditingMessageId] = useState<number | null>(null);
+  const [editingText, setEditingText] = useState("");
   const emojiPickerRef = useRef<HTMLDivElement>(null);
 
   /*
@@ -213,9 +219,7 @@ export default function MessagePage() {
       try {
         setLoading(true);
 
-        const res = await fetch(
-          `/api/developer_profile?userId=${developerId}`,
-        );
+        const res = await fetch(`/api/developer_profile?userId=${developerId}`);
 
         const data = await res.json();
 
@@ -287,7 +291,7 @@ export default function MessagePage() {
     });
   };
 
-/*
+  /*
   --------------------------------------------------
   Mark Messages As Read
   --------------------------------------------------
@@ -299,44 +303,38 @@ export default function MessagePage() {
   পাঠিয়েছে, শুধু সেগুলো read = 1 হবে।
 */
 
-const markMessagesAsRead = async () => {
-  if (!developer?.user_id || !user?.id) {
-    return;
-  }
-
-  try {
-    const response = await fetch("/api/conversations/read-to-unread", {
-      method: "PATCH",
-
-      headers: {
-        "Content-Type": "application/json",
-      },
-
-      body: JSON.stringify({
-        userId: user.id,
-        otherUserId: developer.user_id,
-      }),
-    });
-
-    const result = await response.json();
-
-    if (!response.ok) {
-      console.error(
-        "Failed to mark messages as read:",
-        result,
-      );
-
+  const markMessagesAsRead = async () => {
+    if (!developer?.user_id || !user?.id) {
       return;
     }
 
-    console.log("Messages marked as read:", result);
-  } catch (error) {
-    console.error(
-      "Mark messages as read error:",
-      error,
-    );
-  }
-};
+    try {
+      const response = await fetch("/api/conversations/read-to-unread", {
+        method: "PATCH",
+
+        headers: {
+          "Content-Type": "application/json",
+        },
+
+        body: JSON.stringify({
+          userId: user.id,
+          otherUserId: developer.user_id,
+        }),
+      });
+
+      const result = await response.json();
+
+      if (!response.ok) {
+        console.error("Failed to mark messages as read:", result);
+
+        return;
+      }
+
+      console.log("Messages marked as read:", result);
+    } catch (error) {
+      console.error("Mark messages as read error:", error);
+    }
+  };
 
   /*
     --------------------------------------------------
@@ -344,68 +342,66 @@ const markMessagesAsRead = async () => {
     --------------------------------------------------
   */
 
- const fetchMessages = async (showLoader = true) => {
-  if (!developer?.user_id || !user?.id) {
-    return;
-  }
-
-  try {
-    if (showLoader) {
-      setMessagesLoading(true);
-    }
-
-    const response = await fetch(
-      `/api/conversations?userId=${user.id}&otherUserId=${developer.user_id}`,
-      {
-        cache: "no-store",
-      },
-    );
-
-    const result = await response.json();
-
-    if (!response.ok) {
-      console.error("Failed to fetch messages:", result);
+  const fetchMessages = async (showLoader = true) => {
+    if (!developer?.user_id || !user?.id) {
       return;
     }
 
-    const formattedMessages: Message[] = (result.data || []).map(
-      (item: any) => ({
-        id: item.id,
+    try {
+      if (showLoader) {
+        setMessagesLoading(true);
+      }
 
-        sender:
-          String(item.senderId) === String(user.id)
-            ? "me"
-            : "them",
+      const response = await fetch(
+        `/api/conversations?userId=${user.id}&otherUserId=${developer.user_id}`,
+        {
+          cache: "no-store",
+        },
+      );
 
-        senderId: item.senderId,
+      const result = await response.json();
 
-        text: item.message,
+      if (!response.ok) {
+        console.error("Failed to fetch messages:", result);
+        return;
+      }
 
-        createdAt: item.createdAt,
-      }),
-    );
+      const formattedMessages: Message[] = (result.data || []).map(
+        (item: any) => ({
+          id: item.id,
 
-    setMessages(formattedMessages);
+          sender: String(item.senderId) === String(user.id) ? "me" : "them",
 
-    /*
+          senderId: item.senderId,
+
+          text: item.message,
+
+          createdAt: item.createdAt,
+
+          updatedAt: item.updatedAt,
+
+          edited: item.edited ?? 0,
+        }),
+      );
+
+      setMessages(formattedMessages);
+
+      /*
       Messages successfully load হওয়ার পরে
       এই conversation-এর incoming unread messages
       read = 1 করে দিচ্ছি।
     */
 
-    await markMessagesAsRead();
-  } catch (error) {
-    console.error("Failed to fetch conversation:", error);
-  } finally {
-    if (showLoader) {
-      setMessagesLoading(false);
+      await markMessagesAsRead();
+    } catch (error) {
+      console.error("Failed to fetch conversation:", error);
+    } finally {
+      if (showLoader) {
+        setMessagesLoading(false);
+      }
     }
-  }
-};
+  };
 
-
-
-  
   /*
     --------------------------------------------------
     Initial message fetch
@@ -484,6 +480,93 @@ const markMessagesAsRead = async () => {
   };
 
   /*
+  --------------------------------------------------
+  Start Editing Message
+  --------------------------------------------------
+*/
+
+  const handleStartEdit = (item: Message) => {
+    setEditingMessageId(item.id);
+    setEditingText(item.text);
+    setShowEmojiPicker(false);
+  };
+
+  /*
+  --------------------------------------------------
+  Cancel Editing
+  --------------------------------------------------
+*/
+
+  const handleCancelEdit = () => {
+    setEditingMessageId(null);
+    setEditingText("");
+  };
+
+  /*
+  --------------------------------------------------
+  Save Edited Message
+  --------------------------------------------------
+*/
+
+  const handleSaveEdit = async () => {
+    const trimmedText = editingText.trim();
+
+    if (!trimmedText) return;
+
+    if (editingMessageId === null) return;
+
+    if (!user?.id) {
+      console.error("User information not available");
+      return;
+    }
+
+    try {
+      const response = await fetch("/api/conversations/edit", {
+        method: "PATCH",
+
+        headers: {
+          "Content-Type": "application/json",
+        },
+
+        body: JSON.stringify({
+          messageId: editingMessageId,
+          userId: user.id,
+          message: trimmedText,
+        }),
+      });
+
+      const result = await response.json();
+
+      console.log("EDIT MESSAGE API RESPONSE:", result);
+
+      if (!response.ok) {
+        console.error("Message edit failed:", result);
+        return;
+      }
+
+      const updatedMessage = result.data;
+
+      setMessages((prev) =>
+        prev.map((item) =>
+          item.id === editingMessageId
+            ? {
+                ...item,
+                text: updatedMessage.message,
+                createdAt: updatedMessage.createdAt,
+                updatedAt: updatedMessage.updatedAt,
+                edited: updatedMessage.edited,
+              }
+            : item,
+        ),
+      );
+
+      setEditingMessageId(null);
+      setEditingText("");
+    } catch (error) {
+      console.error("Failed to edit message:", error);
+    }
+  };
+  /*
     --------------------------------------------------
     Send Message
     --------------------------------------------------
@@ -560,8 +643,7 @@ const markMessagesAsRead = async () => {
 
         text: trimmedMessage,
 
-        createdAt:
-          result.data?.createdAt ?? new Date().toISOString(),
+        createdAt: result.data?.createdAt ?? new Date().toISOString(),
       };
 
       setMessages((prev) => [...prev, newMessage]);
@@ -599,7 +681,6 @@ const markMessagesAsRead = async () => {
   return (
     <main className="min-h-screen w-full text-(--text)">
       <div className="mx-auto flex h-screen flex-col px-4 py-4 sm:px-6 lg:px-8">
-
         {/* =====================================================
             HEADER
         ====================================================== */}
@@ -620,10 +701,10 @@ const markMessagesAsRead = async () => {
           "
         >
           <div className="flex min-w-0 items-center gap-3">
-
             {/* Developer Avatar */}
 
             <div className="relative shrink-0">
+              <Link href={`/pages/recruiter/developer_profile_details/${developerId}`}>
               <div
                 className="
                   flex
@@ -640,13 +721,9 @@ const markMessagesAsRead = async () => {
                   text-white
                 "
               >
-                {developer?.developer_photo ||
-                developer?.user_photo ? (
+                {developer?.developer_photo || developer?.user_photo ? (
                   <Image
-                    src={
-                      developer.developer_photo ||
-                      developer.user_photo!
-                    }
+                    src={developer.developer_photo || developer.user_photo!}
                     alt={developer.fullName || "Developer"}
                     width={44}
                     height={44}
@@ -660,6 +737,8 @@ const markMessagesAsRead = async () => {
                   </span>
                 )}
               </div>
+              </Link>
+              
             </div>
 
             {/* Developer Info */}
@@ -681,7 +760,6 @@ const markMessagesAsRead = async () => {
           {/* Header Actions */}
 
           <div className="flex items-center gap-1">
-
             {/* Refresh */}
 
             <button
@@ -710,8 +788,6 @@ const markMessagesAsRead = async () => {
                 className={refreshing ? "animate-spin" : ""}
               />
             </button>
-
-          
           </div>
         </div>
 
@@ -760,55 +836,184 @@ const markMessagesAsRead = async () => {
               </div>
             ) : messages.length === 0 ? (
               <div className="flex h-full items-center justify-center">
-                <p className="text-sm text-(--text-muted)">
-                  No messages yet.
-                </p>
+                <p className="text-sm text-(--text-muted)">No messages yet.</p>
               </div>
             ) : (
               messages.map((item) => {
                 const isMine = item.sender === "me";
+                const isEditing = editingMessageId === item.id;
 
                 return (
                   <div
                     key={item.id}
                     className={`flex ${
-                      isMine
-                        ? "justify-end"
-                        : "justify-start"
+                      isMine ? "justify-end" : "justify-start"
                     }`}
                   >
                     <div
                       className={`flex max-w-[85%] flex-col sm:max-w-[70%] ${
-                        isMine
-                          ? "items-end"
-                          : "items-start"
+                        isMine ? "items-end" : "items-start"
                       }`}
                     >
-                      <div
-                        className={`rounded-2xl px-4 py-3 text-sm leading-6 ${
-                          isMine
-                            ? "rounded-br-md bg-(--primary) text-white"
-                            : "rounded-bl-md border border-(--border) bg-(--surface) text-(--text)"
-                        }`}
-                      >
-                        {item.text}
-                      </div>
+                      {isEditing ? (
+                        /*
+            --------------------------------------------------
+            Editing Mode
+            --------------------------------------------------
+          */
+                        <div className="w-full min-w-[280px] max-w-[500px] rounded-2xl border border-(--primary) bg-(--surface) p-3 shadow-sm">
+                          <textarea
+                            autoFocus
+                            value={editingText}
+                            onChange={(e) => setEditingText(e.target.value)}
+                            onKeyDown={(e) => {
+                              if (e.key === "Escape") {
+                                e.preventDefault();
+                                handleCancelEdit();
+                              }
 
-                      {/* Relative Time */}
+                              if (e.key === "Enter" && !e.shiftKey) {
+                                e.preventDefault();
+                                handleSaveEdit();
+                              }
+                            }}
+                            rows={3}
+                            className="
+                w-full
+                resize-none
+                rounded-lg
+                border-none
+                bg-transparent
+                px-1
+                py-1
+                text-sm
+                leading-6
+                text-(--text)
+                outline-none
+                placeholder:text-(--text-muted)
+              "
+                            placeholder="Edit your message..."
+                          />
 
-                      <span
-                        className="
-                          mt-1.5
-                          px-1
-                          text-[11px]
-                          text-(--text-muted)
-                        "
-                        title={new Date(
-                          item.createdAt,
-                        ).toLocaleString()}
-                      >
-                        {getRelativeTime(item.createdAt)}
-                      </span>
+                          <div className="mt-2 flex items-center justify-end gap-2 border-t border-(--border) pt-2">
+                            {/* Cancel */}
+
+                            <button
+                              type="button"
+                              onClick={handleCancelEdit}
+                              className="
+                  inline-flex
+                  h-8
+                  items-center
+                  gap-1.5
+                  rounded-lg
+                  px-3
+                  text-xs
+                  font-medium
+                  text-(--text-muted)
+                  transition
+                  hover:bg-(--surface-hover)
+                  hover:text-(--text)
+                "
+                            >
+                              <X size={14} />
+                              Cancel
+                            </button>
+
+                            {/* Save */}
+
+                            <button
+                              type="button"
+                              onClick={handleSaveEdit}
+                              disabled={!editingText.trim()}
+                              className="
+                  inline-flex
+                  h-8
+                  items-center
+                  gap-1.5
+                  rounded-lg
+                  bg-(--primary)
+                  px-3
+                  text-xs
+                  font-medium
+                  text-white
+                  transition
+                  hover:bg-(--primary-hover)
+                  disabled:cursor-not-allowed
+                  disabled:opacity-40
+                "
+                            >
+                              <Check size={14} />
+                              Save
+                            </button>
+                          </div>
+                        </div>
+                      ) : (
+                        <>
+                          {/* Normal Message Row */}
+
+                          <div className="flex items-end gap-1.5">
+                            {/* Message Bubble */}
+
+                            <div
+                              className={`rounded-2xl px-4 py-3 text-sm leading-6 ${
+                                isMine
+                                  ? "rounded-br-md bg-(--primary) text-white"
+                                  : "rounded-bl-md border border-(--border) bg-(--surface) text-(--text)"
+                              }`}
+                            >
+                              {item.text}
+                            </div>
+
+                            {/* Edit Button */}
+
+                            {isMine && (
+                              <button
+                                type="button"
+                                onClick={() => handleStartEdit(item)}
+                                className="
+                    mb-1
+                    flex
+                    h-7
+                    w-7
+                    shrink-0
+                    items-center
+                    justify-center
+                    rounded-md
+                    text-(--text-muted)
+                    transition
+                    hover:bg-(--surface-hover)
+                    hover:text-(--primary)
+                  "
+                                aria-label="Edit message"
+                                title="Edit message"
+                              >
+                                <Edit3 size={14} />
+                              </button>
+                            )}
+                          </div>
+
+                          {/* Message Time */}
+
+                          <span
+                            className="
+                mt-1.5
+                px-1
+                text-[11px]
+                text-(--text-muted)
+              "
+                            title={new Date(
+                              item.updatedAt || item.createdAt,
+                            ).toLocaleString()}
+                          >
+                            {getRelativeTime(item.updatedAt || item.createdAt)}
+
+                            {item.edited === 1 && (
+                              <span className="ml-1.5">· edited</span>
+                            )}
+                          </span>
+                        </>
+                      )}
                     </div>
                   </div>
                 );
@@ -833,7 +1038,6 @@ const markMessagesAsRead = async () => {
           "
         >
           <div className="relative">
-
             {/* =================================================
                 EMOJI POPUP
             ================================================== */}
@@ -866,15 +1070,11 @@ const markMessagesAsRead = async () => {
                     pb-2
                   "
                 >
-                  <span className="text-sm font-semibold">
-                    Emojis
-                  </span>
+                  <span className="text-sm font-semibold">Emojis</span>
 
                   <button
                     type="button"
-                    onClick={() =>
-                      setShowEmojiPicker(false)
-                    }
+                    onClick={() => setShowEmojiPicker(false)}
                     className="
                       text-xs
                       text-(--text-muted)
@@ -898,9 +1098,7 @@ const markMessagesAsRead = async () => {
                     <button
                       key={`${emoji}-${index}`}
                       type="button"
-                      onClick={() =>
-                        handleEmojiSelect(emoji)
-                      }
+                      onClick={() => handleEmojiSelect(emoji)}
                       className="
                         flex
                         h-8
@@ -938,7 +1136,6 @@ const markMessagesAsRead = async () => {
                 focus-within:border-(--primary)
               "
             >
-
               {/* Attachment */}
 
               <button
@@ -966,9 +1163,7 @@ const markMessagesAsRead = async () => {
 
               <textarea
                 value={message}
-                onChange={(e) =>
-                  setMessage(e.target.value)
-                }
+                onChange={(e) => setMessage(e.target.value)}
                 onKeyDown={handleKeyDown}
                 placeholder="Write a message..."
                 rows={1}
@@ -992,9 +1187,7 @@ const markMessagesAsRead = async () => {
 
               <button
                 type="button"
-                onClick={() =>
-                  setShowEmojiPicker((prev) => !prev)
-                }
+                onClick={() => setShowEmojiPicker((prev) => !prev)}
                 className={`
                   mb-1
                   flex

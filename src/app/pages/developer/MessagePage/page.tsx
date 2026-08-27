@@ -1,15 +1,11 @@
 "use client";
 
 import { useCallback, useEffect, useRef, useState } from "react";
-import {
-  Paperclip,
-  RefreshCw,
-  Send,
-  Smile,
-} from "lucide-react";
+import { Check, Edit3, Paperclip, RefreshCw, Send, Smile, X } from "lucide-react";
 import { useSearchParams } from "next/navigation";
 import Image from "next/image";
 import { useAuth } from "@/context/AuthContext";
+import Link from "next/link";
 
 interface DeveloperProfileResponse {
   data: {
@@ -26,6 +22,8 @@ type Message = {
   senderId: string | number;
   text: string;
   createdAt: string;
+  updatedAt?: string;
+  edited?: number;
 };
 
 type SendMessageData = {
@@ -102,8 +100,7 @@ export default function MessagePage() {
 
   console.log("RECRUITER ID FROM URL:", recruiterId);
 
-  const [profile, setProfile] =
-    useState<DeveloperProfileResponse | null>(null);
+  const [profile, setProfile] = useState<DeveloperProfileResponse | null>(null);
 
   const [loading, setLoading] = useState(true);
 
@@ -115,7 +112,8 @@ export default function MessagePage() {
   const [message, setMessage] = useState("");
 
   const [showEmojiPicker, setShowEmojiPicker] = useState(false);
-
+  const [editingMessageId, setEditingMessageId] = useState<number | null>(null);
+  const [editingText, setEditingText] = useState("");
   const emojiPickerRef = useRef<HTMLDivElement>(null);
 
   /*
@@ -129,9 +127,7 @@ export default function MessagePage() {
   const developer_name = user?.name;
   const developer_id = user?.id;
 
-
-
-/*
+  /*
 |--------------------------------------------------------------------------
 | Mark Recruiter Messages as Read
 |--------------------------------------------------------------------------
@@ -150,44 +146,38 @@ export default function MessagePage() {
 |
 */
 
-const markMessagesAsRead = useCallback(async () => {
-  if (!user?.id || !recruiterId) {
-    return;
-  }
-
-  try {
-    const response = await fetch("/api/conversations/read-to-unread", {
-      method: "PATCH",
-
-      headers: {
-        "Content-Type": "application/json",
-      },
-
-      body: JSON.stringify({
-        userId: user.id,
-        otherUserId: recruiterId,
-      }),
-    });
-
-    const result = await response.json();
-
-    if (!response.ok) {
-      console.error(
-        "Failed to mark messages as read:",
-        result,
-      );
-
+  const markMessagesAsRead = useCallback(async () => {
+    if (!user?.id || !recruiterId) {
       return;
     }
 
-    console.log("Messages marked as read:", result);
-  } catch (error) {
-    console.error(
-      "Mark messages as read error:",
-      error,
-    );
-  }
-}, [user?.id, recruiterId]);
+    try {
+      const response = await fetch("/api/conversations/read-to-unread", {
+        method: "PATCH",
+
+        headers: {
+          "Content-Type": "application/json",
+        },
+
+        body: JSON.stringify({
+          userId: user.id,
+          otherUserId: recruiterId,
+        }),
+      });
+
+      const result = await response.json();
+
+      if (!response.ok) {
+        console.error("Failed to mark messages as read:", result);
+
+        return;
+      }
+
+      console.log("Messages marked as read:", result);
+    } catch (error) {
+      console.error("Mark messages as read error:", error);
+    }
+  }, [user?.id, recruiterId]);
 
   /*
   |--------------------------------------------------------------------------
@@ -290,9 +280,7 @@ const markMessagesAsRead = useCallback(async () => {
     const date = new Date(dateString);
     const now = new Date();
 
-    const diffInSeconds = Math.floor(
-      (now.getTime() - date.getTime()) / 1000,
-    );
+    const diffInSeconds = Math.floor((now.getTime() - date.getTime()) / 1000);
 
     if (diffInSeconds < 10) {
       return "Just now";
@@ -313,40 +301,30 @@ const markMessagesAsRead = useCallback(async () => {
     const diffInHours = Math.floor(diffInMinutes / 60);
 
     if (diffInHours < 24) {
-      return `${diffInHours} ${
-        diffInHours === 1 ? "hour" : "hours"
-      } ago`;
+      return `${diffInHours} ${diffInHours === 1 ? "hour" : "hours"} ago`;
     }
 
     const diffInDays = Math.floor(diffInHours / 24);
 
     if (diffInDays < 7) {
-      return `${diffInDays} ${
-        diffInDays === 1 ? "day" : "days"
-      } ago`;
+      return `${diffInDays} ${diffInDays === 1 ? "day" : "days"} ago`;
     }
 
     const diffInWeeks = Math.floor(diffInDays / 7);
 
     if (diffInWeeks < 4) {
-      return `${diffInWeeks} ${
-        diffInWeeks === 1 ? "week" : "weeks"
-      } ago`;
+      return `${diffInWeeks} ${diffInWeeks === 1 ? "week" : "weeks"} ago`;
     }
 
     const diffInMonths = Math.floor(diffInDays / 30);
 
     if (diffInMonths < 12) {
-      return `${diffInMonths} ${
-        diffInMonths === 1 ? "month" : "months"
-      } ago`;
+      return `${diffInMonths} ${diffInMonths === 1 ? "month" : "months"} ago`;
     }
 
     const diffInYears = Math.floor(diffInDays / 365);
 
-    return `${diffInYears} ${
-      diffInYears === 1 ? "year" : "years"
-    } ago`;
+    return `${diffInYears} ${diffInYears === 1 ? "year" : "years"} ago`;
   };
 
   /*
@@ -376,17 +354,14 @@ const markMessagesAsRead = useCallback(async () => {
   |--------------------------------------------------------------------------
   */
 
-  const scrollToBottom = useCallback(
-    (behavior: ScrollBehavior = "smooth") => {
-      setTimeout(() => {
-        messagesEndRef.current?.scrollIntoView({
-          behavior,
-          block: "end",
-        });
-      }, 50);
-    },
-    [],
-  );
+  const scrollToBottom = useCallback((behavior: ScrollBehavior = "smooth") => {
+    setTimeout(() => {
+      messagesEndRef.current?.scrollIntoView({
+        behavior,
+        block: "end",
+      });
+    }, 50);
+  }, []);
 
   /*
   |--------------------------------------------------------------------------
@@ -429,23 +404,23 @@ const markMessagesAsRead = useCallback(async () => {
           return;
         }
 
-        const formattedMessages: Message[] = (
-          result.data || []
-        ).map((item: any) => ({
-          id: item.id,
+        const formattedMessages: Message[] = (result.data || []).map(
+          (item: any) => ({
+            id: item.id,
 
-          sender:
-            String(item.senderId) === String(user.id)
-              ? "me"
-              : "them",
+            sender: String(item.senderId) === String(user.id) ? "me" : "them",
 
-          senderId: item.senderId,
+            senderId: item.senderId,
 
-          text: item.message,
+            text: item.message,
 
-          createdAt: item.createdAt,
-        }));
+            createdAt: item.createdAt,
 
+            updatedAt: item.updatedAt,
+
+            edited: item.edited ?? 0,
+          }),
+        );
         setMessages(formattedMessages);
 
         /*
@@ -474,20 +449,19 @@ const markMessagesAsRead = useCallback(async () => {
     fetchMessages(false);
   }, [fetchMessages]);
 
-
   /*
 |--------------------------------------------------------------------------
 | Conversation Enter → Mark Received Messages as Read
 |--------------------------------------------------------------------------
 */
 
-useEffect(() => {
-  if (!user?.id || !recruiterId) {
-    return;
-  }
+  useEffect(() => {
+    if (!user?.id || !recruiterId) {
+      return;
+    }
 
-  markMessagesAsRead();
-}, [user?.id, recruiterId, markMessagesAsRead]);
+    markMessagesAsRead();
+  }, [user?.id, recruiterId, markMessagesAsRead]);
   /*
   |--------------------------------------------------------------------------
   | যখন messages state change হবে,
@@ -512,6 +486,121 @@ useEffect(() => {
   const handleEmojiSelect = (emoji: string) => {
     setMessage((prev) => prev + emoji);
   };
+
+/*
+|--------------------------------------------------------------------------
+| Start Editing Message
+|--------------------------------------------------------------------------
+*/
+
+const handleStartEdit = (item: Message) => {
+  setEditingMessageId(item.id);
+  setEditingText(item.text);
+  setShowEmojiPicker(false);
+};
+
+/*
+|--------------------------------------------------------------------------
+| Cancel Editing
+|--------------------------------------------------------------------------
+*/
+
+const handleCancelEdit = () => {
+  setEditingMessageId(null);
+  setEditingText("");
+};
+
+/*
+|--------------------------------------------------------------------------
+| Save Edited Message
+|--------------------------------------------------------------------------
+|
+| এখনো API call নেই।
+| আপাতত local state update হচ্ছে।
+| পরে এখানে PATCH API বসানো হবে।
+|--------------------------------------------------------------------------
+*/
+
+const handleSaveEdit = async () => {
+  const trimmedText = editingText.trim();
+
+  if (!trimmedText) return;
+
+  if (editingMessageId === null) return;
+
+  if (!user?.id) {
+    console.error("User information not available");
+    return;
+  }
+
+  try {
+    const response = await fetch("/api/conversations/edit", {
+      method: "PATCH",
+
+      headers: {
+        "Content-Type": "application/json",
+      },
+
+      body: JSON.stringify({
+        messageId: editingMessageId,
+        userId: user.id,
+        message: trimmedText,
+      }),
+    });
+
+    const result = await response.json();
+
+    console.log("EDIT MESSAGE API RESPONSE:", result);
+
+    if (!response.ok) {
+      console.error("Message edit failed:", result);
+
+      return;
+    }
+
+    /*
+    ==================================================
+    Update Frontend State
+    ==================================================
+    */
+
+    const updatedMessage = result.data;
+
+    setMessages((prev) =>
+      prev.map((item) =>
+        item.id === editingMessageId
+          ? {
+              ...item,
+
+              text: updatedMessage.message,
+
+              createdAt: updatedMessage.createdAt,
+
+              updatedAt: updatedMessage.updatedAt,
+
+              edited: updatedMessage.edited,
+            }
+          : item,
+      ),
+    );
+
+    /*
+    ==================================================
+    Exit Edit Mode
+    ==================================================
+    */
+
+    setEditingMessageId(null);
+    setEditingText("");
+  } catch (error) {
+    console.error(
+      "Failed to edit message:",
+      error,
+    );
+  }
+};
+
+
 
   /*
   |--------------------------------------------------------------------------
@@ -590,9 +679,7 @@ useEffect(() => {
 
         text: trimmedMessage,
 
-        createdAt:
-          result.data?.createdAt ??
-          new Date().toISOString(),
+        createdAt: result.data?.createdAt ?? new Date().toISOString(),
       };
 
       setMessages((prev) => [...prev, newMessage]);
@@ -616,9 +703,7 @@ useEffect(() => {
   |--------------------------------------------------------------------------
   */
 
-  const handleKeyDown = (
-    e: React.KeyboardEvent<HTMLTextAreaElement>,
-  ) => {
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
     if (e.key === "Enter" && !e.shiftKey) {
       e.preventDefault();
 
@@ -643,21 +728,20 @@ useEffect(() => {
   return (
     <main className="min-h-screen w-full text-(--text)">
       <div className="mx-auto flex h-screen flex-col px-4 py-4 sm:px-6 lg:px-8">
-
         {/* =========================================================
             Header
         ========================================================== */}
 
         <div className="flex items-center justify-between rounded-t-2xl border border-(--border) bg-(--surface) px-4 py-3 shadow-sm sm:px-5">
-
           <div className="flex min-w-0 items-center gap-3">
-
             {/* Recruiter Avatar */}
 
             <div className="relative shrink-0">
 
-              <div className="flex h-11 w-11 shrink-0 items-center justify-center overflow-hidden rounded-full bg-(--primary) text-sm font-semibold text-white">
-
+              <Link 
+              href={`/pages/developer/recuter-profile/${recruiterId}`}
+              >
+<div className="flex h-11 w-11 shrink-0 items-center justify-center overflow-hidden rounded-full bg-(--primary) text-sm font-semibold text-white">
                 {recruiter?.profilePhoto ? (
                   <Image
                     src={recruiter.profilePhoto}
@@ -673,15 +757,14 @@ useEffect(() => {
                       : "??"}
                   </span>
                 )}
-
               </div>
-
+              </Link>
+              
             </div>
 
             {/* Recruiter Info */}
 
             <div className="min-w-0">
-
               <h1 className="truncate text-sm font-semibold sm:text-base">
                 Recruiter name: {recruiter?.fullName}
               </h1>
@@ -689,9 +772,7 @@ useEffect(() => {
               <p className="mt-0.5 truncate text-xs text-(--text-muted)">
                 Company: {recruiter?.companyName}
               </p>
-
             </div>
-
           </div>
 
           {/* Refresh Button */}
@@ -718,12 +799,8 @@ useEffect(() => {
             aria-label="Refresh messages"
             title="Refresh messages"
           >
-            <RefreshCw
-              size={18}
-              className={refreshing ? "animate-spin" : ""}
-            />
+            <RefreshCw size={18} className={refreshing ? "animate-spin" : ""} />
           </button>
-
         </div>
 
         {/* =========================================================
@@ -731,16 +808,13 @@ useEffect(() => {
         ========================================================== */}
 
         <section className="flex min-h-0 flex-1 flex-col border-x border-(--border) bg-(--bg-secondary)">
-
           {/* Conversation Info */}
 
           <div className="border-b border-(--border) px-5 py-3">
-
             <p className="text-center text-xs text-(--text-muted)">
               This conversation is between you and{" "}
               {recruiter?.fullName || "the recruiter"}.
             </p>
-
           </div>
 
           {/* =====================================================
@@ -757,7 +831,6 @@ useEffect(() => {
               sm:px-6
             "
           >
-
             {/* Message Loading */}
 
             {messagesLoading ? (
@@ -768,57 +841,226 @@ useEffect(() => {
               </div>
             ) : messages.length === 0 ? (
               <div className="flex h-full items-center justify-center">
-                <p className="text-sm text-(--text-muted)">
-                  No messages yet.
-                </p>
+                <p className="text-sm text-(--text-muted)">No messages yet.</p>
               </div>
             ) : (
               <>
                 {messages.map((item) => {
+  const isMine = item.sender === "me";
+  const isEditing = editingMessageId === item.id;
 
-                  const isMine = item.sender === "me";
+  return (
+    <div
+      key={item.id}
+      className={`flex ${
+        isMine ? "justify-end" : "justify-start"
+      }`}
+    >
+      <div
+        className={`flex max-w-[85%] flex-col sm:max-w-[70%] ${
+          isMine ? "items-end" : "items-start"
+        }`}
+      >
+        {/*
+        |--------------------------------------------------------------------------
+        | Editing Mode
+        |--------------------------------------------------------------------------
+        */}
 
-                  return (
-                    <div
-                      key={item.id}
-                      className={`flex ${
-                        isMine
-                          ? "justify-end"
-                          : "justify-start"
-                      }`}
-                    >
+        {isEditing ? (
+          <div className="w-full min-w-[280px] max-w-[500px] rounded-2xl border border-(--primary) bg-(--surface) p-3 shadow-sm">
+            <textarea
+              autoFocus
+              value={editingText}
+              onChange={(e) => setEditingText(e.target.value)}
+              onKeyDown={(e) => {
+                if (e.key === "Escape") {
+                  e.preventDefault();
+                  handleCancelEdit();
+                }
 
-                      <div
-                        className={`flex max-w-[85%] flex-col sm:max-w-[70%] ${
-                          isMine
-                            ? "items-end"
-                            : "items-start"
-                        }`}
-                      >
+                if (e.key === "Enter" && !e.shiftKey) {
+                  e.preventDefault();
+                  handleSaveEdit();
+                }
+              }}
+              rows={3}
+              className="
+                w-full
+                resize-none
+                rounded-lg
+                border-none
+                bg-transparent
+                px-1
+                py-1
+                text-sm
+                leading-6
+                text-(--text)
+                outline-none
+                placeholder:text-(--text-muted)
+              "
+              placeholder="Edit your message..."
+            />
 
-                        {/* Message Bubble */}
+            <div className="mt-2 flex items-center justify-end gap-2 border-t border-(--border) pt-2">
+              {/*
+              Cancel
+              */}
 
-                        <div
-                          className={`rounded-2xl px-4 py-3 text-sm leading-6 ${
-                            isMine
-                              ? "rounded-br-md bg-(--primary) text-white"
-                              : "rounded-bl-md border border-(--border) bg-(--surface) text-(--text)"
-                          }`}
-                        >
-                          {item.text}
-                        </div>
+              <button
+                type="button"
+                onClick={handleCancelEdit}
+                className="
+                  inline-flex
+                  h-8
+                  items-center
+                  gap-1.5
+                  rounded-lg
+                  px-3
+                  text-xs
+                  font-medium
+                  text-(--text-muted)
+                  transition
+                  hover:bg-(--surface-hover)
+                  hover:text-(--text)
+                "
+              >
+                <X size={14} />
+                Cancel
+              </button>
 
-                        {/* Relative Time */}
+              {/*
+              Save
+              */}
 
-                        <span className="mt-1.5 px-1 text-[11px] text-(--text-muted)">
-                          {getRelativeTime(item.createdAt)}
-                        </span>
+              <button
+                type="button"
+                onClick={handleSaveEdit}
+                disabled={!editingText.trim()}
+                className="
+                  inline-flex
+                  h-8
+                  items-center
+                  gap-1.5
+                  rounded-lg
+                  bg-(--primary)
+                  px-3
+                  text-xs
+                  font-medium
+                  text-white
+                  transition
+                  hover:bg-(--primary-hover)
+                  disabled:cursor-not-allowed
+                  disabled:opacity-40
+                "
+              >
+                <Check size={14} />
+                Save
+              </button>
+            </div>
+          </div>
+        ) : (
+          <>
+            {/*
+            |--------------------------------------------------------------------------
+            | Normal Message Row
+            |--------------------------------------------------------------------------
+            */}
 
-                      </div>
+            <div className="flex items-end gap-1.5">
+              {/*
+              Message Bubble
+              */}
 
-                    </div>
-                  );
-                })}
+              <div
+                className={`rounded-2xl px-4 py-3 text-sm leading-6 ${
+                  isMine
+                    ? "rounded-br-md bg-(--primary) text-white"
+                    : "rounded-bl-md border border-(--border) bg-(--surface) text-(--text)"
+                }`}
+              >
+                {item.text}
+              </div>
+
+              {/*
+              |--------------------------------------------------------------------------
+              | Edit Button
+              |--------------------------------------------------------------------------
+              |
+              | শুধু নিজের message-এর জন্য।
+              |
+              */}
+
+              {isMine && (
+                <button
+                  type="button"
+                  onClick={() => handleStartEdit(item)}
+                  className="
+                    mb-1
+                    flex
+                    h-7
+                    w-7
+                    shrink-0
+                    items-center
+                    justify-center
+                    rounded-md
+                    text-(--text-muted)
+                    transition
+                    hover:bg-(--surface-hover)
+                    hover:text-(--primary)
+                  "
+                  aria-label="Edit message"
+                  title="Edit message"
+                >
+                  <Edit3 size={14} />
+                </button>
+              )}
+            </div>
+
+            {/*
+            |--------------------------------------------------------------------------
+            | Message Time
+            |--------------------------------------------------------------------------
+            */}
+<div
+  className={`mt-1.5 flex items-center gap-2 px-1 text-[11px] ${
+    isMine ? "justify-end" : "justify-start"
+  }`}
+>
+  {/* Message Time */}
+
+  <span className="text-(--text-muted)">
+    {getRelativeTime(item.createdAt)}
+  </span>
+
+  {/* Edited Badge */}
+
+  {item.edited === 1 && (
+    <span
+      className="
+        inline-flex
+        items-center
+        rounded-full
+        border
+        border-(--border)
+        bg-(--surface)
+        px-1.5
+        py-0.5
+        text-[10px]
+        font-medium
+        text-(--text-muted)
+      "
+    >
+      Edited
+    </span>
+  )}
+</div>
+          </>
+        )}
+      </div>
+    </div>
+  );
+})}
 
                 {/* 
                   এই invisible element সব message-এর শেষে।
@@ -826,10 +1068,8 @@ useEffect(() => {
                 */}
 
                 <div ref={messagesEndRef} />
-
               </>
             )}
-
           </div>
         </section>
 
@@ -838,9 +1078,7 @@ useEffect(() => {
         ========================================================== */}
 
         <div className="rounded-b-2xl border border-(--border) bg-(--surface) p-3 shadow-sm sm:p-4">
-
           <div className="relative">
-
             {/* =====================================================
                 Emoji Popup
             ====================================================== */}
@@ -862,34 +1100,24 @@ useEffect(() => {
                   shadow-[var(--shadow)]
                 "
               >
-
                 <div className="mb-2 flex items-center justify-between border-b border-(--border) pb-2">
-
-                  <span className="text-sm font-semibold">
-                    Emojis
-                  </span>
+                  <span className="text-sm font-semibold">Emojis</span>
 
                   <button
                     type="button"
-                    onClick={() =>
-                      setShowEmojiPicker(false)
-                    }
+                    onClick={() => setShowEmojiPicker(false)}
                     className="text-xs text-(--text-muted) hover:text-(--text)"
                   >
                     Close
                   </button>
-
                 </div>
 
                 <div className="grid max-h-56 grid-cols-8 gap-1 overflow-y-auto">
-
                   {emojis.map((emoji, index) => (
                     <button
                       key={`${emoji}-${index}`}
                       type="button"
-                      onClick={() =>
-                        handleEmojiSelect(emoji)
-                      }
+                      onClick={() => handleEmojiSelect(emoji)}
                       className="
                         flex
                         h-8
@@ -907,7 +1135,6 @@ useEffect(() => {
                       {emoji}
                     </button>
                   ))}
-
                 </div>
               </div>
             )}
@@ -917,7 +1144,6 @@ useEffect(() => {
             ====================================================== */}
 
             <div className="flex items-end gap-2 rounded-xl border border-(--border) bg-(--bg) p-2 transition focus-within:border-(--primary)">
-
               {/* Attachment */}
 
               <button
@@ -945,9 +1171,7 @@ useEffect(() => {
 
               <textarea
                 value={message}
-                onChange={(e) =>
-                  setMessage(e.target.value)
-                }
+                onChange={(e) => setMessage(e.target.value)}
                 onKeyDown={handleKeyDown}
                 placeholder="Write a message..."
                 rows={1}
@@ -971,9 +1195,7 @@ useEffect(() => {
 
               <button
                 type="button"
-                onClick={() =>
-                  setShowEmojiPicker((prev) => !prev)
-                }
+                onClick={() => setShowEmojiPicker((prev) => !prev)}
                 className={`
                   mb-1
                   flex
@@ -1021,14 +1243,12 @@ useEffect(() => {
               >
                 <Send size={17} />
               </button>
-
             </div>
           </div>
 
           <p className="mt-2 hidden text-[11px] text-(--text-muted) sm:block">
             Press Enter to send • Shift + Enter for a new line
           </p>
-
         </div>
       </div>
     </main>
