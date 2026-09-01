@@ -1,7 +1,11 @@
+
 "use client";
 
+import { useAuth } from "@/context/AuthContext";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
+
+import { useEffect } from "react";
 
 const routes = [
   { name: "Home", path: "/" },
@@ -11,12 +15,68 @@ const routes = [
   { name: "Inbox", path: "/pages/developer/inbox" },
 ];
 
-export default function Developerayout({
+export default function DeveloperLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
   const pathname = usePathname();
+  const router = useRouter();
+
+  const { user, isLoggedIn, loading } = useAuth();
+
+  useEffect(() => {
+    // Session/user information এখনো load হচ্ছে
+    if (loading) return;
+
+    // User login করা নেই
+    if (!isLoggedIn) {
+      router.replace("/pages/auth-required");
+      return;
+    }
+
+    // User login করেছে, কিন্তু developer নয়
+    if (user?.role !== "developer") {
+      router.replace("/pages/unauthorized");
+    }
+  }, [loading, isLoggedIn, user, router]);
+
+  // Authentication / Authorization check চলাকালীন loading UI
+  if (loading || !isLoggedIn || user?.role !== "developer") {
+    return (
+      <div
+        className="min-h-screen flex items-center justify-center"
+        style={{ background: "var(--bg)" }}
+      >
+        <div className="flex flex-col items-center gap-4">
+          {/* Spinner */}
+          <div
+            className="w-10 h-10 border-4 rounded-full animate-spin"
+            style={{
+              borderColor: "var(--border)",
+              borderTopColor: "var(--primary)",
+            }}
+          />
+
+          <div className="text-center">
+            <p
+              className="text-lg font-semibold"
+              style={{ color: "var(--text)" }}
+            >
+              Checking access...
+            </p>
+
+            <p
+              className="text-sm mt-1"
+              style={{ color: "var(--text-secondary)" }}
+            >
+              Please wait a moment
+            </p>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="flex min-h-screen" style={{ background: "var(--bg)" }}>
@@ -33,7 +93,8 @@ export default function Developerayout({
         <nav className="flex flex-col gap-2">
           {routes.map((route) => {
             const isActive =
-              pathname === route.path || pathname.startsWith(route.path + "/");
+              pathname === route.path ||
+              pathname.startsWith(route.path + "/");
 
             return (
               <Link
@@ -62,3 +123,4 @@ export default function Developerayout({
     </div>
   );
 }
+

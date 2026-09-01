@@ -19,117 +19,22 @@ export default function Footer() {
             </p>
           </div>
 
-          {/* Product */}
-          <div>
-            <h3 className="text-(--text) font-semibold mb-4">Product</h3>
-            <ul className="space-y-2 text-sm">
-              <li>
-                <Link
-                  href="/explore"
-                  className="hover:text-(--text) transition"
-                >
-                  Explore Challenges
-                </Link>
-              </li>
-              <li>
-                <Link
-                  href="/challenges"
-                  className="hover:text-(--text) transition"
-                >
-                  All Challenges
-                </Link>
-              </li>
-              <li>
-                <Link
-                  href="/dashboard"
-                  className="hover:text-(--text) transition"
-                >
-                  Dashboard
-                </Link>
-              </li>
-              <li>
-                <Link
-                  href="/pricing"
-                  className="hover:text-(--text) transition"
-                >
-                  Pricing
-                </Link>
-              </li>
-            </ul>
-          </div>
 
           {/* Company */}
           <div>
             <h3 className="text-(--text) font-semibold mb-4">Company</h3>
             <ul className="space-y-2 text-sm">
-              <li>
-                <Link
-                  href="/how-it-works"
-                  className="hover:text-(--text) transition"
-                >
-                  How it Works
-                </Link>
-              </li>
+        
               <li>
                 <Link href="/docs" className="hover:text-(--text) transition">
                   Docs
                 </Link>
               </li>
-              <li>
-                <Link href="/about" className="hover:text-(--text) transition">
-                  About
-                </Link>
-              </li>
-              <li>
-                <Link
-                  href="/contact"
-                  className="hover:text-(--text) transition"
-                >
-                  Contact
-                </Link>
-              </li>
+            
+            
             </ul>
           </div>
 
-          {/* Recruiter */}
-          <div>
-            <h3 className="text-(--text) font-semibold mb-4">For Recruiters</h3>
-
-            <ul className="space-y-2 text-sm">
-              <li>
-                <Link
-                  href="/recruiter/dashboard"
-                  className="hover:text-(--text) transition"
-                >
-                  Dashboard
-                </Link>
-              </li>
-              <li>
-                <Link
-                  href="/recruiter/candidates"
-                  className="hover:text-(--text) transition"
-                >
-                  Candidates
-                </Link>
-              </li>
-              <li>
-                <Link
-                  href="/recruiter/ranking"
-                  className="hover:text-(--text) transition"
-                >
-                  Talent Ranking
-                </Link>
-              </li>
-              <li>
-                <Link
-                  href="/recruiter/create-challenge"
-                  className="hover:text-(--text)] transition"
-                >
-                  Create Challenge
-                </Link>
-              </li>
-            </ul>
-          </div>
         </div>
 
         {/* Bottom Section */}
@@ -145,9 +50,7 @@ export default function Footer() {
             <Link href="/terms" className="hover:text-(--text) transition">
               Terms
             </Link>
-            <Link href="/security" className="hover:text-(--text) transition">
-              Security
-            </Link>
+           
           </div>
         </div>
       </div>

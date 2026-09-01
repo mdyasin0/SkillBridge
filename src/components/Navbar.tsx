@@ -40,18 +40,20 @@ const Navbar = () => {
         {/* Desktop Nav */}
         <nav className="hidden md:flex items-center gap-6 text-sm text-(--text-muted)">
           <Link href="/">Home</Link>
-          <Link href="/explore">Explore</Link>
-          <Link href="/challenges">Challenges</Link>
-          <Link href="/how-it-works">How it Works</Link>
+
           <Link href="/docs">Docs</Link>
 
-          <div className="w-px h-5 bg-(--border) mx-2" />
+          {isLoggedIn && user?.role === "recruiter" && (
+            <Link href="/pages/recruiter">Recruiter</Link>
+          )}
 
-          <Link href="/dashboard">Dashboard</Link>
-          <Link href="/pages/recruiter">Recruiter</Link>
-          
-           <Link href="/pages/developer">Developer</Link>
-          <Link href="/pages/admin">Admin</Link>
+          {isLoggedIn && user?.role === "developer" && (
+            <Link href="/pages/developer">Developer</Link>
+          )}
+
+          {isLoggedIn && user?.role === "admin" && (
+            <Link href="/pages/admin">Admin</Link>
+          )}
         </nav>
 
         {/* Right Side */}
@@ -139,16 +141,21 @@ const Navbar = () => {
       {open && (
         <div className="md:hidden px-4 pb-4 space-y-3 text-(--text-muted) bg-(--bg-secondary) border-t border-(--border)">
           <Link href="/">Home</Link>
-          <Link href="/explore">Explore</Link>
-          <Link href="/challenges">Challenges</Link>
-          <Link href="/how-it-works">How it Works</Link>
           <Link href="/docs">Docs</Link>
 
           <hr />
 
-          <Link href="/dashboard">Dashboard</Link>
-          <Link href="/recruiter/dashboard">Recruiter</Link>
-          <Link href="/admin/dashboard">Admin</Link>
+          {isLoggedIn && user?.role === "recruiter" && (
+            <Link href="/pages/recruiter">Recruiter</Link>
+          )}
+
+          {isLoggedIn && user?.role === "developer" && (
+            <Link href="/pages/developer">Developer</Link>
+          )}
+
+          {isLoggedIn && user?.role === "admin" && (
+            <Link href="/pages/admin">Admin</Link>
+          )}
 
           <hr />
 
