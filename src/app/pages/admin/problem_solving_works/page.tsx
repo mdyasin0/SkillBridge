@@ -482,8 +482,11 @@ ${status === "approved" ? "bg-(--primary) text-white" : "bg-(--surface) border"}
         <div className="fixed inset-0 z-60 flex items-center justify-center bg-black/50">
           <div className="w-full max-w-xl rounded-2xl bg-(--surface) p-6 shadow-2xl">
             <div className="mb-5 flex items-center justify-between">
-              <h3 className="text-xl font-bold">Submit Review</h3>
-
+  <div>
+                <h3 className="text-xl font-bold">Submit Review</h3>
+<h6 className="text-sm">There will be no penalty for the first attempt; based on the original score (100), 5% will be deducted from the score for each additional attempt after the first.
+</h6>
+  </div>
               <button
                 onClick={() => setShowReviewForm(false)}
                 className="rounded-lg p-2 hover:bg-(--surface-hover)"

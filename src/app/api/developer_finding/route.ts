@@ -7,29 +7,36 @@ export async function GET() {
     // 1. Get all developer profiles
     // =========================================================
 
-    const [developers]: any = await db.query(`
-      SELECT
-        dp.id,
-        dp.userId,
-        dp.photo,
-        dp.fullName,
-        dp.title,
-        dp.availability,
-        dp.bio,
-        dp.experienceYears,
-        dp.experienceMonths,
-        dp.country,
-        dp.education,
-        dp.skills,
-        dp.techStack,
-        dp.languages,
-        dp.github,
-        dp.portfolio
-      FROM developerprofiles dp
-      INNER JOIN users u
-        ON u.id = dp.userId
-      WHERE u.role = 'developer'
-    `);
+   const [developers]: any = await db.query(`
+  SELECT
+    dp.id,
+    dp.userId,
+
+    -- User information
+    u.name AS name,
+    u.photo AS photo,
+
+    -- Developer profile information
+    dp.title,
+    dp.availability,
+    dp.bio,
+    dp.experienceYears,
+    dp.experienceMonths,
+    dp.country,
+    dp.education,
+    dp.skills,
+    dp.techStack,
+    dp.languages,
+    dp.github,
+    dp.portfolio
+
+  FROM developerprofiles dp
+
+  INNER JOIN users u
+    ON u.id = dp.userId
+
+  WHERE u.role = 'developer'
+`);
 
     // =========================================================
     // 2. Get ranking + scoring data for all developers

@@ -26,7 +26,7 @@ type DeveloperApiData = {
   id: number;
   userId: number;
   photo: string | null;
-  fullName: string;
+  name: string;
   title: string | null;
   availability: number;
   bio: string | null;
@@ -126,7 +126,7 @@ function mapDeveloperData(developer: DeveloperApiData): Developer {
     // REAL API DATA
     id: developer.id,
     userId: developer.userId,
-    name: developer.fullName,
+    name: developer.name,
 
     avatar: developer.photo,
 

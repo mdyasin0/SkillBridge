@@ -1,17 +1,15 @@
-
 "use client";
 
 import { useAuth } from "@/context/AuthContext";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
-
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 
 const routes = [
   { name: "Home", path: "/" },
-  { name: "profile", path: "/pages/recruiter/profile" },
-  { name: "profile-setup", path: "/pages/recruiter/profile-setup" },
-  { name: "DeveloperSearch", path: "/pages/recruiter/DeveloperSearch" },
+  { name: "Profile", path: "/pages/recruiter/profile" },
+  { name: "Profile Setup", path: "/pages/recruiter/profile-setup" },
+  { name: "Developer Search", path: "/pages/recruiter/DeveloperSearch" },
   { name: "Inbox", path: "/pages/recruiter/inbox" },
 ];
 
@@ -25,8 +23,11 @@ export default function RecruiterLayout({
 
   const { user, isLoggedIn, loading } = useAuth();
 
+  const [profileChecking, setProfileChecking] = useState(true);
+  const [profileCompleted, setProfileCompleted] = useState(false);
+
+  // Authentication + Authorization + Profile check
   useEffect(() => {
-    // Session/user information এখনো load হচ্ছে
     if (loading) return;
 
     // User login করা নেই
@@ -35,15 +36,105 @@ export default function RecruiterLayout({
       return;
     }
 
-    // User login করেছে, কিন্তু recruiter নয়
+    // User recruiter নয়
     if (user?.role !== "recruiter") {
       router.replace("/pages/unauthorized");
+      return;
     }
-  }, [loading, isLoggedIn, user, router]);
 
-  // Authentication / Authorization check চলাকালীন
-  // অথবা unauthorized user-এর ক্ষেত্রে protected content দেখানো হবে না
-  if (loading || !isLoggedIn || user?.role !== "recruiter") {
+    checkRecruiterProfile();
+  }, [loading, isLoggedIn, user]);
+
+  const checkRecruiterProfile = async () => {
+    try {
+      setProfileChecking(true);
+
+      const response = await fetch("/api/recruiter_profile/check", {
+        cache: "no-store",
+      });
+
+      const data = await response.json();
+
+      if (!response.ok || !data.success) {
+        console.error(
+          "Recruiter profile check failed:",
+          data.message
+        );
+        return;
+      }
+
+      const completed = data.profileCompleted;
+
+      setProfileCompleted(completed);
+
+      // Profile নেই
+      if (
+        !completed &&
+        pathname !== "/pages/recruiter/profile-setup"
+      ) {
+        router.replace("/pages/recruiter/profile-setup");
+        return;
+      }
+
+      // Profile already exists কিন্তু profile-setup page-এ যাওয়ার চেষ্টা করলে
+      if (
+        completed &&
+        pathname === "/pages/recruiter/profile-setup"
+      ) {
+        router.replace("/pages/recruiter/DeveloperSearch");
+        return;
+      }
+    } catch (error) {
+      console.error("Recruiter profile check error:", error);
+    } finally {
+      setProfileChecking(false);
+    }
+  };
+
+  // Route change হলে profile status check করবে
+  useEffect(() => {
+    if (
+      loading ||
+      profileChecking ||
+      !isLoggedIn ||
+      user?.role !== "recruiter"
+    ) {
+      return;
+    }
+
+    // Profile incomplete হলে শুধু profile-setup accessible
+    if (
+      !profileCompleted &&
+      pathname !== "/pages/recruiter/profile-setup"
+    ) {
+      router.replace("/pages/recruiter/profile-setup");
+      return;
+    }
+
+    // Profile complete হলে profile-setup আর accessible নয়
+    if (
+      profileCompleted &&
+      pathname === "/pages/recruiter/profile-setup"
+    ) {
+      router.replace("/pages/recruiter/DeveloperSearch");
+    }
+  }, [
+    pathname,
+    loading,
+    profileChecking,
+    profileCompleted,
+    isLoggedIn,
+    user,
+    router,
+  ]);
+
+  // Loading UI
+  if (
+    loading ||
+    profileChecking ||
+    !isLoggedIn ||
+    user?.role !== "recruiter"
+  ) {
     return (
       <div
         className="min-h-screen flex items-center justify-center"
@@ -69,7 +160,7 @@ export default function RecruiterLayout({
 
             <p
               className="text-sm mt-1"
-              style={{ color: "var(--text-secondary)" }}
+              style={{ color: "var(--text-muted)" }}
             >
               Please wait a moment
             </p>
@@ -80,7 +171,10 @@ export default function RecruiterLayout({
   }
 
   return (
-    <div className="flex min-h-screen" style={{ background: "var(--bg)" }}>
+    <div
+      className="flex min-h-screen"
+      style={{ background: "var(--bg)" }}
+    >
       {/* Sidebar */}
       <aside
         className="w-64 p-4 border-r"
@@ -89,10 +183,20 @@ export default function RecruiterLayout({
           borderColor: "var(--border)",
         }}
       >
-        <h2 className="text-xl font-semibold mb-6">Recruiter Panel</h2>
+        <h2 className="text-xl font-semibold mb-6">
+          Recruiter Panel
+        </h2>
 
         <nav className="flex flex-col gap-2">
           {routes.map((route) => {
+            // Profile complete হলে Profile Setup navigation hide
+            if (
+              route.path === "/pages/recruiter/profile-setup" &&
+              profileCompleted
+            ) {
+              return null;
+            }
+
             const isActive =
               pathname === route.path ||
               pathname.startsWith(route.path + "/");
@@ -103,7 +207,9 @@ export default function RecruiterLayout({
                 href={route.path}
                 className="px-4 py-2 rounded-md transition-all"
                 style={{
-                  background: isActive ? "var(--primary)" : "transparent",
+                  background: isActive
+                    ? "var(--primary)"
+                    : "transparent",
                   color: isActive ? "#fff" : "var(--text)",
                 }}
               >
@@ -124,4 +230,3 @@ export default function RecruiterLayout({
     </div>
   );
 }
-

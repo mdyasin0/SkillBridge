@@ -238,9 +238,8 @@ export default function DeveloperProfilePage() {
               <div className="flex flex-col items-center gap-5 sm:flex-row">
                 <Image
                   src={
-                    developer?.developer_photo ||
                     developer?.user_photo ||
-                    "/default-user.png"
+                    "default-user.png"
                   }
                   alt={developer?.fullName || "Developer"}
                   width={130}
@@ -257,7 +256,7 @@ export default function DeveloperProfilePage() {
                     className="text-4xl font-bold tracking-tight"
                     style={{ color: "var(--text)" }}
                   >
-                    {developer?.fullName || developer?.name}
+                    { developer?.name}
                   </h1>
 
                   <div className="mt-2 flex flex-wrap items-center gap-2">

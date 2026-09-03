@@ -31,8 +31,6 @@ export async function GET(req: NextRequest) {
     u.created_at AS user_created_at,
 
     dp.id AS developer_profile_id,
-    dp.photo AS developer_photo,
-    dp.fullName,
     dp.title,
     dp.availability,
     dp.bio,

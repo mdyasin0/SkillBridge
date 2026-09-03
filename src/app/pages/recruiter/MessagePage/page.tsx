@@ -23,7 +23,7 @@ interface DeveloperProfileResponse {
     developer_profile_id: number;
     title: string;
     availability: number;
-    fullName: string;
+    name: string;
     developer_photo: string;
     user_photo?: string;
   };
@@ -724,15 +724,15 @@ export default function MessagePage() {
                 {developer?.developer_photo || developer?.user_photo ? (
                   <Image
                     src={developer.developer_photo || developer.user_photo!}
-                    alt={developer.fullName || "Developer"}
+                    alt={developer.name || "Developer"}
                     width={44}
                     height={44}
                     className="h-full w-full object-cover"
                   />
                 ) : (
                   <span>
-                    {developer?.fullName
-                      ? getInitials(developer.fullName)
+                    {developer?.name
+                      ? getInitials(developer.name)
                       : "??"}
                   </span>
                 )}
@@ -745,7 +745,7 @@ export default function MessagePage() {
 
             <div className="min-w-0">
               <h1 className="truncate text-sm font-semibold sm:text-base">
-                {developer?.fullName}
+                {developer?.name}
               </h1>
 
               <p className="mt-0.5 truncate text-xs text-(--text-muted)">
@@ -861,7 +861,7 @@ export default function MessagePage() {
             Editing Mode
             --------------------------------------------------
           */
-                        <div className="w-full min-w-[280px] max-w-[500px] rounded-2xl border border-(--primary) bg-(--surface) p-3 shadow-sm">
+                        <div className="w-full min-w-70 max-w-125 rounded-2xl border border-(--primary) bg-(--surface) p-3 shadow-sm">
                           <textarea
                             autoFocus
                             value={editingText}

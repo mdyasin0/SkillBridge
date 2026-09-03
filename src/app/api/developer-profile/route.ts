@@ -7,8 +7,6 @@ export async function POST(req: Request) {
 
     const {
       userId,
-      photo,
-      fullName,
       title,
       bio,
       experienceYears,
@@ -26,8 +24,6 @@ export async function POST(req: Request) {
     // Validation
     if (
       !userId ||
-      !photo ||
-      !fullName ||
       !title ||
       !bio ||
       experienceYears === undefined ||
@@ -70,8 +66,6 @@ export async function POST(req: Request) {
       INSERT INTO developerprofiles
       (
         userId,
-        photo,
-        fullName,
          title,
         bio,
         experienceYears,
@@ -87,12 +81,10 @@ export async function POST(req: Request) {
       )
 
       VALUES
-      (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ? , ?)
+      (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ? )
       `,
       [
         userId,
-        photo,
-        fullName,
         title,
         bio,
         experienceYears,

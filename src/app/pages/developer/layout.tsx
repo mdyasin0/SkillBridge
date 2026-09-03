@@ -1,11 +1,9 @@
-
 "use client";
 
 import { useAuth } from "@/context/AuthContext";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
-
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 
 const routes = [
   { name: "Home", path: "/" },
@@ -25,31 +23,96 @@ export default function DeveloperLayout({
 
   const { user, isLoggedIn, loading } = useAuth();
 
+  const [profileChecking, setProfileChecking] = useState(true);
+  const [profileCompleted, setProfileCompleted] = useState(false);
+
   useEffect(() => {
-    // Session/user information এখনো load হচ্ছে
     if (loading) return;
 
-    // User login করা নেই
+    // Not logged in
     if (!isLoggedIn) {
       router.replace("/pages/auth-required");
       return;
     }
 
-    // User login করেছে, কিন্তু developer নয়
+    // Logged in but not developer
     if (user?.role !== "developer") {
       router.replace("/pages/unauthorized");
+      return;
     }
-  }, [loading, isLoggedIn, user, router]);
 
-  // Authentication / Authorization check চলাকালীন loading UI
-  if (loading || !isLoggedIn || user?.role !== "developer") {
+    checkDeveloperProfile();
+  }, [loading, isLoggedIn, user]);
+
+  const checkDeveloperProfile = async () => {
+    try {
+      setProfileChecking(true);
+
+      const response = await fetch("/api/developer_profile/check", {
+        cache: "no-store",
+      });
+
+      const data = await response.json();
+
+      if (!response.ok || !data.success) {
+        console.error("Profile check failed:", data.message);
+        return;
+      }
+
+      setProfileCompleted(data.profileCompleted);
+
+      /*
+       * Profile complete না হলে
+       * create-profile ছাড়া অন্য কোনো route access করতে পারবে না
+       */
+      if (
+        data.profileCompleted === false &&
+        pathname !== "/pages/developer/create-profile"
+      ) {
+        router.replace("/pages/developer/create-profile");
+        return;
+      }
+    } catch (error) {
+      console.error("Developer profile check error:", error);
+    } finally {
+      setProfileChecking(false);
+    }
+  };
+
+  /*
+   * Route change হলে আবার check করবে
+   */
+  useEffect(() => {
+    if (
+      loading ||
+      profileChecking ||
+      !isLoggedIn ||
+      user?.role !== "developer"
+    ) {
+      return;
+    }
+
+    if (!profileCompleted && pathname !== "/pages/developer/create-profile") {
+      router.replace("/pages/developer/create-profile");
+    }
+  }, [
+    pathname,
+    loading,
+    profileChecking,
+    profileCompleted,
+    isLoggedIn,
+    user,
+    router,
+  ]);
+
+  // Authentication / Profile check loading
+  if (loading || profileChecking || !isLoggedIn || user?.role !== "developer") {
     return (
       <div
         className="min-h-screen flex items-center justify-center"
         style={{ background: "var(--bg)" }}
       >
         <div className="flex flex-col items-center gap-4">
-          {/* Spinner */}
           <div
             className="w-10 h-10 border-4 rounded-full animate-spin"
             style={{
@@ -66,10 +129,7 @@ export default function DeveloperLayout({
               Checking access...
             </p>
 
-            <p
-              className="text-sm mt-1"
-              style={{ color: "var(--text-secondary)" }}
-            >
+            <p className="text-sm mt-1" style={{ color: "var(--text-muted)" }}>
               Please wait a moment
             </p>
           </div>
@@ -92,9 +152,17 @@ export default function DeveloperLayout({
 
         <nav className="flex flex-col gap-2">
           {routes.map((route) => {
+            // Profile already completed হলে
+            // Create Profile navigation দেখাবে না
+            if (
+              route.path === "/pages/developer/create-profile" &&
+              profileCompleted
+            ) {
+              return null;
+            }
+
             const isActive =
-              pathname === route.path ||
-              pathname.startsWith(route.path + "/");
+              pathname === route.path || pathname.startsWith(route.path + "/");
 
             return (
               <Link
@@ -123,4 +191,3 @@ export default function DeveloperLayout({
     </div>
   );
 }
-

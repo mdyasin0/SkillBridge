@@ -3,15 +3,10 @@
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useMemo, useState } from "react";
+import { useState } from "react";
 import { useAuth } from "@/context/AuthContext";
-import Image from "next/image";
 import { IoIosClose } from "react-icons/io";
 const profileSchema = z.object({
-  photo: z.custom<FileList>().refine((files) => files.length === 1, {
-    message: "Profile photo is required",
-  }),
-  fullName: z.string().trim().min(3, "Full name is required"),
   title: z.string().trim().min(3, "Title is required"),
   bio: z
     .string()
@@ -57,7 +52,6 @@ export default function CompleteProfilePage() {
     resolver: zodResolver(profileSchema),
 
     defaultValues: {
-      fullName: "",
       title: "",
       bio: "",
       experienceYears: 0,
@@ -75,43 +69,12 @@ export default function CompleteProfilePage() {
     },
   });
   const bio = watch("bio") || "";
-  const uploadImage = async (image: File) => {
-    const formData = new FormData();
 
-    formData.append("image", image);
-
-    const res = await fetch(
-      `https://api.imgbb.com/1/upload?key=${process.env.NEXT_PUBLIC_IMGBB_KEY}`,
-      {
-        method: "POST",
-        body: formData,
-      },
-    );
-
-    const data = await res.json();
-
-    return data.data.url;
-  };
-  const photo = watch("photo");
-
-  const preview = useMemo(() => {
-    if (!photo || photo.length === 0) return null;
-
-    return URL.createObjectURL(photo[0]);
-  }, [photo]);
   const onSubmit = async (data: ProfileForm) => {
     try {
-      const image = data.photo?.[0];
-
-      if (!image) return;
-
-      const photoURL = await uploadImage(image);
-
       const payload = {
         userId,
-        photo: photoURL,
-        fullName: data.fullName,
-         title: data.title,
+        title: data.title,
         bio: data.bio,
         experienceYears: data.experienceYears,
         experienceMonths: data.experienceMonths,
@@ -216,60 +179,7 @@ export default function CompleteProfilePage() {
         </div>
 
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
-          {/* Profile Photo */}
-          <div>
-            <label className="mb-2 block font-medium">Profile Photo</label>
-
-            <div className="flex items-center gap-5">
-              <div className="h-24 w-24 overflow-hidden rounded-full border border-(--border)">
-                {preview ? (
-                  <Image
-                    src={preview}
-                    alt="Profile Preview"
-                    width={96}
-                    height={96}
-                    unoptimized
-                    className="h-24 w-24 rounded-full object-cover"
-                  />
-                ) : (
-                  <div className="flex h-full w-full items-center justify-center text-sm text-(--text-muted)">
-                    No Image
-                  </div>
-                )}
-              </div>
-
-              <input
-                type="file"
-                accept="image/*"
-                {...register("photo")}
-                className="block w-full rounded-lg border border-(--border) bg-(--bg-secondary) file:mr-4 file:border-0 file:bg-(--primary) file:px-4 file:py-2 file:text-white"
-              />
-            </div>
-
-            {errors.photo && (
-              <p className="mt-2 text-sm text-red-500">
-                {errors.photo.message}
-              </p>
-            )}
-          </div>
-
-          {/* Full Name */}
-          <div>
-            <label className="mb-2 block font-medium">Full Name</label>
-
-            <input
-              {...register("fullName")}
-              placeholder="Enter your full name"
-              className="w-full rounded-lg border border-(--border) bg-(--bg-secondary) p-3 outline-none focus:border-(--primary)"
-            />
-
-            {errors.fullName && (
-              <p className="mt-1 text-sm text-red-500">
-                {errors.fullName.message}
-              </p>
-            )}
-          </div>
-              {/* Title */}
+          {/* Title */}
           <div>
             <label className="mb-2 block font-medium">Title</label>
 

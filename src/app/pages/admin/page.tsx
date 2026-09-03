@@ -1,11 +1,5 @@
-import React from 'react';
+import { redirect } from "next/navigation";
 
-const page = () => {
-    return (
-        <div>
-            welcome to admin dashboard 
-        </div>
-    );
-};
-
-export default page;
+export default function DeveloperHomePage() {
+  redirect("/pages/admin/users_management");
+}
