@@ -25,7 +25,7 @@ export async function GET() {
       `
       SELECT id
       FROM recruiterprofile
-      WHERE userId = ?
+      WHERE user_Id = ?
       LIMIT 1
       `,
       [userId]

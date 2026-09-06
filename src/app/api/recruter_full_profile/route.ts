@@ -21,38 +21,48 @@ export async function GET(req: Request) {
     const [rows]: any = await db.query(
       `
       SELECT
-        id,
-        user_id,
-        profilePhoto AS profilePhoto,
-        fullName,
-        email,
-        phone,
-        location,
-        country,
-        city,
-        bio,
-        jobTitle,
-        department,
-        experienceYears,
-        specialization,
-        recruitmentType,
-        companyLogo,
-        companyName,
-        companyWebsite,
-        companyDescription,
-        industry,
-        companySize,
-        companyLocation,
-        companyFoundedYear,
-        linkedin,
-        twitter,
-        companyLinkedin,
-        verificationstatus,
-        verified_at,
-        created_at,
-        updated_at
-      FROM recruiterprofile
-      WHERE user_id = ?
+        rp.id,
+        rp.user_id,
+
+        -- Data from users table
+        u.name AS fullName,
+        u.email AS email,
+        u.photo AS profilePhoto,
+
+        -- Data from recruiterprofile table
+        rp.phone,
+        rp.location,
+        rp.country,
+        rp.city,
+        rp.bio,
+        rp.jobTitle,
+        rp.department,
+        rp.experienceYears,
+        rp.specialization,
+        rp.recruitmentType,
+        rp.companyLogo,
+        rp.companyName,
+        rp.companyWebsite,
+        rp.companyDescription,
+        rp.industry,
+        rp.companySize,
+        rp.companyLocation,
+        rp.companyFoundedYear,
+        rp.linkedin,
+        rp.twitter,
+        rp.companyLinkedin,
+        rp.verificationstatus,
+        rp.verified_at,
+        rp.created_at,
+        rp.updated_at
+
+      FROM recruiterprofile rp
+
+      INNER JOIN users u
+        ON rp.user_id = u.id
+
+      WHERE rp.user_id = ?
+
       LIMIT 1
       `,
       [userId],

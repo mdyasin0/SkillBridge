@@ -2,12 +2,10 @@
 
 import { useAuth } from "@/context/AuthContext";
 import Image from "next/image";
+import Link from "next/link";
 import { ChangeEvent, FormEvent, useMemo, useState } from "react";
 
 type FormData = {
-  profilePhoto: File | string | null;
-  fullName: string;
-  email: string;
   phone: string;
   location: string;
   country: string;
@@ -35,9 +33,6 @@ type FormData = {
 };
 
 const initialFormData: FormData = {
-  profilePhoto: null,
-  fullName: "",
-  email: "",
   phone: "",
   location: "",
   country: "",
@@ -135,14 +130,13 @@ const companySizes = [
 export default function RecruiterProfileSetupPage() {
   const [currentStep, setCurrentStep] = useState(1);
   const [formData, setFormData] = useState<FormData>(initialFormData);
-  const [profilePreview, setProfilePreview] = useState<string>("");
   const [companyLogoPreview, setCompanyLogoPreview] = useState<string>("");
 
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isCompleted, setIsCompleted] = useState(false);
-   const { user} = useAuth();
-  const userId =  user?.id;
+  const { user } = useAuth();
+  const userId = user?.id;
   const progress = useMemo(() => {
     return (currentStep / steps.length) * 100;
   }, [currentStep]);
@@ -173,7 +167,7 @@ export default function RecruiterProfileSetupPage() {
 
   const handleFileChange = (
     e: ChangeEvent<HTMLInputElement>,
-    field: "profilePhoto" | "companyLogo",
+    field: "companyLogo",
   ) => {
     const file = e.target.files?.[0];
 
@@ -203,10 +197,6 @@ export default function RecruiterProfileSetupPage() {
       ...prev,
       [field]: file,
     }));
-
-    if (field === "profilePhoto") {
-      setProfilePreview(previewUrl);
-    }
 
     if (field === "companyLogo") {
       setCompanyLogoPreview(previewUrl);
@@ -263,16 +253,6 @@ export default function RecruiterProfileSetupPage() {
     const newErrors: Record<string, string> = {};
 
     if (step === 1) {
-      if (!formData.fullName.trim()) {
-        newErrors.fullName = "Full name is required.";
-      }
-
-      if (!formData.email.trim()) {
-        newErrors.email = "Email is required.";
-      } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) {
-        newErrors.email = "Please enter a valid email address.";
-      }
-
       if (!formData.country.trim()) {
         newErrors.country = "Country is required.";
       }
@@ -358,23 +338,23 @@ export default function RecruiterProfileSetupPage() {
   // Next
   // ----------------------------------------
 
-const handleNext = (e?: React.MouseEvent<HTMLButtonElement>) => {
-  e?.preventDefault();
-  e?.stopPropagation();
+  const handleNext = (e?: React.MouseEvent<HTMLButtonElement>) => {
+    e?.preventDefault();
+    e?.stopPropagation();
 
-  const isValid = validateStep(currentStep);
+    const isValid = validateStep(currentStep);
 
-  if (!isValid) return;
+    if (!isValid) return;
 
-  if (currentStep < 4) {
-    setCurrentStep((prev) => prev + 1);
+    if (currentStep < 4) {
+      setCurrentStep((prev) => prev + 1);
 
-    window.scrollTo({
-      top: 0,
-      behavior: "smooth",
-    });
-  }
-};
+      window.scrollTo({
+        top: 0,
+        behavior: "smooth",
+      });
+    }
+  };
   // ----------------------------------------
   // Back
   // ----------------------------------------
@@ -408,146 +388,128 @@ const handleNext = (e?: React.MouseEvent<HTMLButtonElement>) => {
       });
     }
   };
-// ----------------------------
-// imgbb image upload
-// ---------------------
+  // ----------------------------
+  // imgbb image upload
+  // ---------------------
 
-const uploadToImgBB = async (file: File): Promise<string> => {
-  const apiKey = process.env.NEXT_PUBLIC_IMGBB_KEY;
+  const uploadToImgBB = async (file: File): Promise<string> => {
+    const apiKey = process.env.NEXT_PUBLIC_IMGBB_KEY;
 
-  const formData = new FormData();
-  formData.append("image", file);
+    const formData = new FormData();
+    formData.append("image", file);
 
-  const response = await fetch(
-    `https://api.imgbb.com/1/upload?key=${apiKey}`,
-    {
-      method: "POST",
-      body: formData,
+    const response = await fetch(
+      `https://api.imgbb.com/1/upload?key=${apiKey}`,
+      {
+        method: "POST",
+        body: formData,
+      },
+    );
+
+    const result = await response.json();
+
+    if (!result.success) {
+      throw new Error("ImgBB upload failed");
     }
-  );
 
-  const result = await response.json();
-
-  if (!result.success) {
-    throw new Error("ImgBB upload failed");
-  }
-
-  return result.data.url;
-};
+    return result.data.url;
+  };
   // ----------------------------------------
   // Submit
   // ----------------------------------------
 
-const handleSubmit = async (e: FormEvent) => {
-  e.preventDefault();
+  const handleSubmit = async (e: FormEvent) => {
+    e.preventDefault();
 
-  if (currentStep !== 4) return;
+    if (currentStep !== 4) return;
 
-  const isValid = validateStep(4);
+    const isValid = validateStep(4);
 
-  if (!isValid) return;
+    if (!isValid) return;
 
-  setIsSubmitting(true);
+    setIsSubmitting(true);
 
-  try {
-    const updatedFormData = { ...formData };
+    try {
+      const updatedFormData = { ...formData };
 
-    // ----------------------------------------
-    // Upload profile photo
-    // ----------------------------------------
+      // ----------------------------------------
+      // Upload company logo
+      // ----------------------------------------
 
-    if (formData.profilePhoto instanceof File) {
-      updatedFormData.profilePhoto = await uploadToImgBB(
-        formData.profilePhoto
-      );
-    }
+      if (formData.companyLogo instanceof File) {
+        updatedFormData.companyLogo = await uploadToImgBB(formData.companyLogo);
+      }
 
-    // ----------------------------------------
-    // Upload company logo
-    // ----------------------------------------
+      // ----------------------------------------
+      // API payload
+      // ----------------------------------------
 
-    if (formData.companyLogo instanceof File) {
-      updatedFormData.companyLogo = await uploadToImgBB(
-        formData.companyLogo
-      );
-    }
+      const payload = {
+        userId,
+        ...updatedFormData,
+      };
 
-    // ----------------------------------------
-    // API payload
-    // ----------------------------------------
+      console.log("Recruiter profile payload:", payload);
 
-    const payload = {
-      userId,
-      ...updatedFormData,
-    };
+      // ----------------------------------------
+      // API request
+      // ----------------------------------------
 
-    console.log("Recruiter profile payload:", payload);
+      const response = await fetch("/api/recruiterprofile", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(payload),
+      });
 
-    // ----------------------------------------
-    // API request
-    // ----------------------------------------
+      const result = await response.json();
 
-    const response = await fetch("/api/recruiterprofile", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(payload),
-    });
+      console.log("API response:", result);
 
-    const result = await response.json();
+      // ----------------------------------------
+      // API error
+      // ----------------------------------------
 
-    console.log("API response:", result);
+      if (!response.ok) {
+        // Missing fields
+        if (result.missingFields && Array.isArray(result.missingFields)) {
+          alert(
+            `${result.message}\n\nMissing fields:\n${result.missingFields.join(
+              "\n",
+            )}`,
+          );
 
-    // ----------------------------------------
-    // API error
-    // ----------------------------------------
+          return;
+        }
 
-    if (!response.ok) {
-      // Missing fields
-      if (
-        result.missingFields &&
-        Array.isArray(result.missingFields)
-      ) {
-        alert(
-          `${result.message}\n\nMissing fields:\n${result.missingFields.join(
-            "\n"
-          )}`
-        );
+        // Any other API error
+        alert(result.message || "Something went wrong.");
 
         return;
       }
 
-      // Any other API error
-      alert(result.message || "Something went wrong.");
+      // ----------------------------------------
+      // Success
+      // ----------------------------------------
 
-      return;
+      setFormData(updatedFormData);
+
+      alert(result.message || "Recruiter profile created successfully.");
+
+      setIsCompleted(true);
+    } catch (error: any) {
+      console.error("Profile submission failed:", error);
+
+      // ----------------------------------------
+      // Network / unexpected error
+      // ----------------------------------------
+
+      alert(error?.message || "Something went wrong. Please try again.");
+    } finally {
+      setIsSubmitting(false);
     }
-
-    // ----------------------------------------
-    // Success
-    // ----------------------------------------
-
-    setFormData(updatedFormData);
-
-    alert(result.message || "Recruiter profile created successfully.");
-
-    setIsCompleted(true);
-  } catch (error: any) {
-    console.error("Profile submission failed:", error);
-
-    // ----------------------------------------
-    // Network / unexpected error
-    // ----------------------------------------
-
-    alert(
-      error?.message ||
-        "Something went wrong. Please try again."
-    );
-  } finally {
-    setIsSubmitting(false);
-  }
-};
+  };
 
   // ----------------------------------------
   // Completed screen
@@ -583,12 +545,13 @@ const handleSubmit = async (e: FormEvent) => {
               now start discovering and connecting with talented developers.
             </p>
 
-            <button
-              type="button"
+            <Link
+
+            href="/pages/recruiter/profile"
               className="mt-7 rounded-lg bg-slate-900 px-6 py-3 text-sm font-semibold text-white transition hover:bg-slate-800"
             >
               Go to Dashboard
-            </button>
+            </Link>
           </div>
         </div>
       </main>
@@ -710,7 +673,7 @@ const handleSubmit = async (e: FormEvent) => {
 
         {/* Main Form */}
         <form
-        noValidate
+          noValidate
           onSubmit={handleSubmit}
           className="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm"
         >
@@ -726,85 +689,6 @@ const handleSubmit = async (e: FormEvent) => {
               />
 
               <div className="mt-8 space-y-6">
-                {/* Profile photo */}
-                <div>
-                  <label className="mb-3 block text-sm font-semibold text-slate-800">
-                    Profile Photo
-                  </label>
-
-                  <div className="flex items-center gap-5">
-                    <div className="flex h-20 w-20 shrink-0 items-center justify-center overflow-hidden rounded-full border border-slate-200 bg-slate-100">
-                      {profilePreview ? (
-                        <Image 
-                        width={20}
-                        height={20}
-                          src={profilePreview}
-                          alt="Profile preview"
-                          className="h-full w-full object-cover"
-                        />
-                      ) : (
-                        <svg
-                          className="h-8 w-8 text-slate-400"
-                          fill="none"
-                          stroke="currentColor"
-                          strokeWidth="1.5"
-                          viewBox="0 0 24 24"
-                        >
-                          <path
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                            d="M15.75 6a3.75 3.75 0 1 1-7.5 0 3.75 3.75 0 0 1 7.5 0ZM4.5 20.118a7.5 7.5 0 0 1 15 0A17.933 17.933 0 0 1 12 21.75c-2.676 0-5.216-.584-7.5-1.632Z"
-                          />
-                        </svg>
-                      )}
-                    </div>
-
-                    <div>
-                      <label className="inline-flex cursor-pointer rounded-lg border border-slate-300 bg-white px-4 py-2 text-sm font-semibold text-slate-700 transition hover:bg-slate-50">
-                        Upload photo
-                        <input
-                          type="file"
-                          accept="image/*"
-                          className="hidden"
-                          onChange={(e) => handleFileChange(e, "profilePhoto")}
-                        />
-                      </label>
-
-                      <p className="mt-2 text-xs text-slate-400">
-                        PNG, JPG or WEBP. Max 5MB.
-                      </p>
-                    </div>
-                  </div>
-
-                  {errors.profilePhoto && (
-                    <ErrorMessage message={errors.profilePhoto} />
-                  )}
-                </div>
-
-                {/* Full name + email */}
-                <div className="grid gap-5 md:grid-cols-2">
-                  <InputField
-                    label="Full Name"
-                    name="fullName"
-                    value={formData.fullName}
-                    onChange={handleChange}
-                    placeholder="John Smith"
-                    required
-                    error={errors.fullName}
-                  />
-
-                  <InputField
-                    label="Email"
-                    name="email"
-                    type="email"
-                    value={formData.email}
-                    onChange={handleChange}
-                    placeholder="john@company.com"
-                    required
-                    error={errors.email}
-                  />
-                </div>
-
                 {/* Phone + country */}
                 <div className="grid gap-5 md:grid-cols-2">
                   <InputField
@@ -1015,9 +899,9 @@ const handleSubmit = async (e: FormEvent) => {
                   <div className="flex items-center gap-5">
                     <div className="flex h-20 w-20 shrink-0 items-center justify-center overflow-hidden rounded-xl border border-slate-200 bg-slate-100">
                       {companyLogoPreview ? (
-                        <Image 
-                        width={20}
-                        height={20}
+                        <Image
+                          width={20}
+                          height={20}
                           src={companyLogoPreview}
                           alt="Company logo preview"
                           className="h-full w-full object-cover"

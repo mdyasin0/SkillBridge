@@ -27,9 +27,7 @@ export async function POST(req: Request) {
       userId,
 
       // Personal Information
-      profilePhoto,
-      fullName,
-      email,
+     
       phone,
       location,
       country,
@@ -67,9 +65,7 @@ export async function POST(req: Request) {
 
     if (!userId) missingFields.push("userId");
 
-    if (!profilePhoto) missingFields.push("profilePhoto");
-    if (!fullName) missingFields.push("fullName");
-    if (!email) missingFields.push("email");
+   
     if (!country) missingFields.push("country");
     if (!city) missingFields.push("city");
     if (!bio) missingFields.push("bio");
@@ -151,9 +147,7 @@ export async function POST(req: Request) {
       (
         user_id,
 
-        profilePhoto,
-        fullName,
-        email,
+      
         phone,
         location,
         country,
@@ -192,7 +186,7 @@ export async function POST(req: Request) {
         ?, ?, ?, ?, ?, ?, ?, ?,
         ?, ?, ?, ?, ?,
         ?, ?, ?, ?, ?, ?, ?, ?,
-        ?, ?, ?,
+      
 
         FALSE,
         NULL,
@@ -204,9 +198,7 @@ export async function POST(req: Request) {
         userId,
 
         // Personal
-        profilePhoto,
-        fullName,
-        email,
+      
         phone || "",
         location || "",
         country,

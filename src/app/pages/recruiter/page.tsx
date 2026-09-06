@@ -9,7 +9,7 @@ export default function RecruiterHomePage() {
   useEffect(() => {
     const checkRecruiterProfile = async () => {
       try {
-        const response = await fetch("/api/recruiter_profile/check", {
+        const response = await fetch("/api/recruiter_profile_info/check", {
           cache: "no-store",
         });
 

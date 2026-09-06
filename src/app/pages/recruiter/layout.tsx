@@ -49,7 +49,7 @@ export default function RecruiterLayout({
     try {
       setProfileChecking(true);
 
-      const response = await fetch("/api/recruiter_profile/check", {
+      const response = await fetch("/api/recruiter_profile_info/check", {
         cache: "no-store",
       });
 

@@ -222,9 +222,9 @@ export default function HomePage() {
 
   const secondaryHref =
     role === "recruiter"
-      ? "/pages/recruiter/developer-finding"
+      ? "/pages/recruiter/DeveloperSearch"
       : role === "developer"
-        ? "/pages/developer/challenges"
+        ? "/pages/developer/challenge_select"
         : "/docs";
 
   const secondaryLabel =
@@ -676,7 +676,7 @@ export default function HomePage() {
             <Link
               href={
                 isLoggedIn && role === "developer"
-                  ? "/pages/developer/challenges"
+                  ? "/pages/developer/challenge_select"
                   : "/auth/register"
               }
               className="group mt-8 inline-flex items-center gap-2 text-sm font-semibold text-(--primary)"
@@ -725,7 +725,7 @@ export default function HomePage() {
             <Link
               href={
                 isLoggedIn && role === "recruiter"
-                  ? "/pages/recruiter/developer-finding"
+                  ? "/pages/recruiter/DeveloperSearch"
                   : "/auth/register"
               }
               className="group mt-8 inline-flex items-center gap-2 text-sm font-semibold text-(--primary)"
@@ -1077,7 +1077,7 @@ export default function HomePage() {
             <Link
               href={
                 isLoggedIn && role === "recruiter"
-                  ? "/pages/recruiter/developer-finding"
+                  ? "/pages/recruiter/DeveloperSearch"
                   : "/auth/register"
               }
               className="group mt-8 inline-flex items-center gap-2 rounded-xl bg-(--primary) px-5 py-3 text-sm font-semibold text-white shadow-lg shadow-(--primary)/20 transition hover:bg-(--primary-hover)"
