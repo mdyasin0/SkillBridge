@@ -1,3 +1,4 @@
+
 "use client";
 
 import { useAuth } from "@/context/AuthContext";
@@ -7,9 +8,9 @@ import { useEffect, useState } from "react";
 
 const routes = [
   { name: "Home", path: "/" },
-  { name: "Profile", path: "/pages/developer/create-profile" },
+  { name: "Create Profile", path: "/pages/developer/create-profile" },
   { name: "Challenge", path: "/pages/developer/challenge_select" },
-  { name: "Main_Profile", path: "/pages/developer/main_profile" },
+  { name: "Profile", path: "/pages/developer/main_profile" },
   { name: "Inbox", path: "/pages/developer/inbox" },
 ];
 
@@ -61,16 +62,13 @@ export default function DeveloperLayout({
 
       setProfileCompleted(data.profileCompleted);
 
-      /*
-       * Profile complete না হলে
-       * create-profile ছাড়া অন্য কোনো route access করতে পারবে না
-       */
+      // Profile incomplete হলে
+      // শুধু create-profile route access করা যাবে
       if (
         data.profileCompleted === false &&
         pathname !== "/pages/developer/create-profile"
       ) {
         router.replace("/pages/developer/create-profile");
-        return;
       }
     } catch (error) {
       console.error("Developer profile check error:", error);
@@ -80,7 +78,7 @@ export default function DeveloperLayout({
   };
 
   /*
-   * Route change হলে আবার check করবে
+   * Route change হলে profile status check করবে
    */
   useEffect(() => {
     if (
@@ -92,7 +90,11 @@ export default function DeveloperLayout({
       return;
     }
 
-    if (!profileCompleted && pathname !== "/pages/developer/create-profile") {
+    // Profile incomplete
+    if (
+      !profileCompleted &&
+      pathname !== "/pages/developer/create-profile"
+    ) {
       router.replace("/pages/developer/create-profile");
     }
   }, [
@@ -105,8 +107,15 @@ export default function DeveloperLayout({
     router,
   ]);
 
-  // Authentication / Profile check loading
-  if (loading || profileChecking || !isLoggedIn || user?.role !== "developer") {
+  /*
+   * Authentication / Profile checking
+   */
+  if (
+    loading ||
+    profileChecking ||
+    !isLoggedIn ||
+    user?.role !== "developer"
+  ) {
     return (
       <div
         className="min-h-screen flex items-center justify-center"
@@ -129,7 +138,10 @@ export default function DeveloperLayout({
               Checking access...
             </p>
 
-            <p className="text-sm mt-1" style={{ color: "var(--text-muted)" }}>
+            <p
+              className="text-sm mt-1"
+              style={{ color: "var(--text-muted)" }}
+            >
               Please wait a moment
             </p>
           </div>
@@ -148,21 +160,39 @@ export default function DeveloperLayout({
           borderColor: "var(--border)",
         }}
       >
-        <h2 className="text-xl font-semibold mb-6">Developer Panel</h2>
+        <h2 className="text-xl font-semibold mb-6">
+          Developer Panel
+        </h2>
 
         <nav className="flex flex-col gap-2">
           {routes.map((route) => {
-            // Profile already completed হলে
-            // Create Profile navigation দেখাবে না
+            /*
+             * PROFILE INCOMPLETE
+             *
+             * তখন শুধু Create Profile দেখাবে
+             */
             if (
-              route.path === "/pages/developer/create-profile" &&
-              profileCompleted
+              !profileCompleted &&
+              route.path !== "/pages/developer/create-profile"
+            ) {
+              return null;
+            }
+
+            /*
+             * PROFILE COMPLETE
+             *
+             * তখন Create Profile দেখাবে না
+             */
+            if (
+              profileCompleted &&
+              route.path === "/pages/developer/create-profile"
             ) {
               return null;
             }
 
             const isActive =
-              pathname === route.path || pathname.startsWith(route.path + "/");
+              pathname === route.path ||
+              pathname.startsWith(route.path + "/");
 
             return (
               <Link
@@ -170,7 +200,9 @@ export default function DeveloperLayout({
                 href={route.path}
                 className="px-4 py-2 rounded-md transition-all"
                 style={{
-                  background: isActive ? "var(--primary)" : "transparent",
+                  background: isActive
+                    ? "var(--primary)"
+                    : "transparent",
                   color: isActive ? "#fff" : "var(--text)",
                 }}
               >
@@ -191,3 +223,4 @@ export default function DeveloperLayout({
     </div>
   );
 }
+

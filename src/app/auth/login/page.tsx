@@ -5,8 +5,11 @@ import Link from "next/link";
 import { signIn } from "next-auth/react";
 import { toast } from "react-toastify";
 import Swal from "sweetalert2";
+import { useRouter } from "next/navigation";
 
 export default function LoginPage() {
+  const router = useRouter();
+
   const [showPassword, setShowPassword] = useState(false);
 
   const [form, setForm] = useState({
@@ -47,9 +50,7 @@ export default function LoginPage() {
     });
 
     // redirect after alert
-    setTimeout(() => {
-      window.location.href = "/";
-    }, 1200);
+  router.push("/");
   };
 
   return (

@@ -5,8 +5,11 @@ import { useState } from "react";
 import Link from "next/link";
 import { toast } from "react-toastify";
 import Swal from "sweetalert2";
+import { useRouter } from "next/navigation";
 
 export default function RegisterPage() {
+    const router = useRouter();
+
   const [showPassword, setShowPassword] = useState(false);
   const [imageFile, setImageFile] = useState<File | null>(null);
   const [uploading, setUploading] = useState(false);
@@ -71,18 +74,22 @@ export default function RegisterPage() {
     return valid;
   };
   const uploadImageToImgbb = async (file: File) => {
+    const apiKey = process.env.NEXT_PUBLIC_IMGBB_KEY;
     const formData = new FormData();
     formData.append("image", file);
 
-    const res = await fetch(
-      "https://api.imgbb.com/1/upload?key=c0c2b847b1b59290ac14668dd140a262",
-      {
-        method: "POST",
-        body: formData,
-      },
-    );
+    const res = await fetch(`https://api.imgbb.com/1/upload?key=${apiKey}`, {
+      method: "POST",
+      body: formData,
+    });
 
     const data = await res.json();
+
+    console.log("ImgBB response:", data);
+
+    if (!res.ok || !data.success || !data.data?.url) {
+      throw new Error(data?.error?.message || "Image upload failed");
+    }
 
     return data.data.url;
   };
@@ -125,7 +132,7 @@ export default function RegisterPage() {
         icon: "success",
         confirmButtonColor: "#5B6CFF",
       });
-
+router.push("/auth/login");
       // optional reset
       setForm({
         name: "",

@@ -3,9 +3,10 @@
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useAuth } from "@/context/AuthContext";
 import { IoIosClose } from "react-icons/io";
+import { useRouter } from "next/navigation";
 const profileSchema = z.object({
   title: z.string().trim().min(3, "Title is required"),
   bio: z
@@ -33,6 +34,7 @@ const profileSchema = z.object({
 
 type ProfileForm = z.infer<typeof profileSchema>;
 export default function CompleteProfilePage() {
+  const router = useRouter();
   const [skills, setSkills] = useState<string[]>([]);
   const [skillInput, setSkillInput] = useState("");
 
@@ -47,7 +49,7 @@ export default function CompleteProfilePage() {
     handleSubmit,
     setValue,
     watch,
-    formState: { errors, isSubmitting },
+    formState: { errors, isSubmitting, isDirty },
   } = useForm<ProfileForm>({
     resolver: zodResolver(profileSchema),
 
@@ -103,7 +105,7 @@ export default function CompleteProfilePage() {
       }
 
       alert(result.message);
-
+      router.push("/");
       console.log(result);
     } catch (error) {
       console.error(error);
@@ -116,15 +118,18 @@ export default function CompleteProfilePage() {
 
     if (!value) return;
 
-    if (skills.includes(value)) return;
+    // First letter capital
+    const formattedValue = value.charAt(0).toUpperCase() + value.slice(1);
 
-    const updatedSkills = [...skills, value];
+    if (skills.includes(formattedValue)) return;
+
+    const updatedSkills = [...skills, formattedValue];
 
     setSkills(updatedSkills);
 
-    // React Hook Form update
     setValue("skills", updatedSkills, {
       shouldValidate: true,
+      shouldDirty: true,
     });
 
     setSkillInput("");
@@ -143,14 +148,18 @@ export default function CompleteProfilePage() {
 
     if (!value) return;
 
-    if (languages.includes(value)) return;
+    // First letter capital
+    const formattedValue = value.charAt(0).toUpperCase() + value.slice(1);
 
-    const updatedLanguages = [...languages, value];
+    if (languages.includes(formattedValue)) return;
+
+    const updatedLanguages = [...languages, formattedValue];
 
     setLanguages(updatedLanguages);
 
     setValue("languages", updatedLanguages, {
       shouldValidate: true,
+      shouldDirty: true,
     });
 
     setLanguageInput("");
@@ -164,6 +173,22 @@ export default function CompleteProfilePage() {
       shouldValidate: true,
     });
   };
+
+  useEffect(() => {
+    const handleBeforeUnload = (event: BeforeUnloadEvent) => {
+      if (!isDirty || isSubmitting) return;
+
+      event.preventDefault();
+      event.returnValue = "";
+    };
+
+    window.addEventListener("beforeunload", handleBeforeUnload);
+
+    return () => {
+      window.removeEventListener("beforeunload", handleBeforeUnload);
+    };
+  }, [isDirty, isSubmitting]);
+
   return (
     <div className="min-h-screen bg-(--bg) py-10 px-4">
       <div className="mx-auto max-w-3xl rounded-2xl border border-(--border) bg-(--surface) p-8 shadow-(--shadow)">
@@ -219,45 +244,47 @@ export default function CompleteProfilePage() {
             </div>
           </div>
 
-          <div className="grid gap-5 md:grid-cols-2">
-            {/* Experience */}
-            <div className="grid grid-cols-2 gap-4">
-              <div>
-                <label className="mb-2 block font-medium">
-                  Experience (Years)
-                </label>
+          <div className="grid gap-5 md:grid-cols-3">
+            {/* Experience Years */}
+            <div>
+              <label className="mb-2 block font-medium">
+                Experience (Years)
+              </label>
 
-                <input
-                  className="border border-(--border) p-3 rounded-lg"
-                  type="number"
-                  {...register("experienceYears", {
-                    valueAsNumber: true,
-                  })}
-                />
+              <input
+                className="w-full rounded-lg border border-(--border) p-3"
+                type="number"
+                {...register("experienceYears", {
+                  valueAsNumber: true,
+                })}
+              />
 
-                {errors.experienceYears && (
-                  <p className="text-sm text-red-500">
-                    {errors.experienceYears.message}
-                  </p>
-                )}
-              </div>
+              {errors.experienceYears && (
+                <p className="text-sm text-red-500">
+                  {errors.experienceYears.message}
+                </p>
+              )}
+            </div>
 
-              <div>
-                <label className="mb-2 block font-medium">Months</label>
+            {/* Experience Months */}
+            <div>
+              <label className="mb-2 block font-medium">
+                Experience (Months)
+              </label>
 
-                <input
-                  className="border border-(--border) p-3 rounded-lg"
-                  type="number"
-                  {...register("experienceMonths", {
-                    valueAsNumber: true,
-                  })}
-                />
-                {errors.experienceMonths && (
-                  <p className="text-sm text-red-500">
-                    {errors.experienceMonths.message}
-                  </p>
-                )}
-              </div>
+              <input
+                className="w-full rounded-lg border border-(--border) p-3"
+                type="number"
+                {...register("experienceMonths", {
+                  valueAsNumber: true,
+                })}
+              />
+
+              {errors.experienceMonths && (
+                <p className="text-sm text-red-500">
+                  {errors.experienceMonths.message}
+                </p>
+              )}
             </div>
 
             {/* Country */}
@@ -314,7 +341,7 @@ export default function CompleteProfilePage() {
                   addSkill();
                 }
               }}
-              placeholder="React"
+              placeholder="Type a skill and press Enter (e.g. React)"
               className="w-full rounded-lg border border-(--border) bg-(--bg-secondary) p-3 outline-none focus:border-(--primary)"
             />
             {errors.skills && (
@@ -361,7 +388,7 @@ export default function CompleteProfilePage() {
                   addLanguage();
                 }
               }}
-              placeholder="javascript"
+              placeholder="Type a language and press Enter (e.g. JavaScript)"
               className="w-full rounded-lg border border-(--border) bg-(--bg-secondary) p-3 outline-none focus:border-(--primary)"
             />
             {errors.languages && (
