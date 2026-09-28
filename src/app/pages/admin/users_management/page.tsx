@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { MdDeveloperMode, MdManageAccounts } from "react-icons/md";
+import { MdDeveloperMode, MdManageAccounts, MdOutlineAdminPanelSettings } from "react-icons/md";
 import { toast } from "react-toastify";
 
 type User = {
@@ -9,7 +9,7 @@ type User = {
   id: number;
   name: string;
   email: string;
-  role: "developer" | "recruiter";
+  role: "developer" | "recruiter" | "admin";
   status: "active" | "suspended" | "banned";
   createdAt: string;
 };
@@ -36,6 +36,7 @@ export default function UserTable() {
   const totalDevelopers = users.filter((u) => u.role === "developer").length;
 
   const totalRecruiters = users.filter((u) => u.role === "recruiter").length;
+  const totaladmins = users.filter((u) => u.role === "admin").length;
   useEffect(() => {
     let data = [...users];
 
@@ -183,6 +184,18 @@ export default function UserTable() {
          <MdManageAccounts />
           </div>
         </div>
+
+           {/* admins */}
+        <div className="p-4 rounded-lg border bg-(--surface) shadow-sm flex items-center justify-between hover:shadow-md transition">
+          <div>
+            <p className="text-sm text-gray-500">Total Admins</p>
+            <h2 className="text-2xl font-bold">{totaladmins}</h2>
+          </div>
+
+          <div className="w-10 h-10 rounded-full bg-green-100 flex items-center justify-center">
+        <MdOutlineAdminPanelSettings />
+          </div>
+        </div>
       </div>
 
       {/* Filters */}
@@ -200,6 +213,7 @@ export default function UserTable() {
           <option value="all">All</option>
           <option value="developer">Developer</option>
           <option value="recruiter">Recruiter</option>
+          <option value="admin">Admin</option>
         </select>
 
         <input
@@ -208,7 +222,7 @@ export default function UserTable() {
           className="border px-3 py-2 rounded w-24 bg-(--surface)"
           onChange={(e) => setTimeValue(Number(e.target.value))}
         />
-
+{/* for finding users base on registered time  */}
         <select
           className="border px-3 py-2 rounded bg-(--surface) cursor-pointer"
           onChange={(e) => setTimeUnit(e.target.value)}

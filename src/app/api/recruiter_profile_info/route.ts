@@ -21,12 +21,17 @@ export async function GET(req: Request) {
     const [rows]: any = await db.query(
       `
       SELECT
-        user_id,
-        profilephoto AS profilePhoto,
-        fullName,
-        companyName
-      FROM recruiterprofile
-      WHERE user_id = ?
+        rp.user_id,
+        u.photo AS profilePhoto,
+        u.name AS fullName,
+        rp.companyName
+
+      FROM recruiterprofile rp
+
+      LEFT JOIN users u
+        ON u.id = rp.user_id
+
+      WHERE rp.user_id = ?
       LIMIT 1
       `,
       [userId],

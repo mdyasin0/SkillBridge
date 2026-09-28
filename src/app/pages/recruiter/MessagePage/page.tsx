@@ -2,10 +2,8 @@
 
 import { useEffect, useRef, useState } from "react";
 import {
-  ArrowLeft,
   Check,
   Edit3,
-  MoreVertical,
   Paperclip,
   RefreshCw,
   Send,
@@ -588,7 +586,7 @@ export default function MessagePage() {
     }
 
     const messageData: SendMessageData = {
-      receiverName: developer.fullName,
+      receiverName: developer.name,
       receiverId: developer.user_id,
 
       senderName: recruter_name,
@@ -610,7 +608,7 @@ export default function MessagePage() {
         },
 
         body: JSON.stringify({
-          receiverName: developer.fullName,
+          receiverName: developer.name,
           receiverId: developer.user_id,
 
           senderName: recruter_name,
@@ -811,7 +809,7 @@ export default function MessagePage() {
           <div className="border-b border-(--border) px-5 py-3">
             <p className="text-center text-xs text-(--text-muted)">
               This conversation is between you and{" "}
-              {developer?.fullName || "the developer"}.
+              {developer?.name || "the developer"}.
             </p>
           </div>
 

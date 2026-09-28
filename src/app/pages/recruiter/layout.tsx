@@ -187,37 +187,45 @@ export default function RecruiterLayout({
           Recruiter Panel
         </h2>
 
-        <nav className="flex flex-col gap-2">
-          {routes.map((route) => {
-            // Profile complete হলে Profile Setup navigation hide
-            if (
-              route.path === "/pages/recruiter/profile-setup" &&
-              profileCompleted
-            ) {
-              return null;
-            }
+       <nav className="flex flex-col gap-2">
+  {routes.map((route) => {
+    // Profile incomplete হলে শুধু Profile Setup দেখাবে
+    if (
+      !profileCompleted &&
+      route.path !== "/pages/recruiter/profile-setup"
+    ) {
+      return null;
+    }
 
-            const isActive =
-              pathname === route.path ||
-              pathname.startsWith(route.path + "/");
+    // Profile complete হলে Profile Setup hide থাকবে
+    if (
+      profileCompleted &&
+      route.path === "/pages/recruiter/profile-setup"
+    ) {
+      return null;
+    }
 
-            return (
-              <Link
-                key={route.path}
-                href={route.path}
-                className="px-4 py-2 rounded-md transition-all"
-                style={{
-                  background: isActive
-                    ? "var(--primary)"
-                    : "transparent",
-                  color: isActive ? "#fff" : "var(--text)",
-                }}
-              >
-                {route.name}
-              </Link>
-            );
-          })}
-        </nav>
+    const isActive =
+      pathname === route.path ||
+      pathname.startsWith(route.path + "/");
+
+    return (
+      <Link
+        key={route.path}
+        href={route.path}
+        className="px-4 py-2 rounded-md transition-all"
+        style={{
+          background: isActive
+            ? "var(--primary)"
+            : "transparent",
+          color: isActive ? "#fff" : "var(--text)",
+        }}
+      >
+        {route.name}
+      </Link>
+    );
+  })}
+</nav>
       </aside>
 
       {/* Right Content */}

@@ -86,20 +86,22 @@ export async function GET(req: NextRequest) {
     );
 
     // completed and pending challenges  count start
-    const [[challengeStats]]: any = await db.query(
-      `
+   const [[challengeStats]]: any = await db.query(
+  `
   SELECT
     (
       SELECT COUNT(*)
       FROM submissions
       WHERE user_id = ?
       AND status = 'submitted'
+      AND check_status = 'approved'
     ) +
     (
       SELECT COUNT(*)
       FROM solution_submit
       WHERE user_id = ?
       AND status = 'submitted'
+      AND check_status = 'approved'
     ) AS totalCompletedChallenges,
 
     (
@@ -115,8 +117,8 @@ export async function GET(req: NextRequest) {
       AND status = 'pending'
     ) AS totalPendingChallenges
   `,
-      [userId, userId, userId, userId],
-    );
+  [userId, userId, userId, userId],
+);
 
     // completed challenges count end
 

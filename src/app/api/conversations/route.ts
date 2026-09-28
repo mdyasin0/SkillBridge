@@ -253,7 +253,7 @@ export async function GET(req: Request) {
         /*
           Developer photo
         */
-        dp.photo AS developerPhoto,
+       u.photo AS developerPhoto,
 
         /*
           ==================================================
@@ -321,7 +321,8 @@ export async function GET(req: Request) {
             WHEN c.senderId = ? THEN c.receiverId
             ELSE c.senderId
           END
-
+LEFT JOIN users u
+  ON u.id = dp.userId
       ORDER BY c.createdAt DESC
       `,
       [

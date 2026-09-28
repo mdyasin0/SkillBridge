@@ -2,8 +2,8 @@
 
 import { useAuth } from "@/context/AuthContext";
 import Image from "next/image";
-import Link from "next/link";
-import { ChangeEvent, FormEvent, useMemo, useState } from "react";
+import { useRouter } from "next/navigation";
+import { ChangeEvent, FormEvent, useEffect, useMemo, useState } from "react";
 
 type FormData = {
   phone: string;
@@ -134,13 +134,37 @@ export default function RecruiterProfileSetupPage() {
 
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [isCompleted, setIsCompleted] = useState(false);
+ const [isFormDirty, setIsFormDirty] = useState(false);
   const { user } = useAuth();
   const userId = user?.id;
+  const router = useRouter();
   const progress = useMemo(() => {
     return (currentStep / steps.length) * 100;
   }, [currentStep]);
+  // ----------------------------------------
+  // Unsaved changes protection
+  // ----------------------------------------
 
+  useEffect(() => {
+    const handleBeforeUnload = (event: BeforeUnloadEvent) => {
+      // Form-এ কোনো পরিবর্তন না হলে warning দেখাবে না
+      if (!isFormDirty ) {
+        return;
+      }
+
+      event.preventDefault();
+
+      // Modern browsers এই custom message ব্যবহার করে না,
+      // কিন্তু এই assignment browser warning trigger করতে সাহায্য করে।
+      event.returnValue = "";
+    };
+
+    window.addEventListener("beforeunload", handleBeforeUnload);
+
+    return () => {
+      window.removeEventListener("beforeunload", handleBeforeUnload);
+    };
+  }, [isFormDirty]);
   // ----------------------------------------
   // Generic input handler
   // ----------------------------------------
@@ -149,7 +173,7 @@ export default function RecruiterProfileSetupPage() {
     e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>,
   ) => {
     const { name, value } = e.target;
-
+    setIsFormDirty(true);
     setFormData((prev) => ({
       ...prev,
       [name]: value,
@@ -172,7 +196,7 @@ export default function RecruiterProfileSetupPage() {
     const file = e.target.files?.[0];
 
     if (!file) return;
-
+    setIsFormDirty(true);
     if (!file.type.startsWith("image/")) {
       setErrors((prev) => ({
         ...prev,
@@ -213,6 +237,7 @@ export default function RecruiterProfileSetupPage() {
   // ----------------------------------------
 
   const toggleSpecialization = (value: string) => {
+    setIsFormDirty(true);
     setFormData((prev) => {
       const exists = prev.specialization.includes(value);
 
@@ -494,10 +519,11 @@ export default function RecruiterProfileSetupPage() {
       // ----------------------------------------
 
       setFormData(updatedFormData);
+      setIsFormDirty(false);
 
       alert(result.message || "Recruiter profile created successfully.");
 
-      setIsCompleted(true);
+      router.replace("/");
     } catch (error: any) {
       console.error("Profile submission failed:", error);
 
@@ -511,52 +537,7 @@ export default function RecruiterProfileSetupPage() {
     }
   };
 
-  // ----------------------------------------
-  // Completed screen
-  // ----------------------------------------
-
-  if (isCompleted) {
-    return (
-      <main className="min-h-screen bg-slate-50 px-4 py-10">
-        <div className="mx-auto flex min-h-[70vh] max-w-2xl items-center justify-center">
-          <div className="w-full rounded-2xl border border-slate-200 bg-white p-8 text-center shadow-sm">
-            <div className="mx-auto mb-5 flex h-16 w-16 items-center justify-center rounded-full bg-emerald-50">
-              <svg
-                className="h-8 w-8 text-emerald-600"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="2"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  d="m5 12 4 4L19 6"
-                />
-              </svg>
-            </div>
-
-            <h1 className="text-2xl font-bold text-slate-900">
-              Profile Completed
-            </h1>
-
-            <p className="mx-auto mt-3 max-w-md text-sm leading-6 text-slate-500">
-              Your recruiter profile has been completed successfully. You can
-              now start discovering and connecting with talented developers.
-            </p>
-
-            <Link
-
-            href="/pages/recruiter/profile"
-              className="mt-7 rounded-lg bg-slate-900 px-6 py-3 text-sm font-semibold text-white transition hover:bg-slate-800"
-            >
-              Go to Dashboard
-            </Link>
-          </div>
-        </div>
-      </main>
-    );
-  }
+ 
 
   return (
     <main className="min-h-screen bg-slate-50 px-4 py-8 sm:px-6 lg:px-8">

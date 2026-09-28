@@ -81,7 +81,7 @@ export async function GET(req: Request) {
           ----------------------------------------------
         */
 
-        rp.profilephoto AS recruiterPhoto,
+      u.photo AS recruiterPhoto,
 
         /*
           ----------------------------------------------
@@ -166,7 +166,13 @@ export async function GET(req: Request) {
             WHEN c.senderId = ? THEN c.receiverId
             ELSE c.senderId
           END
-
+        /*
+        ----------------------------------------------
+        Recruiter's users table data  JOIN
+        ----------------------------------------------
+      */
+LEFT JOIN users u
+  ON u.id = rp.user_id
       /*
         Latest conversation আগে
         */

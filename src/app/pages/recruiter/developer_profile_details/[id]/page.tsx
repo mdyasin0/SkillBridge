@@ -41,7 +41,6 @@ interface DeveloperProfileResponse {
     developer_profile_id: number;
     title: string;
     name: string;
-    fullName: string;
     email: string;
     role: string;
 
@@ -248,7 +247,7 @@ export default function DeveloperProfilePage() {
                     developer?.user_photo ||
                     "/default-user.png"
                   }
-                  alt={developer?.fullName || "Developer"}
+                  alt={developer?.name || "Developer"}
                   width={130}
                   height={130}
                   className="rounded-full border-4"
@@ -263,9 +262,9 @@ export default function DeveloperProfilePage() {
                     className="text-4xl font-bold tracking-tight"
                     style={{ color: "var(--text)" }}
                   >
-                    {developer?.fullName || developer?.name}
+                    {developer?.name}
                   </h1>
-                  <p className="mt-1 text-lg text-(--text-muted)">
+                  <p className="mt-1 text-lg font-bold text-(--text-muted)">
                     {developer?.title}
                   </p>
                   <div className="mt-2 flex flex-wrap items-center gap-2">

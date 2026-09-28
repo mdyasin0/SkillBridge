@@ -37,9 +37,8 @@ interface DeveloperProfileResponse {
   data: {
     user_id: number;
     developer_profile_id: number;
-
+    title: string;
     name: string;
-    fullName: string;
     email: string;
     role: string;
 
@@ -237,11 +236,8 @@ export default function DeveloperProfilePage() {
               {/* Left */}
               <div className="flex flex-col items-center gap-5 sm:flex-row">
                 <Image
-                  src={
-                    developer?.user_photo ||
-                    "default-user.png"
-                  }
-                  alt={developer?.fullName || "Developer"}
+                  src={developer?.user_photo || "default-user.png"}
+                  alt={developer?.name || "Developer"}
                   width={130}
                   height={130}
                   className="rounded-full border-4"
@@ -256,9 +252,11 @@ export default function DeveloperProfilePage() {
                     className="text-4xl font-bold tracking-tight"
                     style={{ color: "var(--text)" }}
                   >
-                    { developer?.name}
+                    {developer?.name}
                   </h1>
-
+                  <p className="mt-1 text-lg font-bold text-(--text-muted)">
+                    {developer?.title}
+                  </p>
                   <div className="mt-2 flex flex-wrap items-center gap-2">
                     {(profile?.badgeSystem?.totalBadgeNumber ?? 0) > 0 ? (
                       <span

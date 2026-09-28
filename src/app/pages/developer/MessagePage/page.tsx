@@ -868,7 +868,7 @@ const handleSaveEdit = async () => {
         */}
 
         {isEditing ? (
-          <div className="w-full min-w-[280px] max-w-[500px] rounded-2xl border border-(--primary) bg-(--surface) p-3 shadow-sm">
+          <div className="w-full min-w-70 max-w-125 rounded-2xl border border-(--primary) bg-(--surface) p-3 shadow-sm">
             <textarea
               autoFocus
               value={editingText}
@@ -1097,7 +1097,7 @@ const handleSaveEdit = async () => {
                   border-(--border)
                   bg-(--surface)
                   p-3
-                  shadow-[var(--shadow)]
+                  shadow-(--shadow)
                 "
               >
                 <div className="mb-2 flex items-center justify-between border-b border-(--border) pb-2">

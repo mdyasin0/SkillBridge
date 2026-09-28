@@ -68,17 +68,36 @@ export const authOptions: NextAuthOptions = {
   },
 
   callbacks: {
-    async jwt({ token, user }: { token: JWT; user?: User }) {
-      if (user) {
-        token.id = user.id;
-        token.name = user.name ?? null;
-        token.email = user.email ?? null;
-        token.role = user.role;
-        token.image = user.image ?? null;
-      }
+  async jwt({ token, user }) {
+  if (user) {
+    token.id = user.id;
+    token.name = user.name ?? null;
+    token.email = user.email ?? null;
+    token.role = user.role;
+    token.image = user.image ?? null;
+  }
 
-      return token;
-    },
+  if (token.id) {
+    const [rows]: any = await db.query(
+      `
+      SELECT role, photo, name, email
+      FROM users
+      WHERE id = ?
+      LIMIT 1
+      `,
+      [token.id],
+    );
+
+    if (rows.length > 0) {
+      token.role = rows[0].role;
+      token.image = rows[0].photo;
+      token.name = rows[0].name;
+      token.email = rows[0].email;
+    }
+  }
+
+  return token;
+},
 
     async session({
       session,
