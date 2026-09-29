@@ -12,6 +12,7 @@ type DBUser = {
   password: string;
   role: string;
   photo: string;
+  status: string;
 };
 
 export const authOptions: NextAuthOptions = {
@@ -54,6 +55,7 @@ export const authOptions: NextAuthOptions = {
           email: user.email,
           role: user.role,
           image: user.photo,
+          status:user.status,
         };
       },
     }),
@@ -75,12 +77,13 @@ export const authOptions: NextAuthOptions = {
     token.email = user.email ?? null;
     token.role = user.role;
     token.image = user.image ?? null;
+     token.status = user.status ?? null;
   }
 
   if (token.id) {
     const [rows]: any = await db.query(
       `
-      SELECT role, photo, name, email
+      SELECT role, photo, name, email , status
       FROM users
       WHERE id = ?
       LIMIT 1
@@ -93,6 +96,8 @@ export const authOptions: NextAuthOptions = {
       token.image = rows[0].photo;
       token.name = rows[0].name;
       token.email = rows[0].email;
+        token.status = rows[0].status;
+
     }
   }
 
@@ -112,6 +117,7 @@ export const authOptions: NextAuthOptions = {
         session.user.email = token.email;
         session.user.role = token.role;
         session.user.image = token.image;
+        session.user.status = token.status;
       }
 
       return session;

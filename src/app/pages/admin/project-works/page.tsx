@@ -24,9 +24,10 @@ export type Submission = {
   // Submission
   submission_id: number;
   submit_info: SubmitInfo;
-
+maxAttempts : number;
+submit_attempts:number;
   feedback: string | null;
-
+score: number;
   status: "pending" | "submitted";
   check_status: "pending" | "approved";
 
@@ -59,7 +60,7 @@ const Project_works = () => {
     const res = await fetch(`/api/project_works?status=${status}`);
 
     const json = await res.json();
-
+ console.log("API DATA:", json.data);
     setData(json.data);
     setCounts(json.meta.counts);
   };
@@ -69,6 +70,9 @@ const Project_works = () => {
     }
   }, [status, user?.id]);
   const submitReview = async () => {
+  try {
+    setLoading(true);
+
     const res = await fetch("/api/project_review_submit", {
       method: "POST",
       headers: {
@@ -92,10 +96,16 @@ const Project_works = () => {
         score: "",
       });
 
-      //  Reload data
       await getData();
+    } else {
+      console.error("Review submit failed:", json.message);
     }
-  };
+  } catch (error) {
+    console.error("Review submit error:", error);
+  } finally {
+    setLoading(false);
+  }
+};
 
   const searchedData = data.filter((item) => {
     const keyword = search.toLowerCase();
@@ -241,6 +251,7 @@ ${status === "approved" ? "bg-(--primary) text-white" : "bg-(--surface) border"}
                       >
                         View Details
                       </button>
+    
                     </div>
                   </td>
                 </tr>
@@ -283,12 +294,25 @@ ${status === "approved" ? "bg-(--primary) text-white" : "bg-(--surface) border"}
               </h2>
 
               <div className="flex items-center gap-3">
-                <button
-                  onClick={() => setShowReviewForm((prev) => !prev)}
-                  className="rounded-lg bg-(--primary) px-4 py-2 text-sm font-medium text-white transition hover:bg-(--primary-hover)"
-                >
-                  {showReviewForm ? "Cancel Review" : "Submit Review"}
-                </button>
+                  <button
+  onClick={() => {
+    if (selected) {
+      setReview({
+        feedback: selected.feedback ?? "",
+        score: selected.score ? String(selected.score) : "",
+      });
+    }
+
+    setShowReviewForm((prev) => !prev);
+  }}
+  className="rounded-lg bg-(--primary) px-4 py-2 text-sm font-medium text-white transition hover:bg-(--primary-hover)"
+>
+  {showReviewForm
+    ? "Cancel Review"
+    : selected?.check_status === "approved"
+      ? "Update Review"
+      : "Submit Review"}
+</button>
 
                 <button
                   onClick={() => setSelected(null)}
@@ -397,6 +421,25 @@ ${status === "approved" ? "bg-(--primary) text-white" : "bg-(--surface) border"}
                         : "Not Submitted"}
                     </p>
                   </div>
+                 <div className="rounded-xl border border-(--border) bg-(--bg) p-4">
+  <p className="text-xs text-(--text-muted)">
+    Max Attempts
+  </p>
+
+  <p className="mt-1 font-semibold text-(--text)">
+    {selected.maxAttempts ?? 0}
+  </p>
+</div>
+
+<div className="rounded-xl border border-(--border) bg-(--bg) p-4">
+  <p className="text-xs text-(--text-muted)">
+    Submit Attempts
+  </p>
+
+  <p className="mt-1 font-semibold text-(--text)">
+    {selected.submit_attempts ?? 0}
+  </p>
+</div>
 
                   <div className="rounded-xl border border-(--border) bg-(--bg) p-4 md:col-span-2">
                     <p className="mb-3 text-xs text-(--text-muted)">
@@ -453,10 +496,17 @@ ${status === "approved" ? "bg-(--primary) text-white" : "bg-(--surface) border"}
           <div className="w-full max-w-xl rounded-2xl bg-(--surface) p-6 shadow-2xl">
             <div className="mb-5 flex items-center justify-between">
               <div>
-                <h3 className="text-xl font-bold">Submit Review</h3>
-<h6 className="text-sm">There will be no penalty for the first attempt; based on the original score (100), 5% will be deducted from the score for each additional attempt after the first.
-</h6>
-  </div>
+                        <h3 className="text-xl font-bold">
+  {selected?.check_status === "approved"
+    ? "Update Review"
+    : "Submit Review"}
+</h3>
+                <h6 className="text-sm">
+                  There will be no penalty for the first attempt; based on the
+                  original score (100), 5% will be deducted from the score for
+                  each additional attempt after the first.
+                </h6>
+              </div>
 
               <button
                 onClick={() => setShowReviewForm(false)}
@@ -512,12 +562,16 @@ ${status === "approved" ? "bg-(--primary) text-white" : "bg-(--surface) border"}
                 Cancel
               </button>
 
-              <button
+                <button
                 onClick={submitReview}
                 disabled={loading}
                 className="rounded-xl bg-(--primary) px-6 py-2 text-white disabled:opacity-50"
               >
-                {loading ? "Submitting..." : "Submit Review"}
+             {loading
+  ? "Saving..."
+  : selected?.check_status === "approved"
+    ? "Update Review"
+    : "Submit Review"}
               </button>
             </div>
           </div>

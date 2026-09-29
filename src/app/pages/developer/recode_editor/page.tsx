@@ -15,12 +15,11 @@ interface Challenge {
   description: string;
   difficulty: string;
   category: string;
-  allowedLanguages: string[];
   timeLimit: number;
   maxAttempt: number;
   starterCode: string;
   hint: string;
-  rewardBadge: string;
+
 
   solutionId: number | null;
   score: number | null;
@@ -209,7 +208,6 @@ export default function ChallengeWorkspace({ challenge }: Props) {
 
           <Editor
             height="100%"
-            language={challenge.allowedLanguages[0].toLowerCase()}
             value={code}
             theme="vs-dark"
             onChange={(value) => setCode(value || "")}
@@ -241,9 +239,6 @@ export default function ChallengeWorkspace({ challenge }: Props) {
             <div className="h-full flex flex-col">
               <div className="border-b border-zinc-800 p-3 flex items-center justify-between">
                 <div className="flex gap-3">
-                  <span className="px-3 py-1 rounded-lg bg-blue-600 text-white">
-                    {challenge.allowedLanguages.join(", ")}
-                  </span>
                 </div>
 
                 <button
@@ -261,7 +256,6 @@ export default function ChallengeWorkspace({ challenge }: Props) {
               <div className="flex-1">
                 <Editor
                   height="100%"
-                  language={challenge.allowedLanguages[0].toLowerCase()}
                   value={code}
                   theme="vs-dark"
                   onChange={(value) => setCode(value || "")}

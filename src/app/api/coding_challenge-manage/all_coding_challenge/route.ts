@@ -1,20 +1,8 @@
-import { NextRequest, NextResponse } from "next/server";
+import { NextResponse } from "next/server";
 import { db } from "@/lib/db";
 
-export async function GET(req: NextRequest) {
+export async function GET() {
   try {
-    const userId = req.nextUrl.searchParams.get("userId");
-
-    if (!userId) {
-      return NextResponse.json(
-        {
-          success: false,
-          message: "User ID is required",
-        },
-        { status: 400 }
-      );
-    }
-
     const [rows]: any = await db.query(
       `
       SELECT
@@ -23,64 +11,26 @@ export async function GET(req: NextRequest) {
         c.description,
         c.difficulty,
         c.category,
-        c.allowedLanguages,
         c.timeLimit,
         c.maxAttempt,
         c.starterCode,
         c.hint,
-        c.rewardBadge,
+
         c.createdBy,
-        c.createdAt,
-
-        ss.id AS solutionId,
-        ss.score,
-        ss.feedback,
-        ss.status,
-        ss.submit_attempts,
-        ss.start_time,
-        ss.submitted_at,
-        ss.resubmit_start_at,
-        ss.resubmit_submitted_at
-
+        c.createdAt
       FROM challenges c
-
-      LEFT JOIN solution_submit ss
-      ON c.id = ss.challenge_id
-      AND ss.user_id = ?
-
       ORDER BY c.id DESC
-      `,
-      [userId]
+      `
     );
 
     const allChallenges = rows.map((item: any) => ({
       ...item,
-      allowedLanguages: JSON.parse(item.allowedLanguages || "[]"),
     }));
 
-   const available = allChallenges.filter(
-  (item: any) =>
-    item.solutionId === null ||
-    item.status !== "submitted"
-);
-
-const completed = allChallenges.filter(
-  (item: any) =>
-    item.solutionId !== null &&
-    item.status === "submitted"
-);
     return NextResponse.json({
       success: true,
-
-      counts: {
-        available: available.length,
-        completed: completed.length,
-      },
-
-      data: {
-        available,
-        completed,
-      },
+      count: allChallenges.length,
+      data: allChallenges,
     });
   } catch (error) {
     console.error(error);

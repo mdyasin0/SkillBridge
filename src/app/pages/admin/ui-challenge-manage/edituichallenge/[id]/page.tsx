@@ -11,7 +11,7 @@ type Challenge = {
   category: string;
   timeLimit: number;
   maxAttempts: number;
-  rewardBadge: string;
+  
 };
 
 export default function EditChallengePage() {
@@ -29,7 +29,6 @@ export default function EditChallengePage() {
     category: "",
     timeLimit: 0,
     maxAttempts: 0,
-    rewardBadge: "",
   });
 
   useEffect(() => {
@@ -258,23 +257,7 @@ export default function EditChallengePage() {
               />
             </div>
 
-            <div>
-              <label className="block mb-2">
-                Reward Badge
-              </label>
-
-              <input
-                type="text"
-                name="rewardBadge"
-                value={formData.rewardBadge}
-                onChange={handleChange}
-                className="w-full rounded-xl border p-3"
-                style={{
-                  background: "var(--bg-secondary)",
-                  borderColor: "var(--border)",
-                }}
-              />
-            </div>
+            
           </div>
 
           <button

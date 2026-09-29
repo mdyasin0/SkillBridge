@@ -18,7 +18,7 @@ export async function PUT(
       category,
       timeLimit,
       maxAttempts,
-      rewardBadge,
+     
     } = body;
 
     // Validation
@@ -53,7 +53,6 @@ export async function PUT(
         category = ?,
         timeLimit = ?,
         maxAttempts = ?,
-        rewardBadge = ?
       WHERE id = ?
       `,
       [
@@ -64,7 +63,7 @@ export async function PUT(
         category,
         timeLimit,
         maxAttempts,
-        rewardBadge || "",
+       
         id,
       ]
     );

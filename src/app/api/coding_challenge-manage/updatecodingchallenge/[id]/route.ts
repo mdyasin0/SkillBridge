@@ -15,12 +15,11 @@ export async function PUT(
       description,
       difficulty,
       category,
-      allowedLanguages,
       timeLimit,
       maxAttempt,
       starterCode,
       hint,
-      rewardBadge,
+
      
     } = body;
 
@@ -30,7 +29,6 @@ export async function PUT(
       !description ||
       !difficulty ||
       !category ||
-      !allowedLanguages ||
       !timeLimit ||
       !maxAttempt
       
@@ -53,12 +51,10 @@ export async function PUT(
         description = ?,
         difficulty = ?,
         category = ?,
-        allowedLanguages = ?,
         timeLimit = ?,
         maxAttempt = ?,
         starterCode = ?,
         hint = ?,
-        rewardBadge = ?,
         testCases = ?
       WHERE id = ?
       `,
@@ -67,12 +63,11 @@ export async function PUT(
         description,
         difficulty,
         category,
-        JSON.stringify(allowedLanguages),
         timeLimit,
         maxAttempt,
         starterCode || "",
         hint || "",
-        rewardBadge || "",
+     
        
         id,
       ]

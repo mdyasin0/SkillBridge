@@ -1,6 +1,7 @@
 "use client";
 
 import { useAuth } from "@/context/AuthContext";
+import { signOut } from "next-auth/react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
@@ -36,6 +37,32 @@ export default function RecruiterLayout({
       return;
     }
 
+    // User banned
+    if (user?.status === "banned") {
+      alert(
+        "Your account has been banned. You have been logged out."
+      );
+
+      signOut({
+        callbackUrl: "/auth/login",
+      });
+
+      return;
+    }
+
+    // User suspended
+    if (user?.status === "suspended") {
+      alert(
+        "Your account has been suspended. You have been logged out."
+      );
+
+      signOut({
+        callbackUrl: "/auth/login",
+      });
+
+      return;
+    }
+
     // User recruiter নয়
     if (user?.role !== "recruiter") {
       router.replace("/pages/unauthorized");
@@ -49,9 +76,12 @@ export default function RecruiterLayout({
     try {
       setProfileChecking(true);
 
-      const response = await fetch("/api/recruiter_profile_info/check", {
-        cache: "no-store",
-      });
+      const response = await fetch(
+        "/api/recruiter_profile_info/check",
+        {
+          cache: "no-store",
+        }
+      );
 
       const data = await response.json();
 
@@ -97,6 +127,8 @@ export default function RecruiterLayout({
       loading ||
       profileChecking ||
       !isLoggedIn ||
+      user?.status === "banned" ||
+      user?.status === "suspended" ||
       user?.role !== "recruiter"
     ) {
       return;
@@ -133,6 +165,8 @@ export default function RecruiterLayout({
     loading ||
     profileChecking ||
     !isLoggedIn ||
+    user?.status === "banned" ||
+    user?.status === "suspended" ||
     user?.role !== "recruiter"
   ) {
     return (
@@ -187,45 +221,45 @@ export default function RecruiterLayout({
           Recruiter Panel
         </h2>
 
-       <nav className="flex flex-col gap-2">
-  {routes.map((route) => {
-    // Profile incomplete হলে শুধু Profile Setup দেখাবে
-    if (
-      !profileCompleted &&
-      route.path !== "/pages/recruiter/profile-setup"
-    ) {
-      return null;
-    }
+        <nav className="flex flex-col gap-2">
+          {routes.map((route) => {
+            // Profile incomplete হলে শুধু Profile Setup দেখাবে
+            if (
+              !profileCompleted &&
+              route.path !== "/pages/recruiter/profile-setup"
+            ) {
+              return null;
+            }
 
-    // Profile complete হলে Profile Setup hide থাকবে
-    if (
-      profileCompleted &&
-      route.path === "/pages/recruiter/profile-setup"
-    ) {
-      return null;
-    }
+            // Profile complete হলে Profile Setup hide থাকবে
+            if (
+              profileCompleted &&
+              route.path === "/pages/recruiter/profile-setup"
+            ) {
+              return null;
+            }
 
-    const isActive =
-      pathname === route.path ||
-      pathname.startsWith(route.path + "/");
+            const isActive =
+              pathname === route.path ||
+              pathname.startsWith(route.path + "/");
 
-    return (
-      <Link
-        key={route.path}
-        href={route.path}
-        className="px-4 py-2 rounded-md transition-all"
-        style={{
-          background: isActive
-            ? "var(--primary)"
-            : "transparent",
-          color: isActive ? "#fff" : "var(--text)",
-        }}
-      >
-        {route.name}
-      </Link>
-    );
-  })}
-</nav>
+            return (
+              <Link
+                key={route.path}
+                href={route.path}
+                className="px-4 py-2 rounded-md transition-all"
+                style={{
+                  background: isActive
+                    ? "var(--primary)"
+                    : "transparent",
+                  color: isActive ? "#fff" : "var(--text)",
+                }}
+              >
+                {route.name}
+              </Link>
+            );
+          })}
+        </nav>
       </aside>
 
       {/* Right Content */}

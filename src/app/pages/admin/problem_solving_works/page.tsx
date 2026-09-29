@@ -13,11 +13,9 @@ export type Submission = {
   description: string;
   category: string;
   difficulty: string;
-  allowedLanguages: string;
   timeLimit: number;
   maxAttempt: number;
   hint: string;
-  rewardBadge: string;
 
   submission_id: number;
   submitCode: string;
@@ -69,42 +67,42 @@ const Problem_solving_works = () => {
     }
   }, [status, user?.id]);
   const submitReview = async () => {
-  try {
-    const res = await fetch("/api/pro_sol_review_submit", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        submissionId: selected?.submission_id, // <-- এটা ঠিক করো
-        feedback: review.feedback,
-        score: Number(review.score),
-      }),
-    });
+    try {
+      const res = await fetch("/api/pro_sol_review_submit", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          submissionId: selected?.submission_id, // <-- এটা ঠিক করো
+          feedback: review.feedback,
+          score: Number(review.score),
+        }),
+      });
 
-    const json = await res.json();
+      const json = await res.json();
 
-    if (!res.ok || !json.success) {
-      alert(json.message || "Something went wrong.");
-      return;
+      if (!res.ok || !json.success) {
+        alert(json.message || "Something went wrong.");
+        return;
+      }
+
+      alert(json.message);
+
+      setShowReviewForm(false);
+      setSelected(null);
+
+      setReview({
+        feedback: "",
+        score: "",
+      });
+
+      await getData();
+    } catch (error) {
+      console.error(error);
+      alert("Network error. Please try again.");
     }
-
-    alert(json.message);
-
-    setShowReviewForm(false);
-    setSelected(null);
-
-    setReview({
-      feedback: "",
-      score: "",
-    });
-
-    await getData();
-  } catch (error) {
-    console.error(error);
-    alert("Network error. Please try again.");
-  }
-};
+  };
 
   const searchedData = data.filter((item) => {
     const keyword = search.toLowerCase();
@@ -292,12 +290,25 @@ ${status === "approved" ? "bg-(--primary) text-white" : "bg-(--surface) border"}
               </h2>
 
               <div className="flex items-center gap-3">
-                <button
-                  onClick={() => setShowReviewForm((prev) => !prev)}
-                  className="rounded-lg bg-(--primary) px-4 py-2 text-sm font-medium text-white transition hover:bg-(--primary-hover)"
-                >
-                  {showReviewForm ? "Cancel Review" : "Submit Review"}
-                </button>
+              <button
+  onClick={() => {
+    if (selected) {
+      setReview({
+        feedback: selected.feedback ?? "",
+        score: selected.score ? String(selected.score) : "",
+      });
+    }
+
+    setShowReviewForm((prev) => !prev);
+  }}
+  className="rounded-lg bg-(--primary) px-4 py-2 text-sm font-medium text-white transition hover:bg-(--primary-hover)"
+>
+  {showReviewForm
+    ? "Cancel Review"
+    : selected?.check_status === "approved"
+      ? "Update Review"
+      : "Submit Review"}
+</button>
 
                 <button
                   onClick={() => setSelected(null)}
@@ -380,9 +391,6 @@ ${status === "approved" ? "bg-(--primary) text-white" : "bg-(--surface) border"}
                   <div className="rounded-xl border border-(--border) bg-(--bg) p-4 md:col-span-2">
                     <p className="text-xs text-(--text-muted)">
                       Allowed Languages
-                    </p>
-                    <p className="mt-1 font-semibold">
-                      {JSON.parse(selected.allowedLanguages).join(", ")}
                     </p>
                   </div>
 
@@ -482,11 +490,18 @@ ${status === "approved" ? "bg-(--primary) text-white" : "bg-(--surface) border"}
         <div className="fixed inset-0 z-60 flex items-center justify-center bg-black/50">
           <div className="w-full max-w-xl rounded-2xl bg-(--surface) p-6 shadow-2xl">
             <div className="mb-5 flex items-center justify-between">
-  <div>
-                <h3 className="text-xl font-bold">Submit Review</h3>
-<h6 className="text-sm">There will be no penalty for the first attempt; based on the original score (100), 5% will be deducted from the score for each additional attempt after the first.
-</h6>
-  </div>
+              <div>
+                <h3 className="text-xl font-bold">
+  {selected?.check_status === "approved"
+    ? "Update Review"
+    : "Submit Review"}
+</h3>
+                <h6 className="text-sm">
+                  There will be no penalty for the first attempt; based on the
+                  original score (100), 5% will be deducted from the score for
+                  each additional attempt after the first.
+                </h6>
+              </div>
               <button
                 onClick={() => setShowReviewForm(false)}
                 className="rounded-lg p-2 hover:bg-(--surface-hover)"
@@ -546,7 +561,11 @@ ${status === "approved" ? "bg-(--primary) text-white" : "bg-(--surface) border"}
                 disabled={loading}
                 className="rounded-xl bg-(--primary) px-6 py-2 text-white disabled:opacity-50"
               >
-                {loading ? "Submitting..." : "Submit Review"}
+             {loading
+  ? "Saving..."
+  : selected?.check_status === "approved"
+    ? "Update Review"
+    : "Submit Review"}
               </button>
             </div>
           </div>

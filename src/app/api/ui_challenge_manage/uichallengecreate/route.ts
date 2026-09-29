@@ -13,7 +13,7 @@ export async function POST(req: Request) {
       category,
       timeLimit,
       maxAttempts,
-      rewardBadge,
+     
     } = body;
 
     // Validation
@@ -48,9 +48,9 @@ export async function POST(req: Request) {
         category,
         timeLimit,
         maxAttempts,
-        rewardBadge
+        
       )
-      VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+      VALUES (?, ?, ?, ?, ?, ?, ?)
       `,
       [
         title,
@@ -60,7 +60,7 @@ export async function POST(req: Request) {
         category,
         timeLimit,
         maxAttempts,
-        rewardBadge || "",
+      
       ],
     );
 

@@ -61,7 +61,6 @@ export async function GET(
 
     const challenge = {
       ...rows[0],
-      allowedLanguages: JSON.parse(rows[0].allowedLanguages || "[]"),
       testCases: JSON.parse(rows[0].testCases || "[]"),
     };
 

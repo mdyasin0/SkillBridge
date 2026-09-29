@@ -1,7 +1,7 @@
-
 "use client";
 
 import { useAuth } from "@/context/AuthContext";
+import { signOut } from "next-auth/react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
@@ -33,6 +33,32 @@ export default function DeveloperLayout({
     // Not logged in
     if (!isLoggedIn) {
       router.replace("/pages/auth-required");
+      return;
+    }
+
+    // User banned
+    if (user?.status === "banned") {
+      alert(
+        "Your account has been banned. You have been logged out."
+      );
+
+      signOut({
+        callbackUrl: "/auth/login",
+      });
+
+      return;
+    }
+
+    // User suspended
+    if (user?.status === "suspended") {
+      alert(
+        "Your account has been suspended. You have been logged out."
+      );
+
+      signOut({
+        callbackUrl: "/auth/login",
+      });
+
       return;
     }
 
@@ -85,6 +111,8 @@ export default function DeveloperLayout({
       loading ||
       profileChecking ||
       !isLoggedIn ||
+      user?.status === "banned" ||
+      user?.status === "suspended" ||
       user?.role !== "developer"
     ) {
       return;
@@ -114,6 +142,8 @@ export default function DeveloperLayout({
     loading ||
     profileChecking ||
     !isLoggedIn ||
+    user?.status === "banned" ||
+    user?.status === "suspended" ||
     user?.role !== "developer"
   ) {
     return (
@@ -223,4 +253,3 @@ export default function DeveloperLayout({
     </div>
   );
 }
-

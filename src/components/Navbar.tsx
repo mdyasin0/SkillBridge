@@ -14,6 +14,7 @@ const Navbar = () => {
 
   const dropdownRef = useRef<HTMLDivElement>(null);
 
+ console.log("ggggggggggggg",user);
   // close dropdown on outside click
   useEffect(() => {
     const handler = (e: MouseEvent) => {
@@ -34,7 +35,7 @@ const Navbar = () => {
       <div className="max-w-7xl mx-auto px-4 md:px-6 h-16 flex items-center justify-between">
         {/* Logo */}
         <Link href="/" className="text-xl font-bold text-(--text)">
-          Skill<span className="text-(--primary)">Bridge</span>
+          Skill<span className="text-(--primary)">Bridge</span> 
         </Link>
 
         {/* Desktop Nav */}

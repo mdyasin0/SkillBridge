@@ -1,7 +1,7 @@
-
 "use client";
 
 import { useAuth } from "@/context/AuthContext";
+import { signOut } from "next-auth/react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 
@@ -52,15 +52,36 @@ export default function AdminLayout({
       return;
     }
 
+    // User banned
+    if (user?.status === "banned") {
+      alert("Your account has been banned. You have been logged out.");
+      signOut({ callbackUrl: "/auth/login" });
+      return;
+    }
+
+    // User suspended
+    if (user?.status === "suspended") {
+      alert("Your account has been suspended. You have been logged out.");
+      signOut({ callbackUrl: "/auth/login" });
+      return;
+    }
+
     // User login করেছে, কিন্তু admin নয়
     if (user?.role !== "admin") {
       router.replace("/pages/unauthorized");
+      return;
     }
   }, [loading, isLoggedIn, user, router]);
 
   // Authentication / Authorization check চলাকালীন
-  // অথবা unauthorized user-এর ক্ষেত্রে protected content দেখানো হবে না
-  if (loading || !isLoggedIn || user?.role !== "admin") {
+  // অথবা unauthorized/inactive user-এর ক্ষেত্রে protected content দেখানো হবে না
+  if (
+    loading ||
+    !isLoggedIn ||
+    user?.status === "banned" ||
+    user?.status === "suspended" ||
+    user?.role !== "admin"
+  ) {
     return (
       <div
         className="min-h-screen flex items-center justify-center"
@@ -141,4 +162,3 @@ export default function AdminLayout({
     </div>
   );
 }
-

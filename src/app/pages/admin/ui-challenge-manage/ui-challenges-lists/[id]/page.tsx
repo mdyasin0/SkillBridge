@@ -11,7 +11,7 @@ type Challenge = {
   category: string;
   timeLimit: number;
   maxAttempts: number;
-  rewardBadge: string;
+ 
 };
 
 
@@ -74,10 +74,6 @@ export default  function ChallengeDetails() {
             value={challenge.maxAttempts}
           />
 
-          <Info
-            title="Reward Badge"
-            value={challenge.rewardBadge || "No Badge"}
-          />
         </div>
       </div>
     </div>

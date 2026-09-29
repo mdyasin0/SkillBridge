@@ -46,10 +46,11 @@ export async function GET(req: Request) {
     u.description,
     u.category,
     u.createdAt,
-
+   u.maxAttempts,
     -- Submission
     s.submission_id AS submission_id,
     s.submit_info,
+    s.submit_attempts,
     s.feedback,
     s.score,
     s.status,

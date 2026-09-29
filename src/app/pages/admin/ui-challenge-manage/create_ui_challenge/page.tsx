@@ -10,7 +10,6 @@ type FormData = {
   category: string;
   timeLimit: number;
   maxAttempts: number;
-  rewardBadge: string;
 };
 
 export default function ChallengeForm() {
@@ -35,7 +34,7 @@ export default function ChallengeForm() {
     category: "",
     timeLimit: 30,
     maxAttempts: 3,
-    rewardBadge: "",
+  
   });
 
   const handleChange = (
@@ -86,7 +85,7 @@ export default function ChallengeForm() {
       category: "",
       timeLimit: 30,
       maxAttempts: 3,
-      rewardBadge: "",
+      
     });
   } catch (error) {
     console.error(error);
@@ -259,25 +258,7 @@ export default function ChallengeForm() {
               />
             </div>
 
-            {/* Reward Badge */}
-            <div>
-              <label className="block mb-2 font-medium">
-                Reward Badge
-              </label>
-
-              <input
-                type="text"
-                name="rewardBadge"
-                value={formData.rewardBadge}
-                onChange={handleChange}
-                placeholder="Gold Badge"
-                className="w-full rounded-xl border px-4 py-3 outline-none"
-                style={{
-                  background: "var(--bg-secondary)",
-                  borderColor: "var(--border)",
-                }}
-              />
-            </div>
+           
           </div>
 
           <div className="pt-4">

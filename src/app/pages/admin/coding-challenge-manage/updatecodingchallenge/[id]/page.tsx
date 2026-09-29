@@ -16,12 +16,11 @@ export default function ProblemForm() {
     description: "",
     difficulty: "Easy",
     category: "React",
-    allowedLanguages: ["JavaScript"],
     timeLimit: 1000,
     maxAttempt: 5,
     starterCode: "",
     hint: "",
-    rewardBadge: "",
+    
   });
 
 
@@ -55,12 +54,11 @@ export default function ProblemForm() {
           description: data.description,
           difficulty: data.difficulty,
           category: data.category,
-          allowedLanguages: data.allowedLanguages,
           timeLimit: data.timeLimit,
           maxAttempt: data.maxAttempt,
           starterCode: data.starterCode,
           hint: data.hint,
-          rewardBadge: data.rewardBadge,
+          
         });
 
        
@@ -162,23 +160,7 @@ export default function ProblemForm() {
             </select>
           </div>
 
-          <div className="space-y-2">
-            <label>Allowed Language</label>
-
-            <select
-              value={formData.allowedLanguages[0]}
-              onChange={(e) =>
-                setFormData({
-                  ...formData,
-                  allowedLanguages: [e.target.value],
-                })
-              }
-              className="w-full rounded-xl border border-(--border) bg-(--bg) p-3"
-            >
-              <option value="JavaScript">JavaScript</option>
-              <option value="Python">Python</option>
-            </select>
-          </div>
+        
         </div>
 
         {/* Time */}
@@ -239,21 +221,7 @@ export default function ProblemForm() {
           />
         </div>
 
-        {/* Badge */}
-
-        <div className="space-y-2">
-          <label>Reward Badge</label>
-
-          <input
-            type="text"
-            name="rewardBadge"
-            value={formData.rewardBadge}
-            onChange={handleChange}
-            placeholder="Gold / Silver / Bronze"
-            className="w-full rounded-xl border border-(--border) bg-(--bg) p-3"
-          />
-        </div>
-
+      
      
 
         <button

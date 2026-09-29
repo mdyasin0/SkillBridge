@@ -10,12 +10,11 @@ export async function POST(req: Request) {
       description,
       difficulty,
       category,
-      allowedLanguages,
       timeLimit,
       maxAttempt,
       starterCode,
       hint,
-      rewardBadge,
+      
       
     } = body;
 
@@ -26,7 +25,6 @@ export async function POST(req: Request) {
       !description ||
       !difficulty ||
       !category ||
-      !allowedLanguages ||
       !timeLimit ||
       !maxAttempt 
     ) {
@@ -48,29 +46,27 @@ export async function POST(req: Request) {
         description,
         difficulty,
         category,
-        allowedLanguages,
         timeLimit,
         maxAttempt,
         starterCode,
         hint,
-        rewardBadge,
+      
         createdBy
       )
 
       VALUES
-      (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+      (?, ?, ?, ?, ?, ?, ?, ?, ?)
       `,
       [
         title,
         description,
         difficulty,
         category,
-        JSON.stringify(allowedLanguages),
         timeLimit,
         maxAttempt,
         starterCode || "",
         hint || "",
-        rewardBadge || "",
+       
        
 
         // পরে login করলে session/user থেকে নিবে

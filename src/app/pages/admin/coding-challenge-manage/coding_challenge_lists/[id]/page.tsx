@@ -60,19 +60,13 @@ export default function ChallengeDetails() {
             <b>Max Attempt:</b> {challenge.maxAttempt}
           </p>
 
-          <p>
-            <b>Languages:</b>{" "}
-            {challenge.allowedLanguages.join(", ")}
-          </p>
+         
 
           <p>
             <b>Hint:</b> {challenge.hint}
           </p>
 
-          <p>
-            <b>Reward Badge:</b>{" "}
-            {challenge.rewardBadge}
-          </p>
+         
 
           <div>
 
