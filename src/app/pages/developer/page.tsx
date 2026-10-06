@@ -2,6 +2,7 @@
 
 import { useEffect } from "react";
 import { useRouter } from "next/navigation";
+import { toast } from "react-toastify";
 
 export default function DeveloperHomePage() {
   const router = useRouter();
@@ -27,7 +28,7 @@ export default function DeveloperHomePage() {
 
         router.replace("/pages/developer/main_profile");
       } catch (error) {
-        console.error("Profile check error:", error);
+        toast.error(String(error));
       }
     };
 

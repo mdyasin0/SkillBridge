@@ -1,5 +1,6 @@
 "use client";
 
+import LoadingUI from "@/components/Loadinui";
 import { useParams } from "next/navigation";
 import { useEffect, useState } from "react";
 
@@ -16,9 +17,7 @@ export default function ChallengeDetails() {
 
   if (!challenge)
     return (
-      <div className="p-10">
-        Loading...
-      </div>
+     <LoadingUI/>
     );
 
   return (

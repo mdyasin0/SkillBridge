@@ -4,6 +4,8 @@ import { useEffect, useState } from "react";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/context/AuthContext";
+import LoadingUI from "@/components/Loadinui";
+import { toast } from "react-toastify";
 
 interface Conversation {
   conversationId: string;
@@ -55,16 +57,16 @@ export default function MessageDeveloperList() {
 
         const result = await response.json();
 
-        console.log("DEVELOPER CONVERSATIONS:", result);
+    
 
         if (!response.ok) {
-          console.error("Failed to fetch conversations:", result);
+          toast.error( result);
           return;
         }
 
         setConversations(result.data || []);
       } catch (error) {
-        console.error("Failed to fetch conversations:", error);
+       toast.error(String(error));
       } finally {
         setLoading(false);
       }
@@ -82,41 +84,38 @@ export default function MessageDeveloperList() {
 
     receiverId = current Developer
 
-    MessagePage এই দুইটা ID ব্যবহার করবে
-    unread message read করার জন্য।
+    these 2 id will be used in MessagePage  for
+    unread message read 
   */
 
   const handleConversationClick = (conversation: Conversation) => {
     /*
-      receiverId না থাকলে MessagePage-এ পাঠাবো না।
+      if no receiverId  not redirect in  MessagePage
 
-      কারণ read API-এর জন্য receiverId প্রয়োজন।
+      because for  read API receiverId is needed .
     */
 
     if (!conversation.receiverId) {
-      console.error(
-        "Cannot open conversation: receiverId is missing",
-        conversation,
-      );
+    toast.error(String(conversation));
 
       return;
     }
 
     /*
-      Recruiter ID-ও অবশ্যই থাকতে হবে।
+      Recruiter ID- must need
     */
 
     if (!conversation.otherUserId) {
-      console.error(
-        "Cannot open conversation: recruiterId is missing",
-        conversation,
+      toast.error(
+      String(
+        conversation)
       );
 
       return;
     }
 
     /*
-      দুইটা ID MessagePage-এ পাঠাচ্ছি।
+      2 ID return in MessagePage .
 
       recruiterId = Recruiter
       receiverId = Developer
@@ -135,9 +134,7 @@ export default function MessageDeveloperList() {
 
   if (loading) {
     return (
-      <div className="p-4 text-sm text-(--text-muted)">
-        Loading conversations...
-      </div>
+    <LoadingUI/>
     );
   }
 

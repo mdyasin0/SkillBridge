@@ -40,7 +40,7 @@ export async function POST(req: Request) {
     );
 
 
-    // Existing row হলে id পাওয়া যাবে না, তাই id বের করছি
+    // if row Existed  , id will not be found , so finding the id .
     const [rows]: any = await db.query(
       `
       SELECT id
@@ -65,7 +65,7 @@ export async function POST(req: Request) {
     );
 
   } catch (error) {
-    console.log(error);
+    // console.log(error);
 
     return NextResponse.json(
       {

@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { toast } from "react-toastify";
 
 type FormData = {
   title: string;
@@ -14,17 +15,17 @@ type FormData = {
 
 export default function ChallengeForm() {
   const technologies = [
-  "React",
-  "Next.js",
-  "Angular",
-  "Vue.js",
-  "Express.js",
-  "NestJS",
-  "Docker",
-  "Kubernetes",
-  "AWS",
-  "Git",
-];
+    "React",
+    "Next.js",
+    "Angular",
+    "Vue.js",
+    "Express.js",
+    "NestJS",
+    "Docker",
+    "Kubernetes",
+    "AWS",
+    "Git",
+  ];
   const [loading, setLoading] = useState(false);
   const [formData, setFormData] = useState<FormData>({
     title: "",
@@ -34,66 +35,62 @@ export default function ChallengeForm() {
     category: "",
     timeLimit: 30,
     maxAttempts: 3,
-  
   });
 
   const handleChange = (
     e: React.ChangeEvent<
       HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement
-    >
+    >,
   ) => {
     const { name, value } = e.target;
 
     setFormData((prev) => ({
       ...prev,
       [name]:
-        name === "timeLimit" || name === "maxAttempts"
-          ? Number(value)
-          : value,
+        name === "timeLimit" || name === "maxAttempts" ? Number(value) : value,
     }));
   };
 
- const handleSubmit = async (e: React.FormEvent) => {
-  e.preventDefault();
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
 
-  try {
-    setLoading(true);
+    try {
+      setLoading(true);
 
-    const res = await fetch("/api/ui_challenge_manage/uichallengecreate", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(formData),
-    });
+      const res = await fetch("/api/ui_challenge_manage/uichallengecreate", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(formData),
+      });
 
-    const data = await res.json();
+      const data = await res.json();
 
-    if (!res.ok) {
-      alert(data.message);
-      return;
+      if (!res.ok) {
+        toast.info(data.message);
+        return;
+      }
+
+      toast.info(data.message);
+
+      // Form Reset
+      setFormData({
+        title: "",
+        description: "",
+        technology: "",
+        difficulty: "",
+        category: "",
+        timeLimit: 30,
+        maxAttempts: 3,
+      });
+    } catch (error) {
+      toast.error(String(error));
+      toast.info("Something went wrong");
+    } finally {
+      setLoading(false);
     }
-
-    alert(data.message);
-
-    // Form Reset
-    setFormData({
-      title: "",
-      description: "",
-      technology: "",
-      difficulty: "",
-      category: "",
-      timeLimit: 30,
-      maxAttempts: 3,
-      
-    });
-  } catch (error) {
-    console.error(error);
-    alert("Something went wrong");
-  } finally {
-    setLoading(false);
-  }
-};
+  };
 
   return (
     <div className="max-w-4xl mx-auto p-6">
@@ -105,16 +102,12 @@ export default function ChallengeForm() {
           boxShadow: "var(--shadow)",
         }}
       >
-        <h2 className="text-3xl font-bold mb-8">
-          Create-ui-challenge
-        </h2>
+        <h2 className="text-3xl font-bold mb-8">Create-ui-challenge</h2>
 
         <form onSubmit={handleSubmit} className="space-y-6">
           {/* Title */}
           <div>
-            <label className="block mb-2 font-medium">
-              Title
-            </label>
+            <label className="block mb-2 font-medium">Title</label>
             <input
               type="text"
               name="title"
@@ -131,9 +124,7 @@ export default function ChallengeForm() {
 
           {/* Description */}
           <div>
-            <label className="block mb-2 font-medium">
-              Description
-            </label>
+            <label className="block mb-2 font-medium">Description</label>
 
             <textarea
               rows={6}
@@ -152,36 +143,32 @@ export default function ChallengeForm() {
           {/* Grid */}
           <div className="grid md:grid-cols-2 gap-6">
             {/* Technology */}
-          <div>
-  <label className="mb-2 block font-medium">
-    Technology
-  </label>
+            <div>
+              <label className="mb-2 block font-medium">Technology</label>
 
-  <select
-    name="technology"
-    value={formData.technology}
-    onChange={handleChange}
-    className="w-full rounded-xl border px-4 py-3 outline-none"
-    style={{
-      background: "var(--bg-secondary)",
-      borderColor: "var(--border)",
-    }}
-  >
-    <option value="">Select Technology</option>
+              <select
+                name="technology"
+                value={formData.technology}
+                onChange={handleChange}
+                className="w-full rounded-xl border px-4 py-3 outline-none"
+                style={{
+                  background: "var(--bg-secondary)",
+                  borderColor: "var(--border)",
+                }}
+              >
+                <option value="">Select Technology</option>
 
-    {technologies.map((tech) => (
-      <option key={tech} value={tech}>
-        {tech}
-      </option>
-    ))}
-  </select>
-</div>
+                {technologies.map((tech) => (
+                  <option key={tech} value={tech}>
+                    {tech}
+                  </option>
+                ))}
+              </select>
+            </div>
 
             {/* Difficulty */}
             <div>
-              <label className="block mb-2 font-medium">
-                Difficulty
-              </label>
+              <label className="block mb-2 font-medium">Difficulty</label>
 
               <select
                 name="difficulty"
@@ -202,9 +189,7 @@ export default function ChallengeForm() {
 
             {/* Category */}
             <div>
-              <label className="block mb-2 font-medium">
-                Category
-              </label>
+              <label className="block mb-2 font-medium">Category</label>
 
               <input
                 type="text"
@@ -241,9 +226,7 @@ export default function ChallengeForm() {
 
             {/* Max Attempts */}
             <div>
-              <label className="block mb-2 font-medium">
-                Max Attempts
-              </label>
+              <label className="block mb-2 font-medium">Max Attempts</label>
 
               <input
                 type="number"
@@ -257,27 +240,25 @@ export default function ChallengeForm() {
                 }}
               />
             </div>
-
-           
           </div>
 
           <div className="pt-4">
-          <button
-  type="submit"
-  disabled={loading}
-  className="rounded-xl px-8 py-3 font-semibold text-white transition disabled:opacity-50 disabled:cursor-not-allowed"
-  style={{
-    background: "var(--primary)",
-  }}
-  onMouseOver={(e) =>
-    (e.currentTarget.style.background = "var(--primary-hover)")
-  }
-  onMouseOut={(e) =>
-    (e.currentTarget.style.background = "var(--primary)")
-  }
->
-  {loading ? "Creating..." : "Create Challenge"}
-</button>
+            <button
+              type="submit"
+              disabled={loading}
+              className="rounded-xl px-8 py-3 font-semibold text-white transition disabled:opacity-50 disabled:cursor-not-allowed"
+              style={{
+                background: "var(--primary)",
+              }}
+              onMouseOver={(e) =>
+                (e.currentTarget.style.background = "var(--primary-hover)")
+              }
+              onMouseOut={(e) =>
+                (e.currentTarget.style.background = "var(--primary)")
+              }
+            >
+              {loading ? "Creating..." : "Create Challenge"}
+            </button>
           </div>
         </form>
       </div>

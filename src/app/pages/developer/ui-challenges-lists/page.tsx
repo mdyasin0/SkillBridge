@@ -1,5 +1,6 @@
 "use client";
 
+import LoadingUI from "@/components/Loadinui";
 import { useAuth } from "@/context/AuthContext";
 import { Filter, X } from "lucide-react";
 import { useRouter } from "next/navigation";
@@ -478,7 +479,7 @@ export default function UIChallengesPage() {
     }
   };
   if (loading) {
-    return <div>Loading...</div>;
+    return <LoadingUI/>;
   }
 
   return (

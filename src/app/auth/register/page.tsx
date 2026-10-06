@@ -85,7 +85,7 @@ export default function RegisterPage() {
 
     const data = await res.json();
 
-    console.log("ImgBB response:", data);
+    // console.log("ImgBB response:", data);
 
     if (!res.ok || !data.success || !data.data?.url) {
       throw new Error(data?.error?.message || "Image upload failed");

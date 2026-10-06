@@ -1,7 +1,9 @@
 "use client";
 
+import LoadingUI from "@/components/Loadinui";
 import Link from "next/link";
 import { useEffect, useState } from "react";
+import { toast } from "react-toastify";
 
 type Challenge = {
   id: number;
@@ -41,24 +43,24 @@ export default function UIChallengesPage() {
       const result = await res.json();
 
       if (!res.ok) {
-        alert(result.message);
+        toast.info(result.message);
         return;
       }
 
       // Remove deleted item from UI
       setData((prev) => prev.filter((item) => item.id !== id));
 
-      alert(result.message);
+      toast.info(result.message);
     } catch (error) {
-      console.error(error);
-      alert("Something went wrong.");
+      toast.error(String(error));
+      toast.info("Something went wrong.");
     } finally {
       setDeletingId(null);
     }
   };
 
   if (loading) {
-    return <div>Loading...</div>;
+    return<LoadingUI/>;
   }
 
   return (

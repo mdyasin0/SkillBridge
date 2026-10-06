@@ -5,6 +5,7 @@ import { signOut } from "next-auth/react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
+import { toast } from "react-toastify";
 
 const routes = [
   { name: "Home", path: "/" },
@@ -31,7 +32,7 @@ export default function RecruiterLayout({
   useEffect(() => {
     if (loading) return;
 
-    // User login করা নেই
+    // User is not login
     if (!isLoggedIn) {
       router.replace("/pages/auth-required");
       return;
@@ -39,7 +40,7 @@ export default function RecruiterLayout({
 
     // User banned
     if (user?.status === "banned") {
-      alert(
+      toast.info(
         "Your account has been banned. You have been logged out."
       );
 
@@ -52,7 +53,7 @@ export default function RecruiterLayout({
 
     // User suspended
     if (user?.status === "suspended") {
-      alert(
+      toast.info(
         "Your account has been suspended. You have been logged out."
       );
 
@@ -63,7 +64,7 @@ export default function RecruiterLayout({
       return;
     }
 
-    // User recruiter নয়
+    // User is not recruiter 
     if (user?.role !== "recruiter") {
       router.replace("/pages/unauthorized");
       return;
@@ -86,9 +87,7 @@ export default function RecruiterLayout({
       const data = await response.json();
 
       if (!response.ok || !data.success) {
-        console.error(
-          "Recruiter profile check failed:",
-          data.message
+       toast.error(data.message
         );
         return;
       }
@@ -97,7 +96,7 @@ export default function RecruiterLayout({
 
       setProfileCompleted(completed);
 
-      // Profile নেই
+      // no Profile 
       if (
         !completed &&
         pathname !== "/pages/recruiter/profile-setup"
@@ -106,7 +105,7 @@ export default function RecruiterLayout({
         return;
       }
 
-      // Profile already exists কিন্তু profile-setup page-এ যাওয়ার চেষ্টা করলে
+      // Profile already exists but try to redirect profile-setup page
       if (
         completed &&
         pathname === "/pages/recruiter/profile-setup"
@@ -115,13 +114,13 @@ export default function RecruiterLayout({
         return;
       }
     } catch (error) {
-      console.error("Recruiter profile check error:", error);
+      toast.error(String(error));
     } finally {
       setProfileChecking(false);
     }
   };
 
-  // Route change হলে profile status check করবে
+  // when Route change ,profile status  will check
   useEffect(() => {
     if (
       loading ||
@@ -134,7 +133,7 @@ export default function RecruiterLayout({
       return;
     }
 
-    // Profile incomplete হলে শুধু profile-setup accessible
+    //  if Profile is incomplete just profile-setup is  accessible
     if (
       !profileCompleted &&
       pathname !== "/pages/recruiter/profile-setup"
@@ -143,7 +142,7 @@ export default function RecruiterLayout({
       return;
     }
 
-    // Profile complete হলে profile-setup আর accessible নয়
+    // if Profile is completed  profile-setup is not accessible more
     if (
       profileCompleted &&
       pathname === "/pages/recruiter/profile-setup"
@@ -223,7 +222,7 @@ export default function RecruiterLayout({
 
         <nav className="flex flex-col gap-2">
           {routes.map((route) => {
-            // Profile incomplete হলে শুধু Profile Setup দেখাবে
+            // if Profile  is incomplete just Profile Setup will show
             if (
               !profileCompleted &&
               route.path !== "/pages/recruiter/profile-setup"
@@ -231,7 +230,7 @@ export default function RecruiterLayout({
               return null;
             }
 
-            // Profile complete হলে Profile Setup hide থাকবে
+            // if Profile is complete  Profile Setup will hide 
             if (
               profileCompleted &&
               route.path === "/pages/recruiter/profile-setup"

@@ -9,6 +9,7 @@ import { Panel, PanelGroup, PanelResizeHandle } from "react-resizable-panels";
 import withReactContent from "sweetalert2-react-content";
 import Swal from "sweetalert2";
 import { useRouter } from "next/navigation";
+import { toast } from "react-toastify";
 interface Challenge {
   id: number;
   title: string;
@@ -148,7 +149,7 @@ export default function ChallengeWorkspace({ challenge }: Props) {
 
       return;
     } catch (error) {
-      console.error(error);
+    toast.error(String(error));
 
       MySwal.fire({
         icon: "error",

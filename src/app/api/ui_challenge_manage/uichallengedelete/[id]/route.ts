@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { db } from "@/lib/db";
+import { toast } from "react-toastify";
 
 type Params = {
   params: Promise<{
@@ -50,7 +51,7 @@ export async function DELETE(req: Request, { params }: Params) {
       }
     );
   } catch (error) {
-    console.error(error);
+   toast.error(String(error));
 
     return NextResponse.json(
       {

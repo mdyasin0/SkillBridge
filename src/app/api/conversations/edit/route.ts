@@ -42,7 +42,7 @@ export async function PATCH(req: Request) {
     Find Message
     ==================================================
 
-    messageId দিয়ে নির্দিষ্ট message খুঁজছি।
+     finding specific message by messageId .
     */
 
     const [rows]: any = await db.query(
@@ -88,10 +88,10 @@ export async function PATCH(req: Request) {
     Authorization
     ==================================================
 
-    শুধু message-এর original sender
-    নিজের message edit করতে পারবে।
+    just  message original sender
+      edits his own messages .
 
-    অন্য user's message edit করা যাবে না।
+    others user's message is not edited 
     */
 
     if (String(existingMessage.senderId) !== String(userId)) {
@@ -110,11 +110,7 @@ export async function PATCH(req: Request) {
     Update Message
     ==================================================
 
-    message
-    edited = 1
-    updatedAt = NOW()
 
-    createdAt পরিবর্তন করছি না।
     */
 
     const [result]: any = await db.query(
@@ -159,8 +155,8 @@ export async function PATCH(req: Request) {
     Fetch Updated Message
     ==================================================
 
-    Database থেকে updated data আবার নিয়ে আসছি।
-    এতে frontend exact database value পাবে।
+    again brought updated data from Database.
+    for this frontend exact database value can be found.
     */
 
     const [updatedRows]: any = await db.query(

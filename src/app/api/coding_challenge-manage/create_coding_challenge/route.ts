@@ -69,7 +69,7 @@ export async function POST(req: Request) {
        
        
 
-        // পরে login করলে session/user থেকে নিবে
+        // next time user data is taken from session/user 
         1,
       ]
     );
@@ -83,7 +83,7 @@ export async function POST(req: Request) {
       }
     );
   } catch (error) {
-    console.log(error);
+    // console.log(error);
 
     return NextResponse.json(
       {

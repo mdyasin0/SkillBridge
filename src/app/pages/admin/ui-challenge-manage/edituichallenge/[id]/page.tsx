@@ -2,6 +2,8 @@
 
 import { useEffect, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
+import LoadingUI from "@/components/Loadinui";
+import { toast } from "react-toastify";
 
 type Challenge = {
   title: string;
@@ -39,8 +41,8 @@ export default function EditChallengePage() {
 
         setFormData(result.data);
       } catch (error) {
-        console.log(error);
-        alert("Failed to load challenge.");
+        toast.error(String(error));
+        toast.info("Failed to load challenge.");
       } finally {
         setLoading(false);
       }
@@ -84,16 +86,16 @@ export default function EditChallengePage() {
       const result = await res.json();
 
       if (!res.ok) {
-        alert(result.message);
+        toast.info(result.message);
         return;
       }
 
-      alert(result.message);
+      toast.info(result.message);
 
       router.push("/pages/admin/ui-challenges");
     } catch (error) {
-      console.log(error);
-      alert("Something went wrong.");
+      toast.error(String(error));
+      toast.info("Something went wrong.");
     } finally {
       setUpdating(false);
     }
@@ -101,9 +103,7 @@ export default function EditChallengePage() {
 
   if (loading) {
     return (
-      <div className="text-center mt-20 text-lg">
-        Loading...
-      </div>
+   <LoadingUI/>
     );
   }
 

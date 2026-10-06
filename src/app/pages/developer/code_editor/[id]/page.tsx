@@ -1,16 +1,17 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { useParams, useRouter } from "next/navigation";
+import { useParams } from "next/navigation";
 import ChallengeWorkspace from "../page";
 import { useAuth } from "@/context/AuthContext";
+import LoadingUI from "@/components/Loadinui";
 
 export default function WorkspacePage() {
   const { id } = useParams();
   const { user } = useAuth();
   const [challenge, setChallenge] = useState<any>(null);
   const [loading, setLoading] = useState(true);
-  const router = useRouter();
+  
   useEffect(() => {
     if (!user?.id || !id) return;
 
@@ -26,9 +27,7 @@ export default function WorkspacePage() {
 
   if (loading) {
     return (
-      <div className="h-screen flex items-center justify-center">
-        Loading...
-      </div>
+ <LoadingUI/>
     );
   }
 

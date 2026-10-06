@@ -5,6 +5,7 @@ import { signOut } from "next-auth/react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
+import { toast } from "react-toastify";
 
 const routes = [
   { name: "Home", path: "/" },
@@ -38,7 +39,7 @@ export default function DeveloperLayout({
 
     // User banned
     if (user?.status === "banned") {
-      alert(
+      toast.info(
         "Your account has been banned. You have been logged out."
       );
 
@@ -51,7 +52,7 @@ export default function DeveloperLayout({
 
     // User suspended
     if (user?.status === "suspended") {
-      alert(
+      toast.info(
         "Your account has been suspended. You have been logged out."
       );
 
@@ -82,14 +83,14 @@ export default function DeveloperLayout({
       const data = await response.json();
 
       if (!response.ok || !data.success) {
-        console.error("Profile check failed:", data.message);
+        toast.error(data.message);
         return;
       }
 
       setProfileCompleted(data.profileCompleted);
 
-      // Profile incomplete হলে
-      // শুধু create-profile route access করা যাবে
+      // if Profile is incomplete
+      // just  access in create-profile route 
       if (
         data.profileCompleted === false &&
         pathname !== "/pages/developer/create-profile"
@@ -97,14 +98,14 @@ export default function DeveloperLayout({
         router.replace("/pages/developer/create-profile");
       }
     } catch (error) {
-      console.error("Developer profile check error:", error);
+      toast.error(String(error));
     } finally {
       setProfileChecking(false);
     }
   };
 
   /*
-   * Route change হলে profile status check করবে
+   * if Route changes profile status will be   checked
    */
   useEffect(() => {
     if (
@@ -199,7 +200,7 @@ export default function DeveloperLayout({
             /*
              * PROFILE INCOMPLETE
              *
-             * তখন শুধু Create Profile দেখাবে
+             * at that time just  Create Profile is showed
              */
             if (
               !profileCompleted &&
@@ -211,7 +212,7 @@ export default function DeveloperLayout({
             /*
              * PROFILE COMPLETE
              *
-             * তখন Create Profile দেখাবে না
+             * Create Profile is  not showed
              */
             if (
               profileCompleted &&

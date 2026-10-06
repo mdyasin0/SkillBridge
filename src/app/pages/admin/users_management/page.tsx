@@ -154,7 +154,7 @@ export default function UserTable() {
       );
     } catch (error) {
       toast.error("Server error ");
-      console.error(error);
+      toast.error(String(error));
     }
   };
   return (

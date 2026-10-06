@@ -31,13 +31,13 @@ export async function PATCH(req: Request) {
     userId = current user / receiver
     otherUserId = other user / sender
 
-    তাই শুধু এই ধরনের message update হবে:
+    so just this type of messege will be updated .
 
     senderId   = otherUserId
     receiverId = userId
     read       = 0
 
-    অন্য direction-এর message update হবে না।
+    other direction's message can not be updated update .
     ==================================================
     */
 

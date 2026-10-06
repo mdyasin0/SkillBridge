@@ -4,6 +4,7 @@ import { useAuth } from "@/context/AuthContext";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { ChangeEvent, FormEvent, useEffect, useMemo, useState } from "react";
+import { toast } from "react-toastify";
 
 type FormData = {
   phone: string;
@@ -147,15 +148,16 @@ export default function RecruiterProfileSetupPage() {
 
   useEffect(() => {
     const handleBeforeUnload = (event: BeforeUnloadEvent) => {
-      // Form-এ কোনো পরিবর্তন না হলে warning দেখাবে না
+
+        // if no change in form warning will not be showed
       if (!isFormDirty ) {
         return;
       }
 
       event.preventDefault();
 
-      // Modern browsers এই custom message ব্যবহার করে না,
-      // কিন্তু এই assignment browser warning trigger করতে সাহায্য করে।
+      // Modern browsers do not use this custom message 
+      // but this assignment  helps to  trigger browser warning
       event.returnValue = "";
     };
 
@@ -474,7 +476,7 @@ export default function RecruiterProfileSetupPage() {
         ...updatedFormData,
       };
 
-      console.log("Recruiter profile payload:", payload);
+  
 
       // ----------------------------------------
       // API request
@@ -490,7 +492,7 @@ export default function RecruiterProfileSetupPage() {
 
       const result = await response.json();
 
-      console.log("API response:", result);
+  
 
       // ----------------------------------------
       // API error
@@ -499,7 +501,7 @@ export default function RecruiterProfileSetupPage() {
       if (!response.ok) {
         // Missing fields
         if (result.missingFields && Array.isArray(result.missingFields)) {
-          alert(
+          toast.info(
             `${result.message}\n\nMissing fields:\n${result.missingFields.join(
               "\n",
             )}`,
@@ -509,7 +511,7 @@ export default function RecruiterProfileSetupPage() {
         }
 
         // Any other API error
-        alert(result.message || "Something went wrong.");
+        toast.info(result.message || "Something went wrong.");
 
         return;
       }
@@ -521,17 +523,17 @@ export default function RecruiterProfileSetupPage() {
       setFormData(updatedFormData);
       setIsFormDirty(false);
 
-      alert(result.message || "Recruiter profile created successfully.");
+      toast.info(result.message || "Recruiter profile created successfully.");
 
       router.replace("/");
     } catch (error: any) {
-      console.error("Profile submission failed:", error);
+      toast.error(String(error));
 
       // ----------------------------------------
       // Network / unexpected error
       // ----------------------------------------
 
-      alert(error?.message || "Something went wrong. Please try again.");
+      toast.error(error?.message || "Something went wrong. Please try again.");
     } finally {
       setIsSubmitting(false);
     }

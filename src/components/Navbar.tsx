@@ -5,6 +5,7 @@ import { signOut } from "next-auth/react";
 import Image from "next/image";
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
+import LoadingUI from "./Loadinui";
 
 const Navbar = () => {
   const [open, setOpen] = useState(false);
@@ -14,7 +15,7 @@ const Navbar = () => {
 
   const dropdownRef = useRef<HTMLDivElement>(null);
 
- console.log("ggggggggggggg",user);
+
   // close dropdown on outside click
   useEffect(() => {
     const handler = (e: MouseEvent) => {
@@ -34,6 +35,7 @@ const Navbar = () => {
     <header className="w-full sticky top-0 z-50 border-b border-(--border) bg-(--bg-secondary)/80 backdrop-blur-md">
       <div className="max-w-7xl mx-auto px-4 md:px-6 h-16 flex items-center justify-between">
         {/* Logo */}
+        
         <Link href="/" className="text-xl font-bold text-(--text)">
           Skill<span className="text-(--primary)">Bridge</span> 
         </Link>
@@ -42,7 +44,6 @@ const Navbar = () => {
         <nav className="hidden md:flex items-center gap-6 text-sm text-(--text-muted)">
           <Link href="/">Home</Link>
 
-          <Link href="/docs">Docs</Link>
 
           {isLoggedIn && user?.role === "recruiter" && (
             <Link href="/pages/recruiter">Recruiter</Link>
@@ -142,7 +143,7 @@ const Navbar = () => {
       {open && (
         <div className="md:hidden px-4 pb-4 space-y-3 text-(--text-muted) bg-(--bg-secondary) border-t border-(--border)">
           <Link href="/">Home</Link>
-          <Link href="/docs">Docs</Link>
+         
 
           <hr />
 

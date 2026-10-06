@@ -7,6 +7,7 @@ import { useEffect, useState } from "react";
 import { useAuth } from "@/context/AuthContext";
 import { IoIosClose } from "react-icons/io";
 import { useRouter } from "next/navigation";
+import { toast } from "react-toastify";
 const profileSchema = z.object({
   title: z.string().trim().min(3, "Title is required"),
   bio: z
@@ -42,7 +43,7 @@ export default function CompleteProfilePage() {
   const [languageInput, setLanguageInput] = useState("");
   const { user } = useAuth();
   const userId = user?.id;
-  console.log("userid", userId);
+  
 
   const {
     register,
@@ -104,13 +105,13 @@ export default function CompleteProfilePage() {
         throw new Error(result.message);
       }
 
-      alert(result.message);
+      toast.info(result.message);
       router.push("/");
-      console.log(result);
+      
     } catch (error) {
-      console.error(error);
+      toast.error(String(error));
 
-      alert("Something went wrong");
+      toast.info("Something went wrong");
     }
   };
   const addSkill = () => {

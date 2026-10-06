@@ -2,6 +2,7 @@
 
 import { useEffect } from "react";
 import { useRouter } from "next/navigation";
+import { toast } from "react-toastify";
 
 export default function RecruiterHomePage() {
   const router = useRouter();
@@ -27,7 +28,7 @@ export default function RecruiterHomePage() {
 
         router.replace("/pages/recruiter/DeveloperSearch");
       } catch (error) {
-        console.error("Recruiter profile check error:", error);
+       toast.error(String(error));
       }
     };
 

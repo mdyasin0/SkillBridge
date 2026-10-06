@@ -26,6 +26,8 @@ import { useEffect, useState } from "react";
 import { useAuth } from "@/context/AuthContext";
 import { BsGithub } from "react-icons/bs";
 import { LiaLinkedin } from "react-icons/lia";
+import LoadingUI from "@/components/Loadinui";
+import { toast } from "react-toastify";
 interface DeveloperProfileResponse {
   success: boolean;
   completedChallenges: number;
@@ -197,7 +199,7 @@ export default function DeveloperProfilePage() {
 
         setProfile(data);
       } catch (error) {
-        console.log(error);
+      toast.error(String(error));
       } finally {
         setLoading(false);
       }
@@ -209,7 +211,7 @@ export default function DeveloperProfilePage() {
   const ranking = profile?.ranking;
   const badge = profile?.badgeSystem;
   if (loading) {
-    return <div>Loading...</div>;
+    return<LoadingUI/>;
   }
   return (
     <div className="pb-10 bg-slate-100">

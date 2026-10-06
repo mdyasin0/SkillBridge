@@ -21,6 +21,8 @@ import {
 import Image from "next/image";
 import { FaGithub } from "react-icons/fa";
 import Link from "next/link";
+import LoadingUI from "@/components/Loadinui";
+import { toast } from "react-toastify";
 
 type DeveloperApiData = {
   id: number;
@@ -205,7 +207,7 @@ export default function DeveloperSearch() {
 
       setDevelopers(mappedDevelopers);
     } catch (error) {
-      console.error("Developer fetch error:", error);
+     toast.error(String(error));
 
       setError("Unable to load developer profile.");
     } finally {
@@ -392,11 +394,7 @@ export default function DeveloperSearch() {
   ]);
   if (loading) {
     return (
-      <main className="min-h-screen bg-(--bg) px-4 py-10 text-(--text) sm:px-6 lg:px-8">
-        <div className="mx-auto max-w-3xl">
-          <div className="h-150 animate-pulse rounded-3xl border border-(--border) bg-(--surface)" />
-        </div>
-      </main>
+   <LoadingUI/>
     );
   }
 

@@ -2,12 +2,14 @@
 
 import { useEffect, useState } from "react";
 
-import { useParams, useSearchParams } from "next/navigation";
+import { useParams } from "next/navigation";
 import Image from "next/image";
-import { useAuth } from "@/context/AuthContext";
+
 import { BriefcaseBusiness, BriefcaseBusinessIcon, Building2, CalendarDays, CheckCircle2, ExternalLink, Globe, Mail, MapPin, Phone, ShieldCheck, UserRound, Users } from "lucide-react";
 import { LiaLinkedin, LiaLinkedinIn } from "react-icons/lia";
 import { BsTwitter } from "react-icons/bs";
+import LoadingUI from "@/components/Loadinui";
+import { toast } from "react-toastify";
 
 interface RecruiterProfile {
   id: number;
@@ -97,7 +99,7 @@ export default function RecruiterProfilePage() {
 
         setProfile(result.data);
       } catch (error) {
-        console.error("Recruiter profile error:", error);
+        toast.error(String(error));
 
         setError(
           error instanceof Error
@@ -153,18 +155,7 @@ export default function RecruiterProfilePage() {
 
   if (loading) {
     return (
-      <main className="min-h-screen w-full bg-(--bg) text-(--text)">
-        <div className="mx-auto max-w-6xl px-4 py-8 sm:px-6 lg:px-8">
-          <div className="animate-pulse space-y-6">
-            <div className="h-64 rounded-3xl bg-(--surface)" />
-
-            <div className="grid gap-6 lg:grid-cols-3">
-              <div className="h-80 rounded-2xl bg-(--surface)" />
-              <div className="h-80 rounded-2xl bg-(--surface) lg:col-span-2" />
-            </div>
-          </div>
-        </div>
-      </main>
+   <LoadingUI/>
     );
   }
 

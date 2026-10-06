@@ -9,13 +9,7 @@ import { AuthProvider } from "@/context/AuthContext";
 import Providers from "./providers/providers";
 import { SessionProvider } from "next-auth/react";
 
-// export const metadata: Metadata = {
-//   title: "SkillBridge",
-//   description: "Skill verification platform",
-//   icons: {
-//     icon: "/favicon.png",
-//   },
-// };
+
 
 export default function RootLayout({
   children,

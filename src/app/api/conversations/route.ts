@@ -159,7 +159,7 @@ export async function GET(req: Request) {
     CASE 1
     userId + otherUserId
 
-    দুইজনের সম্পূর্ণ conversation
+    2 users all  conversation .
     ==================================================
     */
 
@@ -209,16 +209,16 @@ export async function GET(req: Request) {
     /*
     ==================================================
     CASE 2
-    শুধু userId
+    just userId
 
     Inbox list
 
-    প্রতিটি developer-এর:
+    every developer's:
     - latest message
     - developer photo
     - unreadCount
 
-    return করবে
+    will be returned . 
     ==================================================
     */
 
@@ -242,7 +242,7 @@ export async function GET(req: Request) {
         c.edited,
 
         /*
-          Current user বাদ দিয়ে
+          Excepting Current user 
           opposite user ID
         */
         CASE
@@ -259,7 +259,7 @@ export async function GET(req: Request) {
           ==================================================
           UNREAD MESSAGE COUNT
           
-          শুধু তখনই count হবে যখন:
+           count will start when:
           
           receiverId = current user
           senderId = developer
@@ -283,7 +283,7 @@ export async function GET(req: Request) {
 
       /*
         ==================================================
-        প্রতিটি developer-এর latest message
+        every developer's latest message
         ==================================================
       */
       INNER JOIN (

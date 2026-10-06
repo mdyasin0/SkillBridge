@@ -27,17 +27,17 @@ export default function ContactDeveloperButton({
         rounded-2xl
         border
         border-white/20
-        bg-[var(--primary)]
+        bg-(--primary)
         px-4
         py-3
         text-sm
         font-semibold
         text-white
-        shadow-[var(--shadow)]
+        shadow-(--shadow)
         transition-all
         duration-300
         hover:-translate-x-1
-        hover:bg-[var(--primary-hover)]
+        hover:bg-(--primary-hover)
         hover:px-5
         hover:shadow-[0_12px_35px_rgba(91,108,255,0.35)]
         active:scale-95

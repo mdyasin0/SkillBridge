@@ -1,10 +1,12 @@
 "use client";
+import LoadingUI from "@/components/Loadinui";
 import { useAuth } from "@/context/AuthContext";
 import { useParams, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { CiWarning } from "react-icons/ci";
 import { IoCheckmarkDone } from "react-icons/io5";
 import { RxCross2 } from "react-icons/rx";
+import { toast } from "react-toastify";
 import Swal from "sweetalert2";
 import withReactContent from "sweetalert2-react-content";
 
@@ -195,7 +197,7 @@ export default function ChallengeDetails() {
 
     router.push("/pages/developer/ui-challenges-lists");
   } catch (error) {
-    console.log(error);
+    toast.error(String(error));
 
     await MySwal.fire({
       icon: "error",
@@ -210,7 +212,7 @@ export default function ChallengeDetails() {
   }
 };
   if (!challenge) {
-    return <div className="p-10">Loading...</div>;
+    return <LoadingUI/>;
   }
   return (
     <>

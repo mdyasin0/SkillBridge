@@ -6,6 +6,8 @@ import { useSearchParams } from "next/navigation";
 import Image from "next/image";
 import { useAuth } from "@/context/AuthContext";
 import Link from "next/link";
+import LoadingUI from "@/components/Loadinui";
+import { toast } from "react-toastify";
 
 interface DeveloperProfileResponse {
   data: {
@@ -98,7 +100,6 @@ export default function MessagePage() {
 
   const recruiterId = searchParams.get("recruiterId");
 
-  console.log("RECRUITER ID FROM URL:", recruiterId);
 
   const [profile, setProfile] = useState<DeveloperProfileResponse | null>(null);
 
@@ -117,8 +118,9 @@ export default function MessagePage() {
   const emojiPickerRef = useRef<HTMLDivElement>(null);
 
   /*
-    Message list-এর একদম শেষে এই element থাকবে।
-    এটাতে scroll করলে automatically last message-এ চলে যাবে।
+    in the end of Message list this element will stay
+
+    if scroll on this automatically return in last message .
   */
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
@@ -135,12 +137,12 @@ export default function MessagePage() {
 | Current user = Developer / Receiver
 | recruiterId = Recruiter / Sender
 |
-| Conversation page enter করলেই:
+| entering in Conversation page 
 |
 | Recruiter → Developer
 | read = 0
 |
-| messageগুলো:
+| messages:
 |
 | read = 1
 |
@@ -168,14 +170,14 @@ export default function MessagePage() {
       const result = await response.json();
 
       if (!response.ok) {
-        console.error("Failed to mark messages as read:", result);
+        toast.error( String(result));
 
         return;
       }
 
-      console.log("Messages marked as read:", result);
+    
     } catch (error) {
-      console.error("Mark messages as read error:", error);
+      toast.error(String(error));
     }
   }, [user?.id, recruiterId]);
 
@@ -198,16 +200,16 @@ export default function MessagePage() {
 
         const data = await res.json();
 
-        console.log("RECRUITER PROFILE:", data);
+        
 
         if (!res.ok) {
-          console.error("Failed to fetch recruiter profile:", data);
+          toast.error(data);
           return;
         }
 
         setProfile(data);
       } catch (error) {
-        console.error("Failed to fetch recruiter:", error);
+        toast.error(String(error));
       } finally {
         setLoading(false);
       }
@@ -332,10 +334,10 @@ export default function MessagePage() {
   | Relative Time Refresh
   |--------------------------------------------------------------------------
   |
-  | প্রতি 30 second পরপর component update হবে।
-  | ফলে "59 seconds ago" → "1 minute ago"
-  | automatically change হবে।
-  |
+
+  |after every 30 second component will be updated so
+  | "59 seconds ago" → "1 minute ago"  
+  |automatically will change 
   */
 
   const [, setTimeTick] = useState(0);
@@ -368,10 +370,10 @@ export default function MessagePage() {
   | Fetch Messages
   |--------------------------------------------------------------------------
   |
-  | এই function দুই জায়গা থেকে ব্যবহার হবে:
+  | this  function is used from tp space ;
   |
-  | 1. Page প্রথম load হওয়ার সময়
-  | 2. Refresh button click করলে
+  | 1. in first time Page loading 
+  | 2. if click  on Refresh button 
   |
   */
 
@@ -397,10 +399,10 @@ export default function MessagePage() {
 
         const result = await response.json();
 
-        console.log("MESSAGES RESPONSE:", result);
+    
 
         if (!response.ok) {
-          console.error("Failed to fetch messages:", result);
+          toast.error(result);
           return;
         }
 
@@ -424,13 +426,14 @@ export default function MessagePage() {
         setMessages(formattedMessages);
 
         /*
-          Message load হওয়ার পরে last message-এ যাবে।
+        
+          after messege loading will return in last messege .
         */
         setTimeout(() => {
           scrollToBottom(isRefresh ? "smooth" : "auto");
         }, 100);
       } catch (error) {
-        console.error("Failed to fetch conversation:", error);
+        toast.error(String(error));
       } finally {
         setMessagesLoading(false);
         setRefreshing(false);
@@ -464,10 +467,9 @@ export default function MessagePage() {
   }, [user?.id, recruiterId, markMessagesAsRead]);
   /*
   |--------------------------------------------------------------------------
-  | যখন messages state change হবে,
-  | তখন last message-এ scroll করবে।
-  |
-  | বিশেষ করে নতুন message send করার পর এটা কাজ করবে।
+  | when messages state will change,
+  | at that time redirect to the last with scroll message
+  |Specialy it works when new messege will be sent.
   |--------------------------------------------------------------------------
   */
 
@@ -514,11 +516,6 @@ const handleCancelEdit = () => {
 |--------------------------------------------------------------------------
 | Save Edited Message
 |--------------------------------------------------------------------------
-|
-| এখনো API call নেই।
-| আপাতত local state update হচ্ছে।
-| পরে এখানে PATCH API বসানো হবে।
-|--------------------------------------------------------------------------
 */
 
 const handleSaveEdit = async () => {
@@ -529,7 +526,7 @@ const handleSaveEdit = async () => {
   if (editingMessageId === null) return;
 
   if (!user?.id) {
-    console.error("User information not available");
+    toast.error("User information not available");
     return;
   }
 
@@ -550,10 +547,10 @@ const handleSaveEdit = async () => {
 
     const result = await response.json();
 
-    console.log("EDIT MESSAGE API RESPONSE:", result);
+   
 
     if (!response.ok) {
-      console.error("Message edit failed:", result);
+      toast.error(result);
 
       return;
     }
@@ -593,10 +590,7 @@ const handleSaveEdit = async () => {
     setEditingMessageId(null);
     setEditingText("");
   } catch (error) {
-    console.error(
-      "Failed to edit message:",
-      error,
-    );
+    toast.error(String(error));
   }
 };
 
@@ -614,12 +608,12 @@ const handleSaveEdit = async () => {
     if (!trimmedMessage) return;
 
     if (!recruiter) {
-      console.log("Recruiter information not available");
+      toast.warn("Recruiter information not available");
       return;
     }
 
     if (!user) {
-      console.log("Sender information not available");
+      toast.info("Sender information not available");
       return;
     }
 
@@ -635,7 +629,7 @@ const handleSaveEdit = async () => {
       createdAt: new Date().toISOString(),
     };
 
-    console.log("MESSAGE DATA:", messageData);
+  
 
     try {
       const response = await fetch("/api/conversations", {
@@ -658,16 +652,16 @@ const handleSaveEdit = async () => {
 
       const result = await response.json();
 
-      console.log("API RESPONSE:", result);
+    
 
       if (!response.ok) {
-        console.error("Message sending failed:", result);
+        toast.error(result);
         return;
       }
 
       /*
-        Message database-এ successfully save হওয়ার পর
-        frontend-এ immediately add করছি।
+        after successfully saved Message in  database
+        immediately add in frontend .
       */
 
       const newMessage: Message = {
@@ -689,11 +683,11 @@ const handleSaveEdit = async () => {
       setShowEmojiPicker(false);
 
       /*
-        Send করার পর অবশ্যই last message-এ যাবে।
+        after Sending back to last message .
       */
       scrollToBottom("smooth");
     } catch (error) {
-      console.error("Failed to send message:", error);
+      toast.error(String(error));
     }
   };
 
@@ -719,9 +713,7 @@ const handleSaveEdit = async () => {
 
   if (loading) {
     return (
-      <main className="flex min-h-screen items-center justify-center text-sm text-(--text-muted)">
-        Loading recruiter...
-      </main>
+     <LoadingUI/>
     );
   }
 
@@ -987,7 +979,7 @@ const handleSaveEdit = async () => {
               | Edit Button
               |--------------------------------------------------------------------------
               |
-              | শুধু নিজের message-এর জন্য।
+              | just for own message .
               |
               */}
 
@@ -1063,8 +1055,9 @@ const handleSaveEdit = async () => {
 })}
 
                 {/* 
-                  এই invisible element সব message-এর শেষে।
-                  এখানে scroll করলেই last message-এ চলে যাবে।
+                  
+                  this invisible element is with every message 
+                   with scrool  here return to last message
                 */}
 
                 <div ref={messagesEndRef} />

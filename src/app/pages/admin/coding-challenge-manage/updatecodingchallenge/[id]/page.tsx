@@ -3,6 +3,7 @@
 import { useParams, useRouter } from "next/navigation";
 
 import { useEffect, useState } from "react";
+import { toast } from "react-toastify";
 
 
 
@@ -44,7 +45,7 @@ export default function ProblemForm() {
         const res = await fetch(`/api/coding_challenge-manage/all_coding_challenge/${id}`);
 
         if (!res.ok) {
-          throw new Error("Failed to fetch challenge");
+         toast.error("Failed to fetch challenge");
         }
 
         const data = await res.json();
@@ -63,7 +64,7 @@ export default function ProblemForm() {
 
        
       } catch (err) {
-        console.error(err);
+        toast.error(String(error));
       }
     };
 
@@ -86,7 +87,7 @@ export default function ProblemForm() {
         }),
       });
       if (!res.ok) {
-        throw new Error("Failed to update challenge");
+       toast.info("Failed to update challenge");
       }
       router.push("/pages/admin/coding-challenge-manage/coding_challenge_lists");
     } finally {

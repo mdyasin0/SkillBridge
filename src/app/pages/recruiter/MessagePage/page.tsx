@@ -14,6 +14,8 @@ import { useSearchParams } from "next/navigation";
 import Image from "next/image";
 import { useAuth } from "@/context/AuthContext";
 import Link from "next/link";
+import LoadingUI from "@/components/Loadinui";
+import { toast } from "react-toastify";
 
 interface DeveloperProfileResponse {
   data: {
@@ -130,8 +132,9 @@ export default function MessagePage() {
   /*
     Message container reference
     ---------------------------
-    এই ref ব্যবহার করে last message-এ
-    automatically scroll করা হবে।
+    using this "ref" automatically 
+    scroll to the last message
+ 
   */
   const messagesContainerRef = useRef<HTMLDivElement>(null);
 
@@ -212,7 +215,7 @@ export default function MessagePage() {
     const fetchDeveloper = async () => {
       if (!developerId) return;
 
-      console.log("developerId:", developerId);
+     
 
       try {
         setLoading(true);
@@ -223,7 +226,7 @@ export default function MessagePage() {
 
         setProfile(data);
       } catch (error) {
-        console.log("Failed to fetch developer profile:", error);
+        toast.error( String(error));
       } finally {
         setLoading(false);
       }
@@ -296,9 +299,9 @@ export default function MessagePage() {
 
   Current user = receiver
   Other user = sender
-
-  অর্থাৎ developer → recruiter যেসব unread message
-  পাঠিয়েছে, শুধু সেগুলো read = 1 হবে।
+  that means whic unread messages are  sent 
+  from   developer to  recruiter ,
+  just those will be = 1.
 */
 
   const markMessagesAsRead = async () => {
@@ -323,14 +326,14 @@ export default function MessagePage() {
       const result = await response.json();
 
       if (!response.ok) {
-        console.error("Failed to mark messages as read:", result);
+       toast.error(result);
 
         return;
       }
 
-      console.log("Messages marked as read:", result);
+     
     } catch (error) {
-      console.error("Mark messages as read error:", error);
+  toast.error(String(error));
     }
   };
 
@@ -360,7 +363,7 @@ export default function MessagePage() {
       const result = await response.json();
 
       if (!response.ok) {
-        console.error("Failed to fetch messages:", result);
+       toast.error( result);
         return;
       }
 
@@ -385,14 +388,14 @@ export default function MessagePage() {
       setMessages(formattedMessages);
 
       /*
-      Messages successfully load হওয়ার পরে
-      এই conversation-এর incoming unread messages
-      read = 1 করে দিচ্ছি।
+      after Messages successfully loading
+      this  conversation's incoming unread messages will made 
+      read = 1 .
     */
 
       await markMessagesAsRead();
     } catch (error) {
-      console.error("Failed to fetch conversation:", error);
+      toast.error(String(error));
     } finally {
       if (showLoader) {
         setMessagesLoading(false);
@@ -413,7 +416,7 @@ export default function MessagePage() {
   /*
     --------------------------------------------------
     Automatically scroll to last message
-    যখন messages load/update হবে
+    when messages will  load/update 
     --------------------------------------------------
   */
 
@@ -421,8 +424,8 @@ export default function MessagePage() {
     if (messages.length === 0) return;
 
     /*
-      DOM update হওয়ার পরে scroll করার জন্য
-      setTimeout ব্যবহার করছি।
+      after DOM updating , for scrolling 
+      setTimeout is used 
     */
 
     const timer = setTimeout(() => {
@@ -437,10 +440,10 @@ export default function MessagePage() {
     Refresh Button
     --------------------------------------------------
 
-    Button click করলে:
-    1. API call হবে
-    2. নতুন messages আসবে
-    3. Last message-এ scroll হবে
+    if click on Button ;
+    1. API call 
+    2. new messages come
+    3. scroll to the Last message 
     --------------------------------------------------
   */
 
@@ -453,15 +456,15 @@ export default function MessagePage() {
       await fetchMessages(false);
 
       /*
-        API data state update হওয়ার পরে
-        scroll করার জন্য ছোট delay।
+        after API data state updating for 
+        scrolling small  delay .
       */
 
       setTimeout(() => {
         scrollToBottom(true);
       }, 100);
     } catch (error) {
-      console.error("Refresh failed:", error);
+     toast.error(String(error));
     } finally {
       setRefreshing(false);
     }
@@ -514,7 +517,7 @@ export default function MessagePage() {
     if (editingMessageId === null) return;
 
     if (!user?.id) {
-      console.error("User information not available");
+     toast.error("User information not available");
       return;
     }
 
@@ -535,10 +538,10 @@ export default function MessagePage() {
 
       const result = await response.json();
 
-      console.log("EDIT MESSAGE API RESPONSE:", result);
+      
 
       if (!response.ok) {
-        console.error("Message edit failed:", result);
+       toast.error(result);
         return;
       }
 
@@ -561,7 +564,7 @@ export default function MessagePage() {
       setEditingMessageId(null);
       setEditingText("");
     } catch (error) {
-      console.error("Failed to edit message:", error);
+      toast.error(String(error));
     }
   };
   /*
@@ -576,12 +579,12 @@ export default function MessagePage() {
     if (!trimmedMessage) return;
 
     if (!developer) {
-      console.log("Developer information not available");
+      toast.info("Developer information not available");
       return;
     }
 
     if (!user) {
-      console.log("Sender information not available");
+      toast.info("Sender information not available");
       return;
     }
 
@@ -597,7 +600,7 @@ export default function MessagePage() {
       createdAt: new Date().toISOString(),
     };
 
-    console.log("MESSAGE DATA:", messageData);
+    
 
     try {
       const response = await fetch("/api/conversations", {
@@ -620,16 +623,16 @@ export default function MessagePage() {
 
       const result = await response.json();
 
-      console.log("API RESPONSE:", result);
+      
 
       if (!response.ok) {
-        console.error("Message sending failed:", result);
+      toast.error(result);
         return;
       }
 
       /*
-        নতুন message locally add করছি।
-        এতে refresh না করেও message সাথে সাথে দেখা যাবে।
+        new  message  added in locally .
+        for this without refreshing  message will be showed immediately
       */
 
       const newMessage: Message = {
@@ -651,14 +654,14 @@ export default function MessagePage() {
       setShowEmojiPicker(false);
 
       /*
-        নতুন message-এর পরে bottom-এ scroll
+        after new message scroll to bottom
       */
 
       setTimeout(() => {
         scrollToBottom(true);
       }, 50);
     } catch (error) {
-      console.error("Failed to send message:", error);
+      toast.error(String(error));
     }
   };
 
@@ -828,9 +831,7 @@ export default function MessagePage() {
           >
             {messagesLoading ? (
               <div className="flex h-full items-center justify-center">
-                <p className="text-sm text-(--text-muted)">
-                  Loading messages...
-                </p>
+               <LoadingUI/>
               </div>
             ) : messages.length === 0 ? (
               <div className="flex h-full items-center justify-center">

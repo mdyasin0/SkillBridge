@@ -1,13 +1,15 @@
 "use client";
 
+import LoadingUI from "@/components/Loadinui";
 import { useAuth } from "@/context/AuthContext";
-import { data } from "framer-motion/client";
+
 import { Filter, X } from "lucide-react";
-import Link from "next/link";
+
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { IoCheckmarkDone } from "react-icons/io5";
 import { LuClock3, LuShieldAlert, LuTimerReset } from "react-icons/lu";
+import { toast } from "react-toastify";
 import Swal from "sweetalert2";
 import withReactContent from "sweetalert2-react-content";
 
@@ -187,7 +189,7 @@ export default function ChallengesPage() {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          userId: user.id, // তোমার login user id
+          userId: user.id, // login user id
           challengeId: id,
         }),
       });
@@ -206,7 +208,7 @@ export default function ChallengesPage() {
 
       router.push(`/pages/developer/code_editor/${id}?userId=${user.id}`);
     } catch (error) {
-      console.error(error);
+      toast.error(String(error));
 
       MySwal.fire({
         icon: "error",
@@ -329,7 +331,7 @@ export default function ChallengesPage() {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          userId: user.id, // তোমার login user id
+          userId: user.id, //  login user id
           challengeId: id,
         }),
       });
@@ -358,7 +360,7 @@ export default function ChallengesPage() {
 
       router.push(`/pages/developer/recode_editor/${id}?userId=${user.id}`);
     } catch (error) {
-      console.error(error);
+      toast.error(String(error));
 
       MySwal.fire({
         icon: "error",
@@ -367,7 +369,7 @@ export default function ChallengesPage() {
       });
     }
   };
-  if (loading) return <div className="p-10 text-center">Loading...</div>;
+  if (loading) return <LoadingUI/>;
 
   return (
     <div className="max-w-7xl mx-auto p-8">

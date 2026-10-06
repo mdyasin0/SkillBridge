@@ -18,7 +18,7 @@ export async function POST(req: Request) {
     }
 
 
-// আগে check করো
+// first  check 
 const [attemptRows]: any = await db.query(
   `
   SELECT
@@ -102,7 +102,7 @@ if (submit_attempts >= maxAttempt) {
       { status: 200 }
     );
   } catch (error) {
-    console.log(error);
+    // console.log(error);
 
     return NextResponse.json(
       {

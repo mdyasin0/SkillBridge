@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 import ChallengeWorkspace from "../page";
 import { useAuth } from "@/context/AuthContext";
+import LoadingUI from "@/components/Loadinui";
 
 export default function WorkspacePage() {
   const { id } = useParams();
@@ -26,9 +27,7 @@ export default function WorkspacePage() {
 
   if (loading) {
     return (
-      <div className="h-screen flex items-center justify-center">
-        Loading...
-      </div>
+     <LoadingUI/>
     );
   }
 

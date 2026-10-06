@@ -2,6 +2,7 @@
 import { useAuth } from "@/context/AuthContext";
 import { Search } from "lucide-react";
 import React, { useEffect, useState } from "react";
+import { toast } from "react-toastify";
 
 export type Submission = {
   user_id: number;
@@ -74,7 +75,7 @@ const Problem_solving_works = () => {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          submissionId: selected?.submission_id, // <-- এটা ঠিক করো
+          submissionId: selected?.submission_id, 
           feedback: review.feedback,
           score: Number(review.score),
         }),
@@ -83,11 +84,11 @@ const Problem_solving_works = () => {
       const json = await res.json();
 
       if (!res.ok || !json.success) {
-        alert(json.message || "Something went wrong.");
+        toast.info(json.message || "Something went wrong.");
         return;
       }
 
-      alert(json.message);
+      toast.info(json.message);
 
       setShowReviewForm(false);
       setSelected(null);
@@ -99,8 +100,8 @@ const Problem_solving_works = () => {
 
       await getData();
     } catch (error) {
-      console.error(error);
-      alert("Network error. Please try again.");
+     toast.error(String(error));
+      toast.warn("Network error. Please try again.");
     }
   };
 

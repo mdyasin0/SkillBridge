@@ -6,6 +6,7 @@ import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 
 import { useEffect } from "react";
+import { toast } from "react-toastify";
 
 const routes = [
   { name: "Home", path: "/" },
@@ -43,10 +44,10 @@ export default function AdminLayout({
   const { user, isLoggedIn, loading } = useAuth();
 
   useEffect(() => {
-    // Session/user information এখনো load হচ্ছে
+    // Session/user information is loading now 
     if (loading) return;
 
-    // User login করা নেই
+    // if User is not  login 
     if (!isLoggedIn) {
       router.replace("/pages/auth-required");
       return;
@@ -54,27 +55,27 @@ export default function AdminLayout({
 
     // User banned
     if (user?.status === "banned") {
-      alert("Your account has been banned. You have been logged out.");
+      toast.info("Your account has been banned. You have been logged out.");
       signOut({ callbackUrl: "/auth/login" });
       return;
     }
 
     // User suspended
     if (user?.status === "suspended") {
-      alert("Your account has been suspended. You have been logged out.");
+      toast.info("Your account has been suspended. You have been logged out.");
       signOut({ callbackUrl: "/auth/login" });
       return;
     }
 
-    // User login করেছে, কিন্তু admin নয়
+    // User login , but he is  not admin 
     if (user?.role !== "admin") {
       router.replace("/pages/unauthorized");
       return;
     }
   }, [loading, isLoggedIn, user, router]);
 
-  // Authentication / Authorization check চলাকালীন
-  // অথবা unauthorized/inactive user-এর ক্ষেত্রে protected content দেখানো হবে না
+  // in the time of Authentication / Authorization checking 
+  // or about user's unauthorized/inactive  protected content will not be showed
   if (
     loading ||
     !isLoggedIn ||

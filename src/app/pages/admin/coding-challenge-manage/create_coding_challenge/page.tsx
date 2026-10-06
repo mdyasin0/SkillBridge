@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { toast } from "react-toastify";
 
 export default function ProblemForm() {
   const [loading, setLoading] = useState(false);
@@ -53,11 +54,11 @@ export default function ProblemForm() {
       const data = await res.json();
 
       if (!res.ok) {
-        alert(data.message);
+        toast.info(data.message);
         return;
       }
 
-      alert("Challenge Created Successfully");
+      toast.success("Challenge Created Successfully");
 
       setFormData({
         title: "",
@@ -71,8 +72,8 @@ export default function ProblemForm() {
       
       });
     } catch (error) {
-      console.log(error);
-      alert("Server Error");
+      toast.error(String(error));
+      toast.error("Server Error");
     } finally {
       setLoading(false);
     }

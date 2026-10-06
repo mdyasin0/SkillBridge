@@ -4,6 +4,8 @@ import { useEffect, useState } from "react";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/context/AuthContext";
+import LoadingUI from "@/components/Loadinui";
+import { toast } from "react-toastify";
 
 interface Conversation {
   id: number;
@@ -27,7 +29,7 @@ interface Conversation {
   edited: number;
 
   /*
-    নতুন field
+    new field
   */
   unreadCount: number;
 }
@@ -52,23 +54,17 @@ export default function MessageDeveloperList() {
 
         const result = await response.json();
 
-        console.log("CONVERSATIONS:", result);
+
 
         if (!response.ok) {
-          console.error(
-            "Failed to fetch conversations:",
-            result,
-          );
+       toast.error(result);
 
           return;
         }
 
         setConversations(result.data || []);
       } catch (error) {
-        console.error(
-          "Failed to fetch conversations:",
-          error,
-        );
+        toast.error(String(error));
       } finally {
         setLoading(false);
       }
@@ -79,7 +75,7 @@ export default function MessageDeveloperList() {
 
   /*
   ==================================================
-  Current user বাদ দিয়ে developer বের করা
+   except Current user , find developers .
   ==================================================
   */
 
@@ -132,9 +128,7 @@ export default function MessageDeveloperList() {
 
   if (loading) {
     return (
-      <div className="p-4 text-sm text-(--text-muted)">
-        Loading conversations...
-      </div>
+     <LoadingUI/>
     );
   }
 

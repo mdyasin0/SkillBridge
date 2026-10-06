@@ -24,7 +24,7 @@ export async function GET(req: Request) {
 
       userId = current Developer
 
-      আমরা প্রতিটি conversation-এর জন্য:
+      for every conversation:
 
       1. Latest message
       2. Other user / Recruiter
@@ -32,7 +32,7 @@ export async function GET(req: Request) {
       4. Current Developer receiver ID
       5. Unread message count
 
-      বের করছি।
+      i founded
       ==================================================
     */
 
@@ -46,8 +46,9 @@ export async function GET(req: Request) {
           ----------------------------------------------
           Current logged-in Developer ID
           
-          এই conversation-এ read API call করার সময়
-          receiverId হিসেবে ব্যবহার করা যাবে।
+        
+
+          for read api calling in this messege receiverid can be used .
           ----------------------------------------------
         */
 
@@ -103,12 +104,12 @@ export async function GET(req: Request) {
           ----------------------------------------------
           UNREAD COUNT
 
-          শুধু:
+          just:
 
           Recruiter → Developer
           read = 0
 
-          এই message-গুলো count হবে।
+          this message will be  count .
           ----------------------------------------------
         */
 
@@ -132,7 +133,7 @@ export async function GET(req: Request) {
 
       /*
         ----------------------------------------------
-        প্রতিটি conversation-এর latest message
+        every  conversation's latest message
         ----------------------------------------------
       */
 
