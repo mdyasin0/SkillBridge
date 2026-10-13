@@ -16,7 +16,7 @@ export default function WorkspacePage() {
     if (!user?.id || !id) return;
 
     fetch(
-      `/api/coding_challenge-manage/all_coding_challenge/${id}?userId=${user.id}`,
+      `/api/developer_coding-challenge/all-coding-challenge/${id}?userId=${user.id}`,
     )
       .then((res) => res.json())
       .then((res) => {

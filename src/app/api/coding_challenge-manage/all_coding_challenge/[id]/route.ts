@@ -1,83 +1,71 @@
-import { NextRequest, NextResponse } from "next/server";
+
+import { NextResponse } from "next/server";
 import { db } from "@/lib/db";
 
 export async function GET(
-  req: NextRequest,
+  _req: Request,
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const { id } = await params;
-    const userId = req.nextUrl.searchParams.get("userId");
 
-    if (!userId) {
+    if (!id || !/^\d+$/.test(id)) {
       return NextResponse.json(
         {
-          message: "User ID is required",
+          success: false,
+          message: "Invalid challenge ID",
         },
-        {
-          status: 400,
-        }
+        { status: 400 }
       );
     }
 
     const [rows]: any = await db.query(
       `
       SELECT
-        c.*,
-
-        ss.id AS solutionId,
-        ss.score,
-        ss.feedback,
-        ss.check_status,
-        ss.submit_attempts,
-        ss.start_time,
-        ss.submitCode,
-        ss.submitted_at,
-        ss.resubmit_start_at,
-        ss.resubmit_submitted_at
-
-      FROM challenges c
-
-      LEFT JOIN solution_submit ss
-      ON c.id = ss.challenge_id
-      AND ss.user_id = ?
-
-      WHERE c.id = ?
+        id,
+        title,
+        description,
+        difficulty,
+        category,
+        timeLimit,
+        maxAttempt,
+        starterCode,
+        hint,
+        createdBy,
+        createdAt
+      FROM challenges
+      WHERE id = ?
       LIMIT 1
       `,
-      [userId, id]
+      [id]
     );
 
-    if (!rows.length) {
+    if (!rows || rows.length === 0) {
       return NextResponse.json(
         {
+          success: false,
           message: "Challenge not found",
         },
-        {
-          status: 404,
-        }
+        { status: 404 }
       );
     }
 
-    const challenge = {
-      ...rows[0],
-      testCases: JSON.parse(rows[0].testCases || "[]"),
-    };
-
-    return NextResponse.json({
-      success: true,
-      data: challenge,
-    });
+    return NextResponse.json(
+      {
+        success: true,
+        data: rows[0],
+      },
+      { status: 200 }
+    );
   } catch (error) {
-    console.error(error);
+    console.error("Failed to fetch challenge details:", error);
 
     return NextResponse.json(
       {
-        message: "Server Error",
+        success: false,
+        message: "Failed to fetch challenge details",
       },
-      {
-        status: 500,
-      }
+      { status: 500 }
     );
   }
 }

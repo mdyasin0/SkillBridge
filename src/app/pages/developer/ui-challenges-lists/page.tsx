@@ -55,19 +55,19 @@ export default function UIChallengesPage() {
     let api = "";
     switch (challengeStatus) {
       case "running":
-        api = `/api/ui_challenge_manage/uichallengedata?userId=${user.id}&status=pending`;
+        api = `/api/developer_uichallenge/uichallenge-data?userId=${user.id}&status=pending`;
         break;
 
       case "completed":
-        api = `/api/ui_challenge_manage/uichallengedata?userId=${user.id}&status=submitted`;
+        api = `/api/developer_uichallenge/uichallenge-data?userId=${user.id}&status=submitted`;
         break;
 
       case "running-resubmission":
-        api = `/api/ui_challenge_manage/uichallengedata?userId=${user.id}&status=running-resubmission`;
+        api = `/api/developer_uichallenge/uichallenge-data?userId=${user.id}&status=running-resubmission`;
         break;
 
       default:
-        api = `/api/ui_challenge_manage/uichallengedata?userId=${user.id}&status=available`;
+        api = `/api/developer_uichallenge/uichallenge-data?userId=${user.id}&status=available`;
     }
 
     setLoading(true);

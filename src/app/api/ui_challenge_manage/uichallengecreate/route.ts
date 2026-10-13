@@ -47,7 +47,7 @@ export async function POST(req: Request) {
         difficulty,
         category,
         timeLimit,
-        maxAttempts,
+        maxAttempts
         
       )
       VALUES (?, ?, ?, ?, ?, ?, ?)

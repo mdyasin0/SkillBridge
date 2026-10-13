@@ -8,6 +8,13 @@ export async function PUT(
   try {
     const { id } = await params;
 
+    if (!id || !/^\d+$/.test(id)) {
+      return NextResponse.json(
+        { success: false, message: "Invalid challenge ID" },
+        { status: 400 }
+      );
+    }
+
     const body = await req.json();
 
     const {
@@ -19,27 +26,19 @@ export async function PUT(
       maxAttempt,
       starterCode,
       hint,
-
-     
     } = body;
 
-    // Validation
     if (
-      !title ||
-      !description ||
+      !title?.trim() ||
+      !description?.trim() ||
       !difficulty ||
       !category ||
-      !timeLimit ||
-      !maxAttempt
-      
+      timeLimit == null ||
+      maxAttempt == null
     ) {
       return NextResponse.json(
-        {
-          message: "Missing required fields",
-        },
-        {
-          status: 400,
-        }
+        { success: false, message: "Missing required fields" },
+        { status: 400 }
       );
     }
 
@@ -54,8 +53,7 @@ export async function PUT(
         timeLimit = ?,
         maxAttempt = ?,
         starterCode = ?,
-        hint = ?,
-        testCases = ?
+        hint = ?
       WHERE id = ?
       `,
       [
@@ -63,45 +61,42 @@ export async function PUT(
         description,
         difficulty,
         category,
-        timeLimit,
-        maxAttempt,
+        Number(timeLimit),
+        Number(maxAttempt),
         starterCode || "",
         hint || "",
-     
-       
         id,
       ]
     );
 
     if (result.affectedRows === 0) {
-      return NextResponse.json(
-        {
-          message: "Challenge not found",
-        },
-        {
-          status: 404,
-        }
+      // affectedRows 0 হলে record নেই, অথবা কোনো value পরিবর্তন হয়নি।
+      const [rows]: any = await db.query(
+        "SELECT id FROM challenges WHERE id = ? LIMIT 1",
+        [id]
       );
+
+      if (rows.length === 0) {
+        return NextResponse.json(
+          { success: false, message: "Challenge not found" },
+          { status: 404 }
+        );
+      }
     }
 
     return NextResponse.json(
       {
+        success: true,
         message: "Challenge updated successfully",
       },
-      {
-        status: 200,
-      }
+      { status: 200 }
     );
   } catch (error) {
-    console.error(error);
+    console.error("Update challenge error:", error);
 
     return NextResponse.json(
-      {
-        message: "Server Error",
-      },
-      {
-        status: 500,
-      }
+      { success: false, message: "Failed to update challenge" },
+      { status: 500 }
     );
   }
 }

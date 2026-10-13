@@ -39,61 +39,87 @@ export default function ProblemForm() {
     }));
   };
 
-  useEffect(() => {
-    const fetchChallenge = async () => {
-      try {
-        const res = await fetch(`/api/coding_challenge-manage/all_coding_challenge/${id}`);
+  
+useEffect(() => {
+  if (!id) return;
 
-        if (!res.ok) {
-         toast.error("Failed to fetch challenge");
-        }
-
-        const data = await res.json();
-
-        setFormData({
-          title: data.title,
-          description: data.description,
-          difficulty: data.difficulty,
-          category: data.category,
-          timeLimit: data.timeLimit,
-          maxAttempt: data.maxAttempt,
-          starterCode: data.starterCode,
-          hint: data.hint,
-          
-        });
-
-       
-      } catch (err) {
-        toast.error(String(error));
-      }
-    };
-
-    fetchChallenge();
-  }, [id]);
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-
+  const fetchChallenge = async () => {
     try {
-      setLoading(true);
+      const res = await fetch(
+        `/api/coding_challenge-manage/all_coding_challenge/${id}`
+      );
 
-      const res = await fetch(`/api/coding_challenge-manage/updatecodingchallenge/${id}`, {
+      const result = await res.json();
+
+      if (!res.ok) {
+        toast.error(result.message || "Failed to fetch challenge");
+        return;
+      }
+
+      // API response হতে challenge object বের করা
+      const data = result.data ?? result;
+
+      if (!data || !data.id) {
+        toast.error("Challenge data not found");
+        return;
+      }
+
+      setFormData({
+        title: data.title ?? "",
+        description: data.description ?? "",
+        difficulty: data.difficulty ?? "Easy",
+        category: data.category ?? "React",
+        timeLimit: data.timeLimit ?? 1000,
+        maxAttempt: data.maxAttempt ?? 5,
+        starterCode: data.starterCode ?? "",
+        hint: data.hint ?? "",
+      });
+    } catch (error) {
+      console.error("Fetch challenge error:", error);
+      toast.error("Failed to load challenge data");
+    }
+  };
+
+  fetchChallenge();
+}, [id]);
+
+  const handleSubmit = async (e: React.FormEvent) => {
+  e.preventDefault();
+
+  try {
+    setLoading(true);
+
+    const res = await fetch(
+      `/api/coding_challenge-manage/updatecodingchallenge/${id}`,
+      {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({
-          ...formData,
-          
-        }),
-      });
-      if (!res.ok) {
-       toast.info("Failed to update challenge");
+        body: JSON.stringify(formData),
       }
-      router.push("/pages/admin/coding-challenge-manage/coding_challenge_lists");
-    } finally {
-      setLoading(false);
+    );
+
+    const result = await res.json();
+
+    if (!res.ok || !result.success) {
+      toast.error(result.message || "Failed to update challenge");
+      return;
     }
-  };
+
+    toast.success(result.message || "Challenge updated successfully");
+
+    router.push(
+      "/pages/admin/coding-challenge-manage/coding_challenge_lists"
+    );
+    router.refresh();
+  } catch (error) {
+    console.error("Update request failed:", error);
+    toast.error("Something went wrong while updating.");
+  } finally {
+    setLoading(false);
+  }
+};
   return (
     <div className="max-w-6xl mx-auto bg-(--surface) rounded-3xl shadow-(--shadow) border border-(--border) p-10">
       <h1 className="text-3xl font-bold mb-8">Create Coding Problem</h1>

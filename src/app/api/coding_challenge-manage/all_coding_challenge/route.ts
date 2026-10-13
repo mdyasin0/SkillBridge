@@ -1,10 +1,10 @@
+
 import { NextResponse } from "next/server";
 import { db } from "@/lib/db";
 
 export async function GET() {
   try {
-    const [rows]: any = await db.query(
-      `
+    const [rows]: any = await db.query(`
       SELECT
         c.id,
         c.title,
@@ -15,34 +15,28 @@ export async function GET() {
         c.maxAttempt,
         c.starterCode,
         c.hint,
-
         c.createdBy,
         c.createdAt
       FROM challenges c
       ORDER BY c.id DESC
-      `
+    `);
+
+    return NextResponse.json(
+      {
+        success: true,
+        data: rows,
+      },
+      { status: 200 }
     );
-
-    const allChallenges = rows.map((item: any) => ({
-      ...item,
-    }));
-
-    return NextResponse.json({
-      success: true,
-      count: allChallenges.length,
-      data: allChallenges,
-    });
   } catch (error) {
-    console.error(error);
+    console.error("Failed to fetch coding challenges:", error);
 
     return NextResponse.json(
       {
         success: false,
-        message: "Server Error",
+        message: "Failed to fetch coding challenges",
       },
-      {
-        status: 500,
-      }
+      { status: 500 }
     );
   }
 }

@@ -52,7 +52,7 @@ export async function PUT(
         difficulty = ?,
         category = ?,
         timeLimit = ?,
-        maxAttempts = ?,
+        maxAttempts = ?
       WHERE id = ?
       `,
       [

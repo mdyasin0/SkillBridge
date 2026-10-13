@@ -92,7 +92,7 @@ export default function EditChallengePage() {
 
       toast.info(result.message);
 
-      router.push("/pages/admin/ui-challenges");
+      router.push("/pages/admin/ui-challenge-manage/ui-challenges-lists");
     } catch (error) {
       toast.error(String(error));
       toast.info("Something went wrong.");

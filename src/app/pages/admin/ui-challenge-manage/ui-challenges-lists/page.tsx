@@ -36,7 +36,7 @@ export default function UIChallengesPage() {
     try {
       setDeletingId(id);
 
-      const res = await fetch(`/api/uichallengedelete/${id}`, {
+      const res = await fetch(`/api/ui_challenge_manage/uichallengedelete/${id}`, {
         method: "DELETE",
       });
 
@@ -137,7 +137,7 @@ export default function UIChallengesPage() {
                         : "Delete"}
                     </button>
                     <Link
-  href={`/pages/admin/edituichallenge/${challenge.id}`}
+  href={`/pages/admin/ui-challenge-manage/edituichallenge/${challenge.id}`}
   className="px-4 py-2 rounded-lg text-white bg-green-600"
 >
   Update

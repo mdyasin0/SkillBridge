@@ -11,12 +11,12 @@ export default function WorkspacePage() {
   const { user } = useAuth();
   const [challenge, setChallenge] = useState<any>(null);
   const [loading, setLoading] = useState(true);
-  const router = useRouter();
+  
   useEffect(() => {
     if (!user?.id || !id) return;
 
     fetch(
-      `/api/coding_challenge-manage/all_coding_challenge/${id}?userId=${user.id}`,
+      `/api/developer_coding-challenge/all-coding-challenge/${id}?userId=${user.id}`,
     )
       .then((res) => res.json())
       .then((res) => {

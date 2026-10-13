@@ -21,11 +21,41 @@ export default  function ChallengeDetails() {
   const { id } = useParams();
 
  const [challenge, setChallenge] = useState<Challenge | null>(null);
-  useEffect(() => {
-    fetch(`/api/ui_challenge_manage/uichallengedata/${id}`)
-      .then((res) => res.json())
-      .then((res) => setChallenge(res.data));
-  }, [id]);
+
+useEffect(() => {
+  if (!id) return;
+
+  const fetchChallenge = async () => {
+    try {
+      const response = await fetch(
+        `/api/ui_challenge_manage/uichallengedata/${id}`
+      );
+
+      const result = await response.json();
+
+      console.log("API response:", result);
+
+      if (!response.ok) {
+        throw new Error(
+          result.message || "Failed to fetch challenge"
+        );
+      }
+
+      const data = result.data ?? result;
+
+      if (!data || !data.id) {
+        throw new Error("Challenge data not found");
+      }
+
+      setChallenge(data);
+    } catch (error) {
+      console.error("Fetch challenge error:", error);
+    }
+  };
+
+  fetchChallenge();
+}, [id]);
+
 
   if (!challenge) {
     return<LoadingUI/>;

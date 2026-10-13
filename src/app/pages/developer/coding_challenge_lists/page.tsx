@@ -56,19 +56,65 @@ export default function ChallengesPage() {
 
     return difficultyMatch && categoryMatch;
   });
-  useEffect(() => {
-    if (!user?.id) return;
+ 
+useEffect(() => {
+  if (!user?.id) return;
 
-    fetch(`/api/coding_challenge-manage/all_coding_challenge?userId=${user.id}`)
-      .then((res) => res.json())
-      .then((res) => {
-        setApiData(res.data);
+  const getChallenges = async () => {
+    try {
+      setLoading(true);
 
-        setTableData(res.data.available);
-        setCounts(res.counts);
-        setLoading(false);
+      const response = await fetch(
+        `/api/developer_coding-challenge/all-coding-challenge?userId=${user.id}`
+      );
+
+      const result = await response.json();
+
+      if (!response.ok || !result.success) {
+        throw new Error(
+          result.message || "Failed to fetch challenges"
+        );
+      }
+
+      setApiData({
+        available: Array.isArray(result.data?.available)
+          ? result.data.available
+          : [],
+        completed: Array.isArray(result.data?.completed)
+          ? result.data.completed
+          : [],
       });
-  }, [user]);
+
+      setTableData(
+        Array.isArray(result.data?.available)
+          ? result.data.available
+          : []
+      );
+
+      setCounts(result.counts);
+    } catch (error) {
+      console.error("Challenge fetch error:", error);
+      toast.error("Failed to load coding challenges.");
+
+      setApiData({
+        available: [],
+        completed: [],
+      });
+      setTableData([]);
+      setCounts({
+        all: 0,
+        available: 0,
+        completed: 0,
+      });
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  getChallenges();
+}, [user?.id]);
+
+
   const router = useRouter();
 
   const handleStartChallenge = async (id: number) => {

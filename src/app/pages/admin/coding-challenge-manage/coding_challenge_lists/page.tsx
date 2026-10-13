@@ -24,38 +24,40 @@ export default function ChallengesPage() {
         setLoading(false);
       });
   }, []);
-  const handleDelete = async (id: number) => {
-    const confirmDelete = window.confirm(
-      "Are you sure you want to delete this challenge?",
-    );
+  console.log(data);
 
-    if (!confirmDelete) return;
+const handleDelete = async (id: number) => {
+  const confirmDelete = window.confirm(
+    "Are you sure you want to delete this challenge?"
+  );
 
-    try {
-      setDeletingId(id);
+  if (!confirmDelete) return;
 
-      const res = await fetch(`/api/codingchallengedelete/${id}`, {
-        method: "DELETE",
-      });
+  try {
+    setDeletingId(id);
 
-      const result = await res.json();
+    const res = await fetch(`/api/coding_challenge-manage/codingchallengedelete/${id}`, {
+      method: "DELETE",
+    });
 
-      if (!res.ok) {
-        toast.info(result.message);
-        return;
-      }
+    const result = await res.json();
 
-      // Remove deleted item from UI
-      setData((prev) => prev.filter((item) => item.id !== id));
-
-      toast.info(result.message);
-    } catch (error) {
-      toast.error(String(error));
-      toast.info("Something went wrong.");
-    } finally {
-      setDeletingId(null);
+    if (!res.ok || !result.success) {
+      toast.error(result.message || "Failed to delete challenge");
+      return;
     }
-  };
+
+    setData((prev) => prev.filter((item) => item.id !== id));
+
+    toast.success(result.message);
+  } catch (error) {
+    console.error("Delete request failed:", error);
+    toast.error("Something went wrong while deleting.");
+  } finally {
+    setDeletingId(null);
+  }
+};
+
   if (loading) return<LoadingUI/>;
 
   return (
@@ -123,15 +125,7 @@ export default function ChallengesPage() {
                       Update
                     </button>
                   </Link>
-                  <Link
-                    href={`/pages/admin/code_editor/${item.id}`}
-                    className="px-4 py-2 rounded-lg text-white"
-                    style={{
-                      background: "var(--primary)",
-                    }}
-                  >
-                    Complete Challenge
-                  </Link>
+             
                 </td>
               </tr>
             ))}

@@ -1,46 +1,32 @@
+
 import { NextResponse } from "next/server";
 import { db } from "@/lib/db";
 
 export async function GET(
-  req: Request,
-  { params }: { params: Promise<{ id: string }> },
+  _req: Request,
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const { id } = await params;
-    const { searchParams } = new URL(req.url);
 
-    const userId = searchParams.get("userId");
-
-    if (!userId) {
+    if (!id || !/^\d+$/.test(id)) {
       return NextResponse.json(
         {
           success: false,
-          message: "User ID is required.",
+          message: "Invalid challenge ID",
         },
-        {
-          status: 400,
-        },
+        { status: 400 }
       );
     }
 
     const [rows]: any = await db.query(
       `
-      SELECT
-        u.*,
-        s.submission_id,
-        s.start_time,
-        s.submitted_at,
-        s.status,
-        s.score
-      FROM uichallenge u
-      LEFT JOIN submissions s
-        ON u.id = s.challenge_id
-        AND s.user_id = ?
-        AND s.challenge_type = 'project'
-      WHERE u.id = ?
+      SELECT *
+      FROM uichallenge
+      WHERE id = ?
       LIMIT 1
       `,
-      [userId, id],
+      [id]
     );
 
     if (rows.length === 0) {
@@ -49,9 +35,7 @@ export async function GET(
           success: false,
           message: "Challenge not found",
         },
-        {
-          status: 404,
-        },
+        { status: 404 }
       );
     }
 
@@ -60,21 +44,17 @@ export async function GET(
         success: true,
         data: rows[0],
       },
-      {
-        status: 200,
-      },
+      { status: 200 }
     );
   } catch (error) {
-    // console.log(error);
+    console.error("Fetch UI challenge error:", error);
 
     return NextResponse.json(
       {
         success: false,
-        message: "Server Error",
+        message: "Failed to fetch challenge",
       },
-      {
-        status: 500,
-      },
+      { status: 500 }
     );
   }
 }
