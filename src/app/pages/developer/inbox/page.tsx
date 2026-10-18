@@ -1,3 +1,4 @@
+
 "use client";
 
 import { useEffect, useState } from "react";
@@ -57,16 +58,14 @@ export default function MessageDeveloperList() {
 
         const result = await response.json();
 
-    
-
         if (!response.ok) {
-          toast.error( result);
+          toast.error(result);
           return;
         }
 
         setConversations(result.data || []);
       } catch (error) {
-       toast.error(String(error));
+        toast.error(String(error));
       } finally {
         setLoading(false);
       }
@@ -85,18 +84,18 @@ export default function MessageDeveloperList() {
     receiverId = current Developer
 
     these 2 id will be used in MessagePage  for
-    unread message read 
+    unread message read
   */
 
   const handleConversationClick = (conversation: Conversation) => {
     /*
       if no receiverId  not redirect in  MessagePage
 
-      because for  read API receiverId is needed .
+      because for read API receiverId is needed .
     */
 
     if (!conversation.receiverId) {
-    toast.error(String(conversation));
+      toast.error(String(conversation));
 
       return;
     }
@@ -106,10 +105,7 @@ export default function MessageDeveloperList() {
     */
 
     if (!conversation.otherUserId) {
-      toast.error(
-      String(
-        conversation)
-      );
+      toast.error(String(conversation));
 
       return;
     }
@@ -133,9 +129,7 @@ export default function MessageDeveloperList() {
   */
 
   if (loading) {
-    return (
-    <LoadingUI/>
-    );
+    return <LoadingUI />;
   }
 
   /*
@@ -146,7 +140,7 @@ export default function MessageDeveloperList() {
 
   if (conversations.length === 0) {
     return (
-      <div className="p-4 text-center text-sm text-(--text-muted)">
+      <div className="w-full p-4 text-center text-sm text-(--text-muted) sm:p-6">
         No conversations yet.
       </div>
     );
@@ -159,7 +153,7 @@ export default function MessageDeveloperList() {
   */
 
   return (
-    <div className="w-full">
+    <div className="w-full min-w-0 overflow-hidden rounded-lg bg-(--surface)">
       {conversations.map((conversation) => {
         const initials = conversation.otherUserName
           ?.trim()
@@ -176,15 +170,24 @@ export default function MessageDeveloperList() {
             className="
               flex
               w-full
+              min-w-0
               items-center
               gap-3
               border-b
               border-(--border)
-              px-4
+              bg-(--surface)
+              px-3
               py-3
               text-left
-              transition
+              transition-colors
+              duration-200
               hover:bg-(--surface-hover)
+              focus-visible:outline-2
+              focus-visible:outline-offset-[-2px]
+              focus-visible:outline-(--primary)
+              sm:gap-3
+              sm:px-4
+              sm:py-3.5
             "
           >
             {/* Recruiter Image */}
@@ -192,8 +195,7 @@ export default function MessageDeveloperList() {
             <div
               className="
                 flex
-                h-11
-                w-11
+                size-10
                 shrink-0
                 items-center
                 justify-center
@@ -203,6 +205,7 @@ export default function MessageDeveloperList() {
                 text-sm
                 font-semibold
                 text-white
+                sm:size-11
               "
             >
               {conversation.recruiterPhoto ? (
@@ -212,6 +215,7 @@ export default function MessageDeveloperList() {
                   width={44}
                   height={44}
                   className="h-full w-full object-cover"
+                  sizes="(max-width: 640px) 40px, 44px"
                 />
               ) : (
                 <span>{initials || "U"}</span>
@@ -221,9 +225,9 @@ export default function MessageDeveloperList() {
             {/* Recruiter Name + Last Message + Indicator */}
 
             <div className="min-w-0 flex-1">
-              <div className="flex items-center justify-between gap-2">
+              <div className="flex min-w-0 items-center justify-between gap-2">
                 <p
-                  className={`truncate text-sm ${
+                  className={`min-w-0 flex-1 truncate text-sm ${
                     conversation.unreadCount > 0
                       ? "font-bold text-(--text)"
                       : "font-semibold text-(--text)"
@@ -259,7 +263,7 @@ export default function MessageDeveloperList() {
               </div>
 
               <p
-                className={`mt-0.5 truncate text-xs ${
+                className={`mt-0.5 truncate text-xs leading-5 ${
                   conversation.unreadCount > 0
                     ? "font-medium text-(--text)"
                     : "text-(--text-muted)"

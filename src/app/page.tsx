@@ -245,11 +245,11 @@ export default function HomePage() {
         {/* Decorative background */}
         <div className="pointer-events-none absolute inset-0 overflow-hidden">
           <div className="absolute left-[8%] top-20 h-64 w-64 rounded-full bg-(--primary)/10 blur-3xl" />
-          <div className="absolute right-[8%] top-32 h-72 w-72 rounded-full bg-indigo-300/10 blur-3xl" />
+          <div className="absolute right-[8%] top-32 h-72 w-72 rounded-full bg-(--primary)/10 blur-3xl" />
           <div className="absolute bottom-0 left-1/2 h-56 w-96 -translate-x-1/2 rounded-full bg-(--primary)/5 blur-3xl" />
         </div>
 
-        <div className="relative mx-auto grid max-w-7xl items-center gap-14 px-4 pb-20 pt-16 sm:px-6 md:pt-24 lg:grid-cols-[1.05fr_.95fr] lg:px-8 lg:pb-28">
+        <div className="relative mx-auto grid min-w-0 max-w-7xl items-center gap-10 px-4 pb-14 pt-10 sm:gap-14 sm:px-6 sm:pb-20 sm:pt-16 md:pt-24 lg:grid-cols-[1.05fr_.95fr] lg:px-8 lg:pb-28">
           {/* Hero copy */}
           <div>
             <div className="inline-flex animate-[fadeIn_.6s_ease-out] items-center gap-2 rounded-full border border-(--border) bg-(--surface)/80 px-4 py-2 text-sm font-medium text-(--text-muted) shadow-sm backdrop-blur">
@@ -259,9 +259,9 @@ export default function HomePage() {
               A better way to prove technical ability
             </div>
 
-            <h1 className="mt-7 max-w-4xl text-4xl font-extrabold leading-[1.08] tracking-tight text-(--text) sm:text-5xl lg:text-6xl xl:text-7xl">
+            <h1 className="mt-7 max-w-4xl text-3xl font-extrabold leading-tight tracking-tight text-(--text) min-[375px]:text-4xl sm:text-5xl lg:text-6xl xl:text-7xl">
               Don&apos;t just show your
-              <span className="block bg-linear-to-r from-(--primary) to-indigo-400 bg-clip-text text-transparent">
+              <span className="block bg-linear-to-r from-(--primary) to-(--primary-hover) bg-clip-text text-transparent">
                 skills. Prove them.
               </span>
             </h1>
@@ -275,7 +275,7 @@ export default function HomePage() {
             <div className="mt-8 flex flex-col gap-3 sm:flex-row">
               <Link
                 href={primaryHref}
-                className="group inline-flex items-center justify-center gap-2 rounded-xl bg-(--primary) px-6 py-3.5 text-sm font-semibold text-white shadow-lg shadow-(--primary)/20 transition hover:bg-(--primary-hover) hover:-translate-y-0.5"
+                className="group inline-flex items-center justify-center gap-2 rounded-xl bg-(--primary) px-6 py-3.5 text-sm font-semibold text-(--surface) shadow-lg shadow-(--primary)/20 transition hover:bg-(--primary-hover) hover:-translate-y-0.5"
               >
                 {primaryLabel}
                 <ArrowRight
@@ -312,16 +312,16 @@ export default function HomePage() {
           </div>
 
           {/* Hero product preview */}
-          <div className="relative mx-auto w-full max-w-xl lg:ml-auto">
-            <div className="absolute -inset-5 rounded-4xk bg-(--primary)/10 blur-2xl" />
+          <div className="relative mx-auto w-full min-w-0 max-w-xl lg:ml-auto">
+            <div className="absolute -inset-5 rounded-4xl bg-(--primary)/10 blur-2xl" />
 
-            <div className="relative rounded-4xl border border-(--border) bg-(--surface)/95 p-3 shadow-[0_30px_80px_rgba(15,23,42,.12)] backdrop-blur">
+            <div className="relative rounded-4xll border border-(--border) bg-(--surface)/95 p-3 shadow-(--shadow) backdrop-blur">
               {/* Fake browser header */}
               <div className="flex items-center justify-between rounded-xl border border-(--border) bg-(--bg) px-4 py-3">
                 <div className="flex gap-1.5">
-                  <span className="h-2.5 w-2.5 rounded-full bg-red-300" />
-                  <span className="h-2.5 w-2.5 rounded-full bg-yellow-300" />
-                  <span className="h-2.5 w-2.5 rounded-full bg-green-300" />
+                  <span className="h-2.5 w-2.5 rounded-full bg-(--border)" />
+                  <span className="h-2.5 w-2.5 rounded-full bg-(--border)" />
+                  <span className="h-2.5 w-2.5 rounded-full bg-(--border)" />
                 </div>
 
                 <div className="hidden items-center gap-2 rounded-lg border border-(--border) bg-(--surface) px-3 py-1.5 text-[10px] text-(--text-muted) sm:flex">
@@ -336,7 +336,7 @@ export default function HomePage() {
                 {/* Profile header */}
                 <div className="flex items-center justify-between gap-4">
                   <div className="flex items-center gap-3">
-                    <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-linear-to-br from-(--primary) to-indigo-400 text-lg font-bold text-white shadow-lg shadow-(--primary)/20">
+                    <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-linear-to-br from-(--primary) to-(--primary-hover) text-lg font-bold text-(--surface) shadow-lg shadow-(--primary)/20">
                       SB
                     </div>
 
@@ -347,7 +347,7 @@ export default function HomePage() {
                         </h3>
                         <BadgeCheck
                           size={16}
-                          className="fill-(--primary) text-white"
+                          className="fill-(--primary) text-(--surface)"
                         />
                       </div>
                       <p className="text-xs text-(--text-muted)">
@@ -439,7 +439,7 @@ export default function HomePage() {
 
             {/* Floating badge */}
             <div className="absolute -left-5 bottom-12 hidden rounded-2xl border border-(--border) bg-(--surface) p-3 shadow-xl sm:flex sm:items-center sm:gap-3">
-              <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-amber-100 text-amber-600">
+              <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-(--primary)/10 text-(--primary)">
                 <Award size={20} />
               </div>
               <div>
@@ -453,8 +453,8 @@ export default function HomePage() {
             {/* Floating verified card */}
             <div className="absolute -right-4 top-24 hidden rounded-2xl border border-(--border) bg-(--surface) p-3 shadow-xl sm:block">
               <div className="flex items-center gap-2">
-                <div className="flex h-8 w-8 items-center justify-center rounded-full bg-emerald-500/10">
-                  <CheckCircle2 size={17} className="text-emerald-500" />
+                <div className="flex h-8 w-8 items-center justify-center rounded-full bg-(--primary)/10">
+                  <CheckCircle2 size={17} className="text-(--primary)" />
                 </div>
                 <div>
                   <p className="text-xs font-bold text-(--text)">Verified</p>
@@ -500,7 +500,7 @@ export default function HomePage() {
       {/* =========================================================
           PROBLEM / SOLUTION
       ========================================================= */}
-      <section className="mx-auto max-w-7xl px-4 py-20 sm:px-6 lg:px-8 lg:py-28">
+      <section className="mx-auto max-w-7xl px-4 py-14 sm:px-6 sm:py-20 lg:px-8 lg:py-28">
         <SectionHeading
           eyebrow="THE PROBLEM"
           title="A resume tells your story. Your performance tells the truth."
@@ -511,7 +511,7 @@ export default function HomePage() {
           {/* Traditional */}
           <div className="rounded-3xl border border-(--border) bg-(--surface) p-6 shadow-sm sm:p-8">
             <div className="flex items-center gap-3">
-              <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-red-500/10 text-red-500">
+              <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-(--primary)/10 text-(--primary)">
                 <FileCheck2 size={21} />
               </div>
               <div>
@@ -532,7 +532,7 @@ export default function HomePage() {
                 "Technical evaluation can require multiple interview stages",
               ].map((item) => (
                 <div key={item} className="flex gap-3">
-                  <span className="mt-1 flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-red-500/10 text-red-500">
+                  <span className="mt-1 flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-(--primary)/10 text-(--primary)">
                     <span className="h-1.5 w-1.5 rounded-full bg-current" />
                   </span>
                   <p className="text-sm leading-6 text-(--text-muted)">
@@ -548,7 +548,7 @@ export default function HomePage() {
             <div className="absolute right-0 top-0 h-40 w-40 rounded-full bg-(--primary)/10 blur-3xl" />
 
             <div className="relative flex items-center gap-3">
-              <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-(--primary) text-white shadow-lg shadow-(--primary)/20">
+              <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-(--primary) text-(--surface) shadow-lg shadow-(--primary)/20">
                 <ShieldCheck size={21} />
               </div>
 
@@ -586,7 +586,7 @@ export default function HomePage() {
           CHALLENGES
       ========================================================= */}
       <section className="border-y border-(--border) bg-(--surface)">
-        <div className="mx-auto max-w-7xl px-4 py-20 sm:px-6 lg:px-8 lg:py-28">
+        <div className="mx-auto max-w-7xl px-4 py-14 sm:px-6 sm:py-20 lg:px-8 lg:py-28">
           <SectionHeading
             eyebrow="PROVE YOUR SKILLS"
             title="Different challenges. One technical profile."
@@ -606,7 +606,7 @@ export default function HomePage() {
                     0{index + 1}
                   </div>
 
-                  <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-(--primary)/10 text-(--primary) transition group-hover:bg-(--primary) group-hover:text-white">
+                  <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-(--primary)/10 text-(--primary) transition group-hover:bg-(--primary) group-hover:text-(--surface)">
                     <Icon size={22} />
                   </div>
 
@@ -632,7 +632,7 @@ export default function HomePage() {
       {/* =========================================================
           DEVELOPER VS RECRUITER
       ========================================================= */}
-      <section className="mx-auto max-w-7xl px-4 py-20 sm:px-6 lg:px-8 lg:py-28">
+      <section className="mx-auto max-w-7xl px-4 py-14 sm:px-6 sm:py-20 lg:px-8 lg:py-28">
         <SectionHeading
           eyebrow="BUILT FOR BOTH SIDES"
           title="One platform. Two powerful experiences."
@@ -641,7 +641,7 @@ export default function HomePage() {
 
         <div className="mt-14 grid gap-6 lg:grid-cols-2">
           {/* Developer */}
-          <div className="rounded-4xl border border-(--border) bg-(--surface) p-6 shadow-sm sm:p-8">
+          <div className="rounded-4xll border border-(--border) bg-(--surface) p-6 shadow-sm sm:p-8">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-3">
                 <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-(--primary)/10 text-(--primary)">
@@ -690,15 +690,15 @@ export default function HomePage() {
           </div>
 
           {/* Recruiter */}
-          <div className="rounded-4xl border border-(--border) bg-(--surface) p-6 shadow-sm sm:p-8">
+          <div className="rounded-4xll border border-(--border) bg-(--surface) p-6 shadow-sm sm:p-8">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-3">
-                <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-indigo-500/10 text-indigo-500">
+                <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-(--primary)/10 text-(--primary)">
                   <BriefcaseBusiness size={23} />
                 </div>
 
                 <div>
-                  <p className="text-xs font-semibold uppercase tracking-wider text-indigo-500">
+                  <p className="text-xs font-semibold uppercase tracking-wider text-(--primary)">
                     For Recruiters
                   </p>
                   <h3 className="text-2xl font-bold text-(--text)">
@@ -707,7 +707,7 @@ export default function HomePage() {
                 </div>
               </div>
 
-              <Search className="text-indigo-500/30" size={30} />
+              <Search className="text-(--primary)/30" size={30} />
             </div>
 
             <div className="mt-8 space-y-4">
@@ -810,10 +810,10 @@ export default function HomePage() {
           <div className="relative">
             <div className="absolute -inset-8 rounded-full bg-(--primary)/5 blur-3xl" />
 
-            <div className="relative rounded-4xl border border-(--border) bg-(--bg) p-4 shadow-(--shadow) sm:p-6">
+            <div className="relative rounded-4xll border border-(--border) bg-(--bg) p-4 shadow-(--shadow) sm:p-6">
               <div className="flex items-start justify-between gap-4">
                 <div className="flex items-center gap-4">
-                  <div className="flex h-16 w-16 items-center justify-center rounded-2xl bg-linear-to-br from-(--primary) to-indigo-400 text-xl font-bold text-white">
+                  <div className="flex h-16 w-16 items-center justify-center rounded-2xl bg-linear-to-br from-(--primary) to-(--primary-hover) text-xl font-bold text-(--surface)">
                     JD
                   </div>
 
@@ -824,7 +824,7 @@ export default function HomePage() {
                       </h3>
                       <BadgeCheck
                         size={17}
-                        className="fill-(--primary) text-white"
+                        className="fill-(--primary) text-(--surface)"
                       />
                     </div>
 
@@ -870,7 +870,7 @@ export default function HomePage() {
                 <div className="rounded-2xl border border-(--border) bg-(--surface) p-4">
                   <div className="flex items-center justify-between">
                     <p className="text-xs text-(--text-muted)">Average Score</p>
-                    <Star size={16} className="text-amber-500" />
+                    <Star size={16} className="text-(--primary)" />
                   </div>
 
                   <p className="mt-2 text-3xl font-black text-(--text)">89%</p>
@@ -917,7 +917,7 @@ export default function HomePage() {
                       key={badge}
                       className="flex items-center gap-2 rounded-full border border-(--border) bg-(--surface) px-3 py-2"
                     >
-                      <Award size={14} className="text-amber-500" />
+                      <Award size={14} className="text-(--primary)" />
                       <span className="text-[11px] font-medium text-(--text)">
                         {badge}
                       </span>
@@ -933,11 +933,11 @@ export default function HomePage() {
       {/* =========================================================
           RECRUITER DISCOVERY
       ========================================================= */}
-      <section className="mx-auto max-w-7xl px-4 py-20 sm:px-6 lg:px-8 lg:py-28">
+      <section className="mx-auto max-w-7xl px-4 py-14 sm:px-6 sm:py-20 lg:px-8 lg:py-28">
         <div className="grid items-center gap-14 lg:grid-cols-[1.1fr_.9fr]">
           {/* Search UI mockup */}
           <div className="order-2 lg:order-1">
-            <div className="rounded-4xl border border-(--border) bg-(--surface) p-4 shadow-(--shadow) sm:p-6">
+            <div className="rounded-4xll border border-(--border) bg-(--surface) p-4 shadow-(--shadow) sm:p-6">
               <div className="flex flex-col gap-3 sm:flex-row">
                 <div className="flex flex-1 items-center gap-3 rounded-xl border border-(--border) bg-(--bg) px-4 py-3">
                   <Search size={18} className="text-(--text-muted)" />
@@ -1003,7 +1003,7 @@ export default function HomePage() {
                           </p>
                           <BadgeCheck
                             size={14}
-                            className="shrink-0 fill-(--primary) text-white"
+                            className="shrink-0 fill-(--primary) text-(--surface)"
                           />
                         </div>
 
@@ -1013,7 +1013,7 @@ export default function HomePage() {
                       </div>
                     </div>
 
-                    <div className="hidden items-center gap-6 sm:flex">
+                    <div className="flex shrink-0 items-center gap-2 sm:gap-6">
                       <div className="text-right">
                         <p className="text-[10px] text-(--text-muted)">SCORE</p>
                         <p className="text-sm font-bold text-(--text)">
@@ -1080,7 +1080,7 @@ export default function HomePage() {
                   ? "/pages/recruiter/DeveloperSearch"
                   : "/auth/register"
               }
-              className="group mt-8 inline-flex items-center gap-2 rounded-xl bg-(--primary) px-5 py-3 text-sm font-semibold text-white shadow-lg shadow-(--primary)/20 transition hover:bg-(--primary-hover)"
+              className="group mt-8 inline-flex items-center gap-2 rounded-xl bg-(--primary) px-5 py-3 text-sm font-semibold text-(--surface) shadow-lg shadow-(--primary)/20 transition hover:bg-(--primary-hover)"
             >
               Explore Developer Profiles
               <ArrowRight
@@ -1096,7 +1096,7 @@ export default function HomePage() {
           WORKFLOW
       ========================================================= */}
       <section className="border-y border-(--border) bg-(--surface)">
-        <div className="mx-auto max-w-7xl px-4 py-20 sm:px-6 lg:px-8 lg:py-28">
+        <div className="mx-auto max-w-7xl px-4 py-14 sm:px-6 sm:py-20 lg:px-8 lg:py-28">
           <SectionHeading
             eyebrow="HOW SKILLBRIDGE WORKS"
             title="From skill to opportunity."
@@ -1141,7 +1141,7 @@ export default function HomePage() {
       {/* =========================================================
           PLATFORM SYSTEMS
       ========================================================= */}
-      <section className="mx-auto max-w-7xl px-4 py-20 sm:px-6 lg:px-8 lg:py-28">
+      <section className="mx-auto max-w-7xl px-4 py-14 sm:px-6 sm:py-20 lg:px-8 lg:py-28">
         <SectionHeading
           eyebrow="THE PLATFORM"
           title="More than a job portal."
@@ -1157,7 +1157,7 @@ export default function HomePage() {
                 key={feature.title}
                 className="group rounded-2xl border border-(--border) bg-(--surface) p-6 transition duration-300 hover:-translate-y-1 hover:border-(--primary)/30 hover:shadow-(--shadow)"
               >
-                <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-(--primary)/10 text-(--primary) transition group-hover:bg-(--primary) group-hover:text-white">
+                <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-(--primary)/10 text-(--primary) transition group-hover:bg-(--primary) group-hover:text-(--surface)">
                   <Icon size={20} />
                 </div>
 
@@ -1240,9 +1240,9 @@ export default function HomePage() {
           </div>
 
           {/* Chat visualization */}
-          <div className="rounded-4xl border border-(--border) bg-(--bg) p-4 shadow-(--shadow) sm:p-6">
+          <div className="rounded-4xll border border-(--border) bg-(--bg) p-4 shadow-(--shadow) sm:p-6">
             <div className="flex items-center gap-3 border-b border-(--border) pb-4">
-              <div className="flex h-11 w-11 items-center justify-center rounded-full bg-(--primary) text-sm font-bold text-white">
+              <div className="flex h-11 w-11 items-center justify-center rounded-full bg-(--primary) text-sm font-bold text-(--surface)">
                 JD
               </div>
 
@@ -1255,7 +1255,7 @@ export default function HomePage() {
                 </p>
               </div>
 
-              <div className="ml-auto flex h-2.5 w-2.5 rounded-full bg-emerald-500" />
+              <div className="ml-auto flex h-2.5 w-2.5 rounded-full bg-(--primary)" />
             </div>
 
             <div className="space-y-4 py-6">
@@ -1267,11 +1267,11 @@ export default function HomePage() {
                 <p className="mt-2 text-[10px] text-(--text-muted)">10:42 AM</p>
               </div>
 
-              <div className="ml-auto max-w-[80%] rounded-2xl rounded-tr-sm bg-(--primary) p-4 text-white">
+              <div className="ml-auto max-w-[80%] rounded-2xl rounded-tr-sm bg-(--primary) p-4 text-(--surface)">
                 <p className="text-sm leading-6">
                   Thank you. I&apos;d be happy to discuss the opportunity.
                 </p>
-                <p className="mt-2 text-[10px] text-white/70">
+                <p className="mt-2 text-[10px] text-(--surface)/70">
                   10:44 AM · Read
                 </p>
               </div>
@@ -1289,7 +1289,7 @@ export default function HomePage() {
                 Write a message...
               </div>
 
-              <button className="flex h-9 w-9 items-center justify-center rounded-lg bg-(--primary) text-white">
+              <button className="flex h-9 w-9 items-center justify-center rounded-lg bg-(--primary) text-(--surface)">
                 <ArrowRight size={16} />
               </button>
             </div>
@@ -1301,7 +1301,7 @@ export default function HomePage() {
           ADMIN / PLATFORM QUALITY
       ========================================================= */}
       <section className="mx-auto max-w-7xl px-4 py-20 sm:px-6 lg:px-8 lg:py-24">
-        <div className="rounded-4xl border border-(--border) bg-(--surface) p-6 shadow-sm sm:p-8 lg:p-10">
+        <div className="rounded-4xll border border-(--border) bg-(--surface) p-6 shadow-sm sm:p-8 lg:p-10">
           <div className="grid gap-10 lg:grid-cols-[.8fr_1.2fr] lg:items-center">
             <div>
               <div className="inline-flex items-center gap-2 rounded-full bg-(--primary)/10 px-3 py-1.5 text-xs font-semibold text-(--primary)">
@@ -1369,19 +1369,19 @@ export default function HomePage() {
       <section className="relative overflow-hidden">
         <div className="absolute inset-0 bg-(--primary)" />
 
-        <div className="absolute -left-20 top-0 h-80 w-80 rounded-full bg-white/10 blur-3xl" />
-        <div className="absolute -right-20 bottom-0 h-80 w-80 rounded-full bg-indigo-900/10 blur-3xl" />
+        <div className="absolute -left-20 top-0 h-80 w-80 rounded-full bg-(--surface)/10 blur-3xl" />
+        <div className="absolute -right-20 bottom-0 h-80 w-80 rounded-full bg-(--primary)/10 blur-3xl" />
 
         <div className="relative mx-auto max-w-5xl px-4 py-20 text-center sm:px-6 lg:py-28">
-          <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl bg-white/15 text-white backdrop-blur">
+          <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl bg-(--surface)/15 text-(--surface) backdrop-blur">
             <Zap size={25} />
           </div>
 
-          <h2 className="mt-7 text-3xl font-extrabold tracking-tight text-white sm:text-4xl lg:text-5xl">
+          <h2 className="mt-7 text-3xl font-extrabold tracking-tight text-(--surface) sm:text-4xl lg:text-5xl">
             Your next opportunity should see what you can actually do.
           </h2>
 
-          <p className="mx-auto mt-5 max-w-2xl text-base leading-7 text-white/75 sm:text-lg">
+          <p className="mx-auto mt-5 max-w-2xl text-base leading-7 text-(--surface)/75 sm:text-lg">
             Whether you&apos;re proving your ability or looking for someone who
             can deliver, SkillBridge turns technical skill into meaningful
             evidence.
@@ -1390,7 +1390,7 @@ export default function HomePage() {
           <div className="mt-8 flex flex-col justify-center gap-3 sm:flex-row">
             <Link
               href={primaryHref}
-              className="group inline-flex items-center justify-center gap-2 rounded-xl bg-white px-6 py-3.5 text-sm font-bold text-(--primary) shadow-xl transition hover:-translate-y-0.5 hover:bg-slate-50"
+              className="group inline-flex items-center justify-center gap-2 rounded-xl bg-(--surface) px-6 py-3.5 text-sm font-bold text-(--primary) shadow-xl transition hover:-translate-y-0.5 hover:bg-(--surface-hover)"
             >
               {primaryLabel}
               <ArrowRight
@@ -1401,7 +1401,7 @@ export default function HomePage() {
 
             <Link
               href="/docs"
-              className="inline-flex items-center justify-center gap-2 rounded-xl border border-white/25 bg-white/10 px-6 py-3.5 text-sm font-semibold text-white backdrop-blur transition hover:bg-white/15"
+              className="inline-flex items-center justify-center gap-2 rounded-xl border border-(--surface)/25 bg-(--surface)/10 px-6 py-3.5 text-sm font-semibold text-(--surface) backdrop-blur transition hover:bg-(--surface)/15"
             >
               <Play size={16} />
               Learn More

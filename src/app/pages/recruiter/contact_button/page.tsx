@@ -1,3 +1,4 @@
+
 "use client";
 
 import { ArrowRight, MessageCircle } from "lucide-react";
@@ -16,19 +17,19 @@ export default function ContactDeveloperButton({
       className="
         group
         fixed
-        right-5
+        right-3
         top-1/2
         z-50
         hidden
         -translate-y-1/2
         items-center
-        gap-2.5
+        gap-2
         overflow-hidden
         rounded-2xl
         border
-        border-white/20
+        border-(--border)
         bg-(--primary)
-        px-4
+        px-3
         py-3
         text-sm
         font-semibold
@@ -38,9 +39,11 @@ export default function ContactDeveloperButton({
         duration-300
         hover:-translate-x-1
         hover:bg-(--primary-hover)
-        hover:px-5
-        hover:shadow-[0_12px_35px_rgba(91,108,255,0.35)]
+        hover:shadow-[0_12px_35px_rgba(91,108,255,0.25)]
         active:scale-95
+        sm:right-4
+        sm:gap-2.5
+        sm:px-4
         lg:flex
       "
     >
@@ -73,7 +76,9 @@ export default function ContactDeveloperButton({
         />
       </span>
 
-      <span className="whitespace-nowrap">Contact Developer</span>
+      <span className="whitespace-nowrap">
+        Contact Developer
+      </span>
 
       <ArrowRight
         size={16}

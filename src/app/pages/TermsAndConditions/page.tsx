@@ -1,5 +1,7 @@
+
 "use client";
 
+import { useEffect, useState, type ReactNode } from "react";
 import {
   FileText,
   UserRound,
@@ -13,6 +15,8 @@ import {
   RefreshCw,
   Mail,
   ChevronRight,
+  Menu,
+  X,
 } from "lucide-react";
 
 const sections = [
@@ -34,74 +38,107 @@ const sections = [
 ];
 
 export default function TermsAndConditions() {
+  const [sidebarOpen, setSidebarOpen] = useState(false);
+
+  // Close the mobile sidebar with the Escape key.
+  useEffect(() => {
+    if (!sidebarOpen) return;
+
+    const handleEscape = (event: KeyboardEvent) => {
+      if (event.key === "Escape") {
+        setSidebarOpen(false);
+      }
+    };
+
+    window.addEventListener("keydown", handleEscape);
+
+    return () => {
+      window.removeEventListener("keydown", handleEscape);
+    };
+  }, [sidebarOpen]);
+
+  // Scroll to the beginning of a section instead of its bottom.
+  const handleSectionNavigation = (
+    event: React.MouseEvent<HTMLAnchorElement>,
+    sectionId: string
+  ) => {
+    event.preventDefault();
+    setSidebarOpen(false);
+
+    const target = document.getElementById(sectionId);
+
+    if (!target) return;
+
+    const top =
+      window.scrollY + target.getBoundingClientRect().top - 104;
+
+    window.history.replaceState(null, "", `#${sectionId}`);
+
+    window.scrollTo({
+      top: Math.max(0, top),
+      behavior: "smooth",
+    });
+  };
+
   return (
-    <main className="min-h-screen bg-(--bg) text-(--text)">
+    <main className="min-h-screen min-w-0 overflow-x-clip bg-(--bg) text-(--text)">
       {/* Hero */}
       <section className="border-b border-(--border) bg-(--surface)">
-        <div className="mx-auto max-w-7xl px-4 py-16 sm:px-6 lg:px-8">
+        <div className="mx-auto max-w-7xl px-4 py-10 sm:px-6 sm:py-14 lg:px-8 lg:py-16">
           <div className="max-w-3xl">
-            <div className="mb-5 inline-flex items-center gap-2 rounded-full border border-(--border) bg-(--surface-hover) px-4 py-2 text-sm font-medium text-(--primary)">
-              <FileText size={17} />
-              Legal Agreement
+            <div className="mb-5 inline-flex max-w-full items-center gap-2 rounded-full border border-(--border) bg-(--surface-hover) px-3 py-2 text-sm font-medium text-(--primary) sm:px-4">
+              <FileText size={17} className="shrink-0" />
+              <span>Legal Agreement</span>
             </div>
 
-            <h1 className="text-4xl font-bold tracking-tight sm:text-5xl">
+            <h1 className="text-3xl font-bold tracking-tight sm:text-4xl lg:text-5xl">
               Terms & Conditions
             </h1>
 
-            <p className="mt-5 text-lg leading-8 text-(--text-muted)">
+            <p className="mt-4 text-base leading-7 text-(--text-muted) sm:mt-5 sm:text-lg sm:leading-8">
               These Terms & Conditions define the rules and responsibilities
               that apply when using SkillBridge, including accounts, profiles,
               challenges, communication, rankings, and platform usage.
             </p>
 
-            <div className="mt-6 flex items-center gap-2 text-sm text-(--text-muted)">
-              <span className="h-2 w-2 rounded-full bg-(--primary)" />
-              Last updated: September 4, 2026
+            <div className="mt-5 flex flex-wrap items-center gap-2 text-sm text-(--text-muted) sm:mt-6">
+              <span className="h-2 w-2 shrink-0 rounded-full bg-(--primary)" />
+              <span>Last updated: September 4, 2026</span>
             </div>
           </div>
         </div>
       </section>
 
-      {/* Content */}
-      <section className="mx-auto max-w-7xl px-4 py-10 sm:px-6 lg:px-8">
-        <div className="grid gap-8 lg:grid-cols-[260px_1fr]">
-          {/* Sidebar */}
-          <aside className="hidden lg:block">
-            <div className="sticky top-24 rounded-2xl border border-(--border) bg-(--surface) p-4 shadow-(--shadow)">
-              <p className="mb-3 px-3 text-xs font-semibold uppercase tracking-wider text-(--text-muted)">
-                On this page
-              </p>
+      {/* Main Content */}
+      <section className="mx-auto max-w-7xl px-4 py-6 sm:px-6 sm:py-8 lg:px-8 lg:py-10">
+       ```tsx
+{/* Fixed Mobile Sidebar Button */}
+<div className="fixed left-4 top-24 z-40 lg:hidden">
+  <button
+    type="button"
+    onClick={() => setSidebarOpen(true)}
+    aria-label="Open terms navigation"
+    aria-expanded={sidebarOpen}
+    className="flex h-11 w-11 items-center justify-center rounded-xl border border-(--border) bg-(--surface) text-(--text) shadow-(--shadow) transition-colors hover:bg-(--surface-hover) focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-(--primary)"
+  >
+    <Menu size={21} />
+  </button>
+</div>
+```
 
-              <nav className="space-y-1">
-                {sections.map((section) => {
-                  const Icon = section.icon;
-
-                  return (
-                    <a
-                      key={section.id}
-                      href={`#${section.id}`}
-                      className="group flex items-center justify-between rounded-xl px-3 py-2.5 text-sm text-(--text-muted) transition hover:bg-(--surface-hover) hover:text-(--text)"
-                    >
-                      <span className="flex items-center gap-2">
-                        <Icon size={16} />
-                        {section.title}
-                      </span>
-
-                      <ChevronRight
-                        size={15}
-                        className="opacity-0 transition group-hover:translate-x-0.5 group-hover:opacity-100"
-                      />
-                    </a>
-                  );
-                })}
-              </nav>
+        <div className="grid min-w-0 grid-cols-1 gap-5 sm:gap-7 lg:grid-cols-[minmax(0,3fr)_minmax(0,7fr)] lg:gap-8">
+          {/* Desktop Sidebar */}
+          <aside className="hidden min-w-0 lg:block">
+            <div className="sticky top-24 max-h-[calc(100vh-7rem)] overflow-y-auto rounded-2xl border border-(--border) bg-(--surface) p-3 shadow-(--shadow) xl:p-4">
+              <SidebarNavigation
+                onNavigate={handleSectionNavigation}
+              />
             </div>
           </aside>
 
           {/* Document */}
-          <article className="min-w-0 rounded-2xl border border-(--border) bg-(--surface) p-6 shadow-(--shadow) sm:p-8 lg:p-10">
-            <div className="space-y-12">
+          <article className="min-w-0 rounded-2xl border border-(--border) bg-(--surface) p-4 shadow-(--shadow) sm:p-6 md:p-8 lg:p-8 xl:p-10">
+            <div className="min-w-0 space-y-10 sm:space-y-12">
               <TermsSection id="about" number="01" title="About SkillBridge">
                 <p>
                   SkillBridge is a technology platform designed to connect
@@ -145,7 +182,7 @@ export default function TermsAndConditions() {
                   including:
                 </p>
 
-                <div className="grid gap-4 sm:grid-cols-3">
+                <div className="grid min-w-0 grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-3">
                   <RoleCard
                     title="Developer"
                     description="Demonstrates technical skills through challenges and maintains a professional technical profile."
@@ -211,7 +248,7 @@ export default function TermsAndConditions() {
                     explicitly permitted.
                   </li>
                   <li>
-                    Attempts may be tracked and associated with the user&apos;s
+                    Attempts may be tracked and associated with the user's
                     profile.
                   </li>
                   <li>
@@ -232,7 +269,7 @@ export default function TermsAndConditions() {
                   to reflect the quality and correctness of submitted work.
                 </p>
 
-                <div className="rounded-2xl border border-(--primary)/20 bg-(--primary)/5 p-5">
+                <div className="rounded-2xl border border-(--primary)/20 bg-(--primary)/5 p-4 sm:p-5">
                   <h3 className="font-semibold text-(--text)">
                     Attempt Penalty
                   </h3>
@@ -246,7 +283,7 @@ export default function TermsAndConditions() {
 
                 <p>
                   Challenge difficulty may also be considered separately by
-                  SkillBridge&apos;s ranking and skill evaluation systems.
+                  SkillBridge's ranking and skill evaluation systems.
                 </p>
               </TermsSection>
 
@@ -269,7 +306,7 @@ export default function TermsAndConditions() {
                 <p>
                   Rankings and badges are platform-generated indicators and
                   should not be interpreted as an absolute measurement of a
-                  person&apos;s complete professional ability.
+                  person's complete professional ability.
                 </p>
               </TermsSection>
 
@@ -374,7 +411,7 @@ export default function TermsAndConditions() {
               >
                 <p>
                   SkillBridge provides tools for technical evaluation and
-                  professional discovery. A developer&apos;s ranking, badge, score,
+                  professional discovery. A developer's ranking, badge, score,
                   or profile does not guarantee employment.
                 </p>
 
@@ -409,15 +446,17 @@ export default function TermsAndConditions() {
               </TermsSection>
 
               {/* Acceptance */}
-              <div className="rounded-2xl border border-(--primary)/20 bg-(--primary)/5 p-5">
-                <div className="flex gap-3">
+              <div className="rounded-2xl border border-(--primary)/20 bg-(--primary)/5 p-4 sm:p-5">
+                <div className="flex min-w-0 items-start gap-3">
                   <ShieldCheck
                     className="mt-0.5 shrink-0 text-(--primary)"
                     size={20}
                   />
 
-                  <div>
-                    <h3 className="font-semibold">Acceptance of These Terms</h3>
+                  <div className="min-w-0">
+                    <h3 className="font-semibold text-(--text)">
+                      Acceptance of These Terms
+                    </h3>
 
                     <p className="mt-1 text-sm leading-6 text-(--text-muted)">
                       By creating an account or using SkillBridge, you
@@ -431,7 +470,101 @@ export default function TermsAndConditions() {
           </article>
         </div>
       </section>
+
+      {/* Mobile Sidebar Drawer */}
+      {sidebarOpen && (
+        <div className="fixed inset-0 z-50 lg:hidden">
+          {/* Backdrop: clicking outside closes the sidebar */}
+          <button
+            type="button"
+            aria-label="Close navigation"
+            onClick={() => setSidebarOpen(false)}
+            className="absolute inset-0 h-full w-full cursor-default bg-black/50"
+          />
+
+          {/* Drawer */}
+          <aside
+            role="dialog"
+            aria-modal="true"
+            aria-label="Terms and Conditions navigation"
+            className="absolute inset-y-0 left-0 flex w-[min(88vw,340px)] flex-col overflow-hidden border-r border-(--border) bg-(--surface) shadow-(--shadow)"
+          >
+            <div className="flex shrink-0 items-center justify-between border-b border-(--border) px-4 py-4">
+              <div className="flex min-w-0 items-center gap-2">
+                <FileText size={19} className="shrink-0 text-(--primary)" />
+                <h2 className="truncate text-sm font-semibold text-(--text)">
+                  Terms & Conditions
+                </h2>
+              </div>
+
+              <button
+                type="button"
+                onClick={() => setSidebarOpen(false)}
+                aria-label="Close sidebar"
+                className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl text-(--text-muted) transition-colors hover:bg-(--surface-hover) hover:text-(--text) focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-(--primary)"
+              >
+                <X size={20} />
+              </button>
+            </div>
+
+            <div className="min-h-0 flex-1 overflow-y-auto p-3">
+              <SidebarNavigation
+                onNavigate={handleSectionNavigation}
+              />
+            </div>
+          </aside>
+        </div>
+      )}
     </main>
+  );
+}
+
+function SidebarNavigation({
+  onNavigate,
+}: {
+  onNavigate: (
+    event: React.MouseEvent<HTMLAnchorElement>,
+    sectionId: string
+  ) => void;
+}) {
+  return (
+    <>
+      <p className="mb-3 px-3 pt-2 text-xs font-semibold uppercase tracking-wider text-(--text-muted)">
+        On this page
+      </p>
+
+      <nav aria-label="Terms sections" className="space-y-1">
+        {sections.map((section) => {
+          const Icon = section.icon;
+
+          return (
+            <a
+              key={section.id}
+              href={`#${section.id}`}
+              onClick={(event) =>
+                onNavigate(event, section.id)
+              }
+              className="group flex min-h-10 min-w-0 items-center justify-between gap-2 rounded-xl px-3 py-2.5 text-sm text-(--text-muted) transition-colors hover:bg-(--surface-hover) hover:text-(--text) focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-(--primary)"
+            >
+              <span className="flex min-w-0 items-center gap-2.5">
+                <Icon
+                  size={16}
+                  className="shrink-0 text-(--primary)"
+                />
+                <span className="min-w-0 break-words">
+                  {section.title}
+                </span>
+              </span>
+
+              <ChevronRight
+                size={15}
+                className="shrink-0 opacity-0 transition group-hover:translate-x-0.5 group-hover:opacity-100"
+              />
+            </a>
+          );
+        })}
+      </nav>
+    </>
   );
 }
 
@@ -444,19 +577,24 @@ function TermsSection({
   id: string;
   number: string;
   title: string;
-  children: React.ReactNode;
+  children: ReactNode;
 }) {
   return (
-    <section id={id} className="scroll-mt-24">
-      <div className="mb-5 flex items-start gap-4">
-        <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-(--primary)/10 text-xs font-bold text-(--primary)">
+    <section
+      id={id}
+      className="min-w-0 scroll-mt-28"
+    >
+      <div className="mb-4 flex min-w-0 items-start gap-3 sm:mb-5 sm:gap-4">
+        <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-xl bg-(--primary)/10 text-xs font-bold text-(--primary) sm:h-9 sm:w-9">
           {number}
         </span>
 
-        <h2 className="text-2xl font-bold tracking-tight">{title}</h2>
+        <h2 className="min-w-0 break-words pt-0.5 text-xl font-bold tracking-tight text-(--text) sm:text-2xl">
+          {title}
+        </h2>
       </div>
 
-      <div className="space-y-4 pl-0 text-[15px] leading-7 text-(--text-muted) sm:pl-13">
+      <div className="min-w-0 space-y-4 break-words text-sm leading-7 text-(--text-muted) sm:text-[15px]">
         {children}
       </div>
     </section>
@@ -471,14 +609,16 @@ function RoleCard({
   description: string;
 }) {
   return (
-    <div className="rounded-xl border border-(--border) bg-(--surface-hover) p-5 transition hover:-translate-y-0.5 hover:shadow-(--shadow)">
+    <div className="min-w-0 rounded-xl border border-(--border) bg-(--surface-hover) p-4 transition-colors hover:border-(--primary)/30 sm:p-5">
       <div className="mb-3 flex h-10 w-10 items-center justify-center rounded-xl bg-(--primary)/10 text-(--primary)">
         <UserRound size={18} />
       </div>
 
-      <h3 className="font-semibold text-(--text)">{title}</h3>
+      <h3 className="font-semibold text-(--text)">
+        {title}
+      </h3>
 
-      <p className="mt-2 text-sm leading-6 text-(--text-muted)">
+      <p className="mt-2 break-words text-sm leading-6 text-(--text-muted)">
         {description}
       </p>
     </div>

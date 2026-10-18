@@ -1,3 +1,4 @@
+
 "use client";
 
 import LoadingUI from "@/components/Loadinui";
@@ -32,6 +33,7 @@ export default function UIChallengesPage() {
   const MySwal = withReactContent(Swal);
   const [technologyFilter, setTechnologyFilter] = useState("All");
   const technologies = ["All", ...new Set(data.map((item) => item.technology))];
+
   const [meta, setMeta] = useState({
     counts: {
       available: 0,
@@ -40,6 +42,7 @@ export default function UIChallengesPage() {
       runningResubmission: 0,
     },
   });
+
   const filteredData = data.filter((item) => {
     const difficultyMatch =
       difficultyFilter === "All" || item.difficulty === difficultyFilter;
@@ -49,10 +52,12 @@ export default function UIChallengesPage() {
 
     return difficultyMatch && technologyMatch;
   });
+
   useEffect(() => {
     if (!user?.id) return;
 
     let api = "";
+
     switch (challengeStatus) {
       case "running":
         api = `/api/developer_uichallenge/uichallenge-data?userId=${user.id}&status=pending`;
@@ -80,46 +85,88 @@ export default function UIChallengesPage() {
         setLoading(false);
       });
   }, [challengeStatus, user?.id]);
+
   const handleStartChallenge = async (id: number) => {
     const result = await MySwal.fire({
       title: "Start Challenge",
       html: (
-        <div className="mt-2 text-left">
+        <div
+          className="mt-2 text-left"
+          style={{ color: "var(--text)" }}
+        >
           {/* Header */}
-          <div className="mb-5 flex items-center gap-3 rounded-xl border border-blue-100 bg-blue-50 p-4">
-            <div className="flex h-12 w-12 items-center justify-center rounded-full bg-[#5B6CFF] text-white">
+          <div
+            className="mb-5 flex flex-col sm:flex-row items-start sm:items-center gap-3 rounded-xl border p-4"
+            style={{
+              background: "var(--surface-hover)",
+              borderColor: "var(--border)",
+            }}
+          >
+            <div
+              className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full"
+              style={{
+                background: "var(--primary)",
+                color: "#FFFFFF",
+              }}
+            >
               <TiStopwatch size={28} />
             </div>
 
-            <div>
-              <h3 className="text-base font-semibold text-slate-900">
+            <div className="min-w-0">
+              <h3
+                className="text-base font-semibold"
+                style={{ color: "var(--text)" }}
+              >
                 Timer starts immediately
               </h3>
-              <p className="text-sm text-slate-500">
+              <p
+                className="text-sm"
+                style={{ color: "var(--text-muted)" }}
+              >
                 Please read the instructions carefully before continuing.
               </p>
             </div>
           </div>
 
           {/* Rules */}
-          <div className="rounded-xl border border-slate-200 bg-slate-50 p-4">
-            <h4 className="mb-3 font-semibold text-slate-800">
+          <div
+            className="rounded-xl border p-4"
+            style={{
+              background: "var(--surface)",
+              borderColor: "var(--border)",
+            }}
+          >
+            <h4
+              className="mb-3 font-semibold"
+              style={{ color: "var(--text)" }}
+            >
               Challenge Rules
             </h4>
 
-            <ul className="space-y-3 text-sm text-slate-600">
+            <ul
+              className="space-y-3 text-sm"
+              style={{ color: "var(--text-muted)" }}
+            >
               <li className="flex items-start gap-3">
-                <span className="mt-1 text-green-500">
+                <span
+                  className="mt-1 shrink-0"
+                  style={{ color: "var(--primary)" }}
+                >
                   <IoCheckmarkDone />
                 </span>
                 <span>
                   Your challenge timer will start immediately after clicking
-                  <strong> Start Challenge</strong>.
+                  <strong style={{ color: "var(--text)" }}>
+                    {" "}Start Challenge
+                  </strong>.
                 </span>
               </li>
 
               <li className="flex items-start gap-3">
-                <span className="mt-1 text-green-500">
+                <span
+                  className="mt-1 shrink-0"
+                  style={{ color: "var(--primary)" }}
+                >
                   <IoCheckmarkDone />
                 </span>
                 <span>
@@ -129,29 +176,50 @@ export default function UIChallengesPage() {
               </li>
 
               <li className="flex items-start gap-3">
-                <span className="mt-1 text-amber-500">
+                <span
+                  className="mt-1 shrink-0"
+                  style={{ color: "var(--primary)" }}
+                >
                   <CiWarning />
                 </span>
                 <span>
                   Once started, the timer{" "}
-                  <strong>cannot be paused or reset.</strong>
+                  <strong style={{ color: "var(--text)" }}>
+                    cannot be paused or reset.
+                  </strong>
                 </span>
               </li>
 
-              <li className="flex items-start gap-3 rounded-lg border border-red-200 bg-red-50 p-3">
-                <span className="mt-1 text-red-500">
+              <li
+                className="flex items-start gap-3 rounded-lg border p-3"
+                style={{
+                  background: "var(--surface-hover)",
+                  borderColor: "var(--border)",
+                }}
+              >
+                <span
+                  className="mt-1 shrink-0"
+                  style={{ color: "var(--text-muted)" }}
+                >
                   <RxCross2 />
                 </span>
-                <span className="font-medium text-red-700">
+                <span
+                  className="font-medium"
+                  style={{ color: "var(--text)" }}
+                >
                   If the time expires, your challenge will be submitted
-                  automatically and you will receive <strong>0 marks</strong>.
+                  automatically and you will receive{" "}
+                  <strong>0 marks</strong>.
                 </span>
               </li>
             </ul>
           </div>
 
           {/* Footer */}
-          <p className="mt-5 text-center text-sm font-medium text-[#5B6CFF]">
+          <p
+            className="mt-5 text-center text-sm font-medium"
+            style={{ color: "var(--primary)" }}
+          >
             Are you ready to prove your skills?
           </p>
         </div>
@@ -166,18 +234,21 @@ export default function UIChallengesPage() {
       confirmButtonText: " Start Challenge",
       cancelButtonText: "Cancel",
 
-      confirmButtonColor: "#5B6CFF",
-      cancelButtonColor: "#E2E8F0",
+      confirmButtonColor: "var(--primary)",
+      cancelButtonColor: "var(--border)",
 
-      width: 700,
+      width: "min(700px, 92vw)",
 
-      background: "#FFFFFF",
+      background: "var(--surface)",
+      color: "var(--text)",
 
       customClass: {
         popup: "rounded-3xl shadow-2xl",
-        title: "text-3xl font-bold text-slate-900 pt-4",
-        confirmButton: "rounded-xl px-6 py-3 font-semibold text-white",
-        cancelButton: "rounded-xl px-6 py-3 font-semibold text-slate-700",
+        title: "text-xl sm:text-3xl font-bold pt-4",
+        confirmButton:
+          "rounded-xl px-4 sm:px-6 py-3 font-semibold",
+        cancelButton:
+          "rounded-xl px-4 sm:px-6 py-3 font-semibold",
       },
     });
 
@@ -205,21 +276,22 @@ export default function UIChallengesPage() {
 
           html = `
       <div style="
-        background:#F8FAFC;
-        border:1px solid #E2E8F0;
+        background:var(--surface-hover);
+        border:1px solid var(--border);
         border-radius:14px;
         padding:18px;
         text-align:left;
+        color:var(--text);
       ">
-        <p style="margin:0;font-size:15px;color:#475569;">
+        <p style="margin:0;font-size:15px;color:var(--text-muted);">
           You currently have
-          <strong style="color:#5B6CFF;">
+          <strong style="color:var(--primary);">
             ${data.runningCount}
           </strong>
           active challenge${data.runningCount > 1 ? "s" : ""}.
         </p>
 
-        <p style="margin-top:12px;font-size:14px;color:#64748B;">
+        <p style="margin-top:12px;font-size:14px;color:var(--text-muted);">
           Please submit ${
             data.runningCount > 1 ? "them" : "it"
           } before starting a new challenge.
@@ -231,21 +303,22 @@ export default function UIChallengesPage() {
 
           html = `
       <div style="
-        background:#F8FAFC;
-        border:1px solid #E2E8F0;
+        background:var(--surface-hover);
+        border:1px solid var(--border);
         border-radius:14px;
         padding:18px;
         text-align:left;
+        color:var(--text);
       ">
-        <p style="margin:0;font-size:15px;color:#475569;">
+        <p style="margin:0;font-size:15px;color:var(--text-muted);">
           You currently have
-          <strong style="color:#5B6CFF;">
+          <strong style="color:var(--primary);">
             ${data.resubmitCount}
           </strong>
           active resubmission${data.resubmitCount > 1 ? "s" : ""}.
         </p>
 
-        <p style="margin-top:12px;font-size:14px;color:#64748B;">
+        <p style="margin-top:12px;font-size:14px;color:var(--text-muted);">
           Please submit ${
             data.resubmitCount > 1 ? "them" : "it"
           } before starting a new challenge.
@@ -262,11 +335,13 @@ export default function UIChallengesPage() {
           title,
           html,
           confirmButtonText: "Got it",
-          confirmButtonColor: "#5B6CFF",
-          width: 500,
+          confirmButtonColor: "var(--primary)",
+          width: "min(500px, 92vw)",
+          background: "var(--surface)",
+          color: "var(--text)",
           customClass: {
             popup: "rounded-3xl shadow-2xl",
-            title: "text-2xl font-bold text-slate-900",
+            title: "text-xl sm:text-2xl font-bold",
             confirmButton: "rounded-xl px-6 py-3 font-semibold",
           },
         });
@@ -293,49 +368,92 @@ export default function UIChallengesPage() {
         return "Start Now";
     }
   };
+
   const handleRunningChallenge = (id: number) => {
     router.push(`/pages/developer/ui-challenges-lists/${id}`);
   };
+
   const handleResubmitChallenge = async (id: number) => {
     const result = await MySwal.fire({
       title: "Start Resubmission",
       html: (
-        <div className="mt-2 text-left">
+        <div
+          className="mt-2 text-left"
+          style={{ color: "var(--text)" }}
+        >
           {/* Header */}
-          <div className="mb-5 flex items-center gap-3 rounded-xl border border-blue-100 bg-blue-50 p-4">
-            <div className="flex h-12 w-12 items-center justify-center rounded-full bg-[#5B6CFF] text-white">
+          <div
+            className="mb-5 flex flex-col sm:flex-row items-start sm:items-center gap-3 rounded-xl border p-4"
+            style={{
+              background: "var(--surface-hover)",
+              borderColor: "var(--border)",
+            }}
+          >
+            <div
+              className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full"
+              style={{
+                background: "var(--primary)",
+                color: "#FFFFFF",
+              }}
+            >
               <TiStopwatch size={28} />
             </div>
 
-            <div>
-              <h3 className="text-base font-semibold text-slate-900">
+            <div className="min-w-0">
+              <h3
+                className="text-base font-semibold"
+                style={{ color: "var(--text)" }}
+              >
                 Resubmission timer starts immediately
               </h3>
-              <p className="text-sm text-slate-500">
+              <p
+                className="text-sm"
+                style={{ color: "var(--text-muted)" }}
+              >
                 Your resubmission session will begin as soon as you continue.
               </p>
             </div>
           </div>
 
           {/* Rules */}
-          <div className="rounded-xl border border-slate-200 bg-slate-50 p-4">
-            <h4 className="mb-3 font-semibold text-slate-800">
+          <div
+            className="rounded-xl border p-4"
+            style={{
+              background: "var(--surface)",
+              borderColor: "var(--border)",
+            }}
+          >
+            <h4
+              className="mb-3 font-semibold"
+              style={{ color: "var(--text)" }}
+            >
               Resubmission Rules
             </h4>
 
-            <ul className="space-y-3 text-sm text-slate-600">
+            <ul
+              className="space-y-3 text-sm"
+              style={{ color: "var(--text-muted)" }}
+            >
               <li className="flex items-start gap-3">
-                <span className="mt-1 text-green-500">
+                <span
+                  className="mt-1 shrink-0"
+                  style={{ color: "var(--primary)" }}
+                >
                   <IoCheckmarkDone />
                 </span>
                 <span>
                   Your resubmission timer will start immediately after clicking
-                  <strong> Start Resubmission</strong>.
+                  <strong style={{ color: "var(--text)" }}>
+                    {" "}Start Resubmission
+                  </strong>.
                 </span>
               </li>
 
               <li className="flex items-start gap-3">
-                <span className="mt-1 text-green-500">
+                <span
+                  className="mt-1 shrink-0"
+                  style={{ color: "var(--primary)" }}
+                >
                   <IoCheckmarkDone />
                 </span>
                 <span>
@@ -345,20 +463,37 @@ export default function UIChallengesPage() {
               </li>
 
               <li className="flex items-start gap-3">
-                <span className="mt-1 text-amber-500">
+                <span
+                  className="mt-1 shrink-0"
+                  style={{ color: "var(--primary)" }}
+                >
                   <CiWarning />
                 </span>
                 <span>
                   The resubmission timer{" "}
-                  <strong>cannot be paused or reset.</strong>
+                  <strong style={{ color: "var(--text)" }}>
+                    cannot be paused or reset.
+                  </strong>
                 </span>
               </li>
 
-              <li className="flex items-start gap-3 rounded-lg border border-red-200 bg-red-50 p-3">
-                <span className="mt-1 text-red-500">
+              <li
+                className="flex items-start gap-3 rounded-lg border p-3"
+                style={{
+                  background: "var(--surface-hover)",
+                  borderColor: "var(--border)",
+                }}
+              >
+                <span
+                  className="mt-1 shrink-0"
+                  style={{ color: "var(--text-muted)" }}
+                >
                   <RxCross2 />
                 </span>
-                <span className="font-medium text-red-700">
+                <span
+                  className="font-medium"
+                  style={{ color: "var(--text)" }}
+                >
                   Your resubmission time will be recorded and used during the
                   evaluation process.
                 </span>
@@ -367,7 +502,10 @@ export default function UIChallengesPage() {
           </div>
 
           {/* Footer */}
-          <p className="mt-5 text-center text-sm font-medium text-[#5B6CFF]">
+          <p
+            className="mt-5 text-center text-sm font-medium"
+            style={{ color: "var(--primary)" }}
+          >
             Ready to improve your previous submission?
           </p>
         </div>
@@ -382,17 +520,20 @@ export default function UIChallengesPage() {
       confirmButtonText: "Start Resubmission",
       cancelButtonText: "Cancel",
 
-      confirmButtonColor: "#5B6CFF",
-      cancelButtonColor: "#E2E8F0",
+      confirmButtonColor: "var(--primary)",
+      cancelButtonColor: "var(--border)",
 
-      width: 700,
-      background: "#FFFFFF",
+      width: "min(700px, 92vw)",
+      background: "var(--surface)",
+      color: "var(--text)",
 
       customClass: {
         popup: "rounded-3xl shadow-2xl",
-        title: "text-3xl font-bold text-slate-900 pt-4",
-        confirmButton: "rounded-xl px-6 py-3 font-semibold text-white",
-        cancelButton: "rounded-xl px-6 py-3 font-semibold text-slate-700",
+        title: "text-xl sm:text-3xl font-bold pt-4",
+        confirmButton:
+          "rounded-xl px-4 sm:px-6 py-3 font-semibold",
+        cancelButton:
+          "rounded-xl px-4 sm:px-6 py-3 font-semibold",
       },
     });
 
@@ -415,7 +556,9 @@ export default function UIChallengesPage() {
           icon: "error",
           title: "Unable to Start Resubmission",
           text: data.message,
-          confirmButtonColor: "#5B6CFF",
+          confirmButtonColor: "var(--primary)",
+          background: "var(--surface)",
+          color: "var(--text)",
         });
 
         return;
@@ -424,6 +567,7 @@ export default function UIChallengesPage() {
       router.push(`/pages/developer/ui-challenges-lists/${id}`);
     }
   };
+
   const handleAction = (challenge: Challenge) => {
     switch (challengeStatus) {
       case "running":
@@ -465,6 +609,7 @@ export default function UIChallengesPage() {
       show: meta.counts.runningResubmission > 0,
     },
   ];
+
   const pageSubtitle = () => {
     switch (challengeStatus) {
       case "running":
@@ -472,41 +617,76 @@ export default function UIChallengesPage() {
 
       case "completed":
         return "Review your submitted challenges and start a resubmission if needed.";
+
       case "running-resubmission":
         return "Continue working on your active resubmissions and submit  as soon as possible .";
+
       default:
         return "Browse all available challenges and start your next assessment.";
     }
   };
+
   if (loading) {
-    return <LoadingUI/>;
+    return <LoadingUI />;
   }
 
   return (
-    <div className="max-w-7xl mx-auto p-8">
-      <div className="mb-6  items-center justify-between">
-        <h1 className="text-3xl font-bold">Project Challenges</h1>
-        <p className="mt-2 text-gray-500">{pageSubtitle()}</p>
-        <div className="mb-5">
-          <div className="flex flex-wrap mt-5 gap-3">
+    <div
+      className="mx-auto w-full max-w-7xl px-3 py-5 sm:px-5 sm:py-6 md:px-6 lg:px-8 lg:py-8"
+      style={{
+        background: "var(--bg)",
+        color: "var(--text)",
+      }}
+    >
+      {/* Page Header */}
+      <div className="mb-6">
+        <h1 className="text-2xl font-bold sm:text-3xl">
+          Project Challenges
+        </h1>
+
+        <p
+          className="mt-2 text-sm sm:text-base"
+          style={{ color: "var(--text-muted)" }}
+        >
+          {pageSubtitle()}
+        </p>
+
+        {/* Status Filters */}
+        <div className="mb-5 mt-5">
+          <div className="flex flex-wrap items-center gap-2 sm:gap-3">
             {statusButtons
               .filter((item) => item.show)
               .map((item) => (
                 <button
                   key={item.value}
                   onClick={() => setChallengeStatus(item.value)}
-                  className={`rounded-full border px-4 py-2 text-sm transition ${
+                  className="rounded-full border px-3 py-2 text-xs font-medium transition-colors sm:px-4 sm:text-sm"
+                  style={
                     challengeStatus === item.value
-                      ? "border-blue-600 bg-blue-600 text-white"
-                      : "border-gray-300 hover:border-blue-500"
-                  }`}
+                      ? {
+                          background: "var(--primary)",
+                          borderColor: "var(--primary)",
+                          color: "#FFFFFF",
+                        }
+                      : {
+                          background: "var(--surface)",
+                          borderColor: "var(--border)",
+                          color: "var(--text)",
+                        }
+                  }
                 >
                   {item.label}
                 </button>
               ))}
+
             <button
               onClick={() => setShowFilter(!showFilter)}
-              className="flex items-center gap-2 rounded-lg border px-4 py-2"
+              className="flex items-center justify-center gap-2 rounded-lg border px-3 py-2 text-sm transition-colors sm:px-4"
+              style={{
+                background: "var(--surface)",
+                borderColor: "var(--border)",
+                color: "var(--text)",
+              }}
             >
               <Filter size={18} />
               Filter
@@ -514,17 +694,37 @@ export default function UIChallengesPage() {
           </div>
         </div>
       </div>
+
+      {/* Filter Panel */}
       {showFilter && (
-        <div className="mb-6 rounded-2xl border bg-white p-6 shadow-sm">
-          <div className="mb-6 flex items-center justify-between border-b pb-4">
-            <div className="flex items-center gap-2">
-              <Filter className="h-5 w-5 text-blue-600" />
-              <h2 className="text-lg font-semibold">Filter Challenges</h2>
+        <div
+          className="mb-6 rounded-2xl border p-4 shadow-sm sm:p-6"
+          style={{
+            background: "var(--surface)",
+            borderColor: "var(--border)",
+            boxShadow: "var(--shadow)",
+          }}
+        >
+          <div
+            className="mb-6 flex items-center justify-between gap-3 border-b pb-4"
+            style={{ borderColor: "var(--border)" }}
+          >
+            <div className="flex min-w-0 items-center gap-2">
+              <Filter
+                className="h-5 w-5 shrink-0"
+                style={{ color: "var(--primary)" }}
+              />
+
+              <h2 className="text-base font-semibold sm:text-lg">
+                Filter Challenges
+              </h2>
             </div>
 
             <button
               onClick={() => setShowFilter(false)}
-              className="rounded-md p-2 hover:bg-gray-100"
+              className="shrink-0 rounded-md p-2 transition-colors"
+              style={{ color: "var(--text-muted)" }}
+              aria-label="Close filters"
             >
               <X className="h-5 w-5" />
             </button>
@@ -533,20 +733,32 @@ export default function UIChallengesPage() {
           <div className="space-y-6">
             {/* Difficulty */}
             <div>
-              <h3 className="mb-3 text-sm font-semibold text-gray-700">
+              <h3
+                className="mb-3 text-sm font-semibold"
+                style={{ color: "var(--text)" }}
+              >
                 Difficulty
               </h3>
 
-              <div className="flex flex-wrap gap-3">
+              <div className="flex flex-wrap gap-2 sm:gap-3">
                 {["All", "Easy", "Medium", "Hard"].map((level) => (
                   <button
                     key={level}
                     onClick={() => setDifficultyFilter(level)}
-                    className={`rounded-full border px-4 py-2 text-sm transition ${
+                    className="rounded-full border px-4 py-2 text-sm transition-colors"
+                    style={
                       difficultyFilter === level
-                        ? "border-blue-600 bg-blue-600 text-white"
-                        : "border-gray-300 hover:border-blue-500"
-                    }`}
+                        ? {
+                            background: "var(--primary)",
+                            borderColor: "var(--primary)",
+                            color: "#FFFFFF",
+                          }
+                        : {
+                            background: "var(--surface)",
+                            borderColor: "var(--border)",
+                            color: "var(--text)",
+                          }
+                    }
                   >
                     {level}
                   </button>
@@ -556,14 +768,23 @@ export default function UIChallengesPage() {
 
             {/* Technology */}
             <div>
-              <label className="mb-3 block text-sm font-semibold text-gray-700">
+              <label
+                className="mb-3 block text-sm font-semibold"
+                style={{ color: "var(--text)" }}
+              >
                 Technology
               </label>
 
               <select
                 value={technologyFilter}
                 onChange={(e) => setTechnologyFilter(e.target.value)}
-                className="w-full rounded-lg border px-3 py-2 outline-none focus:border-blue-500"
+                className="w-full min-w-0 rounded-lg border px-3 py-2.5 text-sm outline-none focus:ring-2"
+                style={{
+                  background: "var(--surface)",
+                  borderColor: "var(--border)",
+                  color: "var(--text)",
+                  outlineColor: "var(--primary)",
+                }}
               >
                 {technologies.map((tech) => (
                   <option key={tech}>{tech}</option>
@@ -572,24 +793,40 @@ export default function UIChallengesPage() {
             </div>
           </div>
 
-          <div className="mt-8 flex justify-between  border-t pt-4">
-            <p className="text-sm text-gray-500">
+          <div
+            className="mt-8 flex flex-col gap-4 border-t pt-4 sm:flex-row sm:items-center sm:justify-between"
+            style={{ borderColor: "var(--border)" }}
+          >
+            <p
+              className="text-sm"
+              style={{ color: "var(--text-muted)" }}
+            >
               Filters are applied instantly.
             </p>
-            <div className="flex gap-3">
+
+            <div className="flex flex-col-reverse gap-2 sm:flex-row sm:gap-3">
               <button
                 onClick={() => {
                   setDifficultyFilter("All");
                   setTechnologyFilter("All");
                 }}
-                className="rounded-lg border px-4 py-2 hover:bg-gray-50"
+                className="rounded-lg border px-4 py-2 text-sm font-medium transition-colors"
+                style={{
+                  background: "var(--surface)",
+                  borderColor: "var(--border)",
+                  color: "var(--text)",
+                }}
               >
                 Reset
               </button>
 
               <button
                 onClick={() => setShowFilter(false)}
-                className="rounded-lg bg-blue-600 px-5 py-2 text-white hover:bg-blue-700"
+                className="rounded-lg px-5 py-2 text-sm font-medium transition-colors"
+                style={{
+                  background: "var(--primary)",
+                  color: "#FFFFFF",
+                }}
               >
                 Done
               </button>
@@ -597,80 +834,126 @@ export default function UIChallengesPage() {
           </div>
         </div>
       )}
+
+      {/* Challenges Table */}
       <div
-        className="rounded-xl overflow-hidden border"
+        className="w-full overflow-hidden rounded-xl border"
         style={{
           background: "var(--surface)",
           borderColor: "var(--border)",
           boxShadow: "var(--shadow)",
         }}
       >
-        <table className="w-full">
-          <thead
-            style={{
-              background: "var(--surface-hover)",
-            }}
-          >
-            <tr>
-              <th className="text-left p-4">Title</th>
-              <th className="text-left p-4">Technology</th>
-              <th className="text-left p-4">Difficulty</th>
-              <th className="text-center p-4">Action</th>
-            </tr>
-          </thead>
+        <div className="w-full overflow-x-auto">
+          <table className="w-full min-w-[600px] border-collapse text-left">
+            <thead
+              style={{
+                background: "var(--surface-hover)",
+                color: "var(--text)",
+              }}
+            >
+              <tr>
+                <th className="p-3 text-sm font-semibold sm:p-4 sm:text-base">
+                  Title
+                </th>
 
-          <tbody>
-            {filteredData.map((challenge) => (
-              <tr
-                key={challenge.id}
-                className="border-t"
-                style={{
-                  borderColor: "var(--border)",
-                }}
-              >
-                <td className="p-4">{challenge.title}</td>
+                <th className="p-3 text-sm font-semibold sm:p-4 sm:text-base">
+                  Technology
+                </th>
 
-                <td className="p-4">{challenge.technology}</td>
+                <th className="p-3 text-sm font-semibold sm:p-4 sm:text-base">
+                  Difficulty
+                </th>
 
-                <td className="p-4">{challenge.difficulty}</td>
+                <th className="p-3 text-center text-sm font-semibold sm:p-4 sm:text-base">
+                  Action
+                </th>
+              </tr>
+            </thead>
 
-                <td className="p-4">
-                  <div className="flex justify-center gap-3">
-                    {challengeStatus === "completed" ? (
-                      challenge.submit_attempts < challenge.maxAttempts ? (
+            <tbody>
+              {filteredData.map((challenge) => (
+                <tr
+                  key={challenge.id}
+                  className="border-t transition-colors"
+                  style={{
+                    borderColor: "var(--border)",
+                    color: "var(--text)",
+                  }}
+                >
+                  <td className="max-w-[260px] break-words p-3 text-sm sm:p-4 sm:text-base">
+                    {challenge.title}
+                  </td>
+
+                  <td className="p-3 text-sm sm:p-4 sm:text-base">
+                    {challenge.technology}
+                  </td>
+
+                  <td className="p-3 text-sm sm:p-4 sm:text-base">
+                    {challenge.difficulty}
+                  </td>
+
+                  <td className="p-3 sm:p-4">
+                    <div className="flex justify-center gap-3">
+                      {challengeStatus === "completed" ? (
+                        challenge.submit_attempts < challenge.maxAttempts ? (
+                          <button
+                            onClick={() =>
+                              handleResubmitChallenge(challenge.id)
+                            }
+                            className="whitespace-nowrap rounded-lg px-3 py-2 text-xs font-medium transition-colors sm:px-4 sm:text-sm"
+                            style={{
+                              background: "var(--primary)",
+                              color: "#FFFFFF",
+                            }}
+                          >
+                            Resubmit {challenge.submit_attempts} /{" "}
+                            {challenge.maxAttempts}
+                          </button>
+                        ) : (
+                          <span
+                            className="whitespace-nowrap rounded-lg border px-3 py-2 text-xs font-medium sm:px-4 sm:text-sm"
+                            style={{
+                              background: "var(--surface-hover)",
+                              borderColor: "var(--border)",
+                              color: "var(--text-muted)",
+                            }}
+                          >
+                            Max Attempts Reached {challenge.submit_attempts} /{" "}
+                            {challenge.maxAttempts}
+                          </span>
+                        )
+                      ) : (
                         <button
-                          onClick={() => handleResubmitChallenge(challenge.id)}
-                          className="px-4 py-2 rounded-lg text-white"
+                          onClick={() => handleAction(challenge)}
+                          className="whitespace-nowrap rounded-lg px-3 py-2 text-xs font-medium transition-colors sm:px-4 sm:text-sm"
                           style={{
                             background: "var(--primary)",
+                            color: "#FFFFFF",
                           }}
                         >
-                          Resubmit {challenge.submit_attempts} /{" "}
-                          {challenge.maxAttempts}
+                          {getButtonLabel()}
                         </button>
-                      ) : (
-                        <span className="px-4 py-2 rounded-lg bg-red-100 text-red-600 font-medium">
-                          Max Attempts Reached {challenge.submit_attempts} /{" "}
-                          {challenge.maxAttempts}
-                        </span>
-                      )
-                    ) : (
-                      <button
-                        onClick={() => handleAction(challenge)}
-                        className="px-4 py-2 rounded-lg text-white"
-                        style={{
-                          background: "var(--primary)",
-                        }}
-                      >
-                        {getButtonLabel()}
-                      </button>
-                    )}
-                  </div>
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
+                      )}
+                    </div>
+                  </td>
+                </tr>
+              ))}
+
+              {filteredData.length === 0 && (
+                <tr>
+                  <td
+                    colSpan={4}
+                    className="p-8 text-center text-sm sm:p-12 sm:text-base"
+                    style={{ color: "var(--text-muted)" }}
+                  >
+                    No challenges found.
+                  </td>
+                </tr>
+              )}
+            </tbody>
+          </table>
+        </div>
       </div>
     </div>
   );

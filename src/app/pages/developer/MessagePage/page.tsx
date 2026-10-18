@@ -1,3 +1,4 @@
+
 "use client";
 
 import { useCallback, useEffect, useRef, useState } from "react";
@@ -38,68 +39,18 @@ type SendMessageData = {
 };
 
 const emojis = [
-  "😀",
-  "😃",
-  "😄",
-  "😁",
-  "😆",
-  "😅",
-  "😂",
-  "🤣",
-  "😊",
-  "😇",
-  "🙂",
-  "🙃",
-  "😉",
-  "😌",
-  "😍",
-  "🥰",
-  "😘",
-  "😎",
-  "🤩",
-  "🤔",
-  "😐",
-  "😑",
-  "😶",
-  "🙄",
-  "😏",
-  "😢",
-  "😭",
-  "😡",
-  "🤬",
-  "😱",
-  "🤯",
-  "😴",
-  "🤝",
-  "👍",
-  "👎",
-  "👏",
-  "🙌",
-  "🙏",
-  "💪",
-  "❤️",
-  "💙",
-  "💚",
-  "💛",
-  "🧡",
-  "💜",
-  "🖤",
-  "🤍",
-  "🔥",
-  "✨",
-  "🎉",
-  "🚀",
-  "💯",
-  "⭐",
-  "✅",
-  "❌",
+  "😀", "😃", "😄", "😁", "😆", "😅", "😂", "🤣", "😊", "😇",
+  "🙂", "🙃", "😉", "😌", "😍", "🥰", "😘", "😎", "🤩", "🤔",
+  "😐", "😑", "😶", "🙄", "😏", "😢", "😭", "😡", "🤬", "😱",
+  "🤯", "😴", "🤝", "👍", "👎", "👏", "🙌", "🙏", "💪", "❤️",
+  "💙", "💚", "💛", "🧡", "💜", "🖤", "🤍", "🔥", "✨", "🎉",
+  "🚀", "💯", "⭐", "✅", "❌",
 ];
 
 export default function MessagePage() {
   const searchParams = useSearchParams();
 
   const recruiterId = searchParams.get("recruiterId");
-
 
   const [profile, setProfile] = useState<DeveloperProfileResponse | null>(null);
 
@@ -170,12 +121,10 @@ export default function MessagePage() {
       const result = await response.json();
 
       if (!response.ok) {
-        toast.error( String(result));
+        toast.error(String(result));
 
         return;
       }
-
-    
     } catch (error) {
       toast.error(String(error));
     }
@@ -199,8 +148,6 @@ export default function MessagePage() {
         );
 
         const data = await res.json();
-
-        
 
         if (!res.ok) {
           toast.error(data);
@@ -399,8 +346,6 @@ export default function MessagePage() {
 
         const result = await response.json();
 
-    
-
         if (!response.ok) {
           toast.error(result);
           return;
@@ -465,6 +410,7 @@ export default function MessagePage() {
 
     markMessagesAsRead();
   }, [user?.id, recruiterId, markMessagesAsRead]);
+
   /*
   |--------------------------------------------------------------------------
   | when messages state will change,
@@ -489,112 +435,108 @@ export default function MessagePage() {
     setMessage((prev) => prev + emoji);
   };
 
-/*
-|--------------------------------------------------------------------------
-| Start Editing Message
-|--------------------------------------------------------------------------
-*/
+  /*
+  |--------------------------------------------------------------------------
+  | Start Editing Message
+  |--------------------------------------------------------------------------
+  */
 
-const handleStartEdit = (item: Message) => {
-  setEditingMessageId(item.id);
-  setEditingText(item.text);
-  setShowEmojiPicker(false);
-};
+  const handleStartEdit = (item: Message) => {
+    setEditingMessageId(item.id);
+    setEditingText(item.text);
+    setShowEmojiPicker(false);
+  };
 
-/*
-|--------------------------------------------------------------------------
-| Cancel Editing
-|--------------------------------------------------------------------------
-*/
+  /*
+  |--------------------------------------------------------------------------
+  | Cancel Editing
+  |--------------------------------------------------------------------------
+  */
 
-const handleCancelEdit = () => {
-  setEditingMessageId(null);
-  setEditingText("");
-};
+  const handleCancelEdit = () => {
+    setEditingMessageId(null);
+    setEditingText("");
+  };
 
-/*
-|--------------------------------------------------------------------------
-| Save Edited Message
-|--------------------------------------------------------------------------
-*/
+  /*
+  |--------------------------------------------------------------------------
+  | Save Edited Message
+  |--------------------------------------------------------------------------
+  */
 
-const handleSaveEdit = async () => {
-  const trimmedText = editingText.trim();
+  const handleSaveEdit = async () => {
+    const trimmedText = editingText.trim();
 
-  if (!trimmedText) return;
+    if (!trimmedText) return;
 
-  if (editingMessageId === null) return;
+    if (editingMessageId === null) return;
 
-  if (!user?.id) {
-    toast.error("User information not available");
-    return;
-  }
-
-  try {
-    const response = await fetch("/api/conversations/edit", {
-      method: "PATCH",
-
-      headers: {
-        "Content-Type": "application/json",
-      },
-
-      body: JSON.stringify({
-        messageId: editingMessageId,
-        userId: user.id,
-        message: trimmedText,
-      }),
-    });
-
-    const result = await response.json();
-
-   
-
-    if (!response.ok) {
-      toast.error(result);
-
+    if (!user?.id) {
+      toast.error("User information not available");
       return;
     }
 
-    /*
-    ==================================================
-    Update Frontend State
-    ==================================================
-    */
+    try {
+      const response = await fetch("/api/conversations/edit", {
+        method: "PATCH",
 
-    const updatedMessage = result.data;
+        headers: {
+          "Content-Type": "application/json",
+        },
 
-    setMessages((prev) =>
-      prev.map((item) =>
-        item.id === editingMessageId
-          ? {
-              ...item,
+        body: JSON.stringify({
+          messageId: editingMessageId,
+          userId: user.id,
+          message: trimmedText,
+        }),
+      });
 
-              text: updatedMessage.message,
+      const result = await response.json();
 
-              createdAt: updatedMessage.createdAt,
+      if (!response.ok) {
+        toast.error(result);
 
-              updatedAt: updatedMessage.updatedAt,
+        return;
+      }
 
-              edited: updatedMessage.edited,
-            }
-          : item,
-      ),
-    );
+      /*
+      ==================================================
+      Update Frontend State
+      ==================================================
+      */
 
-    /*
-    ==================================================
-    Exit Edit Mode
-    ==================================================
-    */
+      const updatedMessage = result.data;
 
-    setEditingMessageId(null);
-    setEditingText("");
-  } catch (error) {
-    toast.error(String(error));
-  }
-};
+      setMessages((prev) =>
+        prev.map((item) =>
+          item.id === editingMessageId
+            ? {
+                ...item,
 
+                text: updatedMessage.message,
 
+                createdAt: updatedMessage.createdAt,
+
+                updatedAt: updatedMessage.updatedAt,
+
+                edited: updatedMessage.edited,
+              }
+            : item,
+        ),
+      );
+
+      /*
+      ==================================================
+      Exit Edit Mode
+      ==================================================
+      */
+
+      setEditingMessageId(null);
+      setEditingText("");
+    } catch (error) {
+      toast.error(String(error));
+    }
+  };
 
   /*
   |--------------------------------------------------------------------------
@@ -629,8 +571,6 @@ const handleSaveEdit = async () => {
       createdAt: new Date().toISOString(),
     };
 
-  
-
     try {
       const response = await fetch("/api/conversations", {
         method: "POST",
@@ -651,8 +591,6 @@ const handleSaveEdit = async () => {
       });
 
       const result = await response.json();
-
-    
 
       if (!response.ok) {
         toast.error(result);
@@ -712,56 +650,53 @@ const handleSaveEdit = async () => {
   */
 
   if (loading) {
-    return (
-     <LoadingUI/>
-    );
+    return <LoadingUI />;
   }
 
   return (
-    <main className="min-h-screen w-full text-(--text)">
-      <div className="mx-auto flex h-screen flex-col px-4 py-4 sm:px-6 lg:px-8">
+    <main className="h-[100dvh] min-h-0 w-full overflow-hidden bg-(--bg) text-(--text)">
+      <div className="mx-auto flex h-full min-h-0 w-full flex-col px-2 py-2 sm:px-4 sm:py-4 lg:px-8">
         {/* =========================================================
             Header
         ========================================================== */}
 
-        <div className="flex items-center justify-between rounded-t-2xl border border-(--border) bg-(--surface) px-4 py-3 shadow-sm sm:px-5">
-          <div className="flex min-w-0 items-center gap-3">
+        <div className="flex shrink-0 items-center justify-between gap-2 rounded-t-2xl border border-(--border) bg-(--surface) px-3 py-3 shadow-sm sm:gap-3 sm:px-5">
+          <div className="flex min-w-0 flex-1 items-center gap-2 sm:gap-3">
             {/* Recruiter Avatar */}
 
             <div className="relative shrink-0">
-
-              <Link 
-              href={`/pages/developer/recuter-profile/${recruiterId}`}
+              <Link
+                href={`/pages/developer/recuter-profile/${recruiterId}`}
+                aria-label="View recruiter profile"
               >
-<div className="flex h-11 w-11 shrink-0 items-center justify-center overflow-hidden rounded-full bg-(--primary) text-sm font-semibold text-white">
-                {recruiter?.profilePhoto ? (
-                  <Image
-                    src={recruiter.profilePhoto}
-                    alt={recruiter.fullName || "Recruiter"}
-                    width={44}
-                    height={44}
-                    className="h-full w-full object-cover"
-                  />
-                ) : (
-                  <span>
-                    {recruiter?.fullName
-                      ? getInitials(recruiter.fullName)
-                      : "??"}
-                  </span>
-                )}
-              </div>
+                <div className="flex h-10 w-10 shrink-0 items-center justify-center overflow-hidden rounded-full bg-(--primary) text-sm font-semibold text-white sm:h-11 sm:w-11">
+                  {recruiter?.profilePhoto ? (
+                    <Image
+                      src={recruiter.profilePhoto}
+                      alt={recruiter.fullName || "Recruiter"}
+                      width={44}
+                      height={44}
+                      className="h-full w-full object-cover"
+                    />
+                  ) : (
+                    <span>
+                      {recruiter?.fullName
+                        ? getInitials(recruiter.fullName)
+                        : "??"}
+                    </span>
+                  )}
+                </div>
               </Link>
-              
             </div>
 
             {/* Recruiter Info */}
 
-            <div className="min-w-0">
-              <h1 className="truncate text-sm font-semibold sm:text-base">
+            <div className="min-w-0 flex-1">
+              <h1 className="break-words text-xs font-semibold leading-5 sm:text-base">
                 Recruiter name: {recruiter?.fullName}
               </h1>
 
-              <p className="mt-0.5 truncate text-xs text-(--text-muted)">
+              <p className="mt-0.5 break-words text-[11px] leading-4 text-(--text-muted) sm:text-xs">
                 Company: {recruiter?.companyName}
               </p>
             </div>
@@ -774,19 +709,11 @@ const handleSaveEdit = async () => {
             onClick={() => fetchMessages(true)}
             disabled={refreshing || messagesLoading}
             className="
-              flex
-              h-9
-              w-9
-              shrink-0
-              items-center
-              justify-center
-              rounded-lg
-              text-(--text-muted)
-              transition
-              hover:bg-(--surface-hover)
-              hover:text-(--text)
-              disabled:cursor-not-allowed
-              disabled:opacity-50
+              flex h-9 w-9 shrink-0 items-center justify-center
+              rounded-lg text-(--text-muted) transition
+              hover:bg-(--surface-hover) hover:text-(--text)
+              disabled:cursor-not-allowed disabled:opacity-50
+              sm:h-10 sm:w-10
             "
             aria-label="Refresh messages"
             title="Refresh messages"
@@ -799,11 +726,11 @@ const handleSaveEdit = async () => {
             Message Area
         ========================================================== */}
 
-        <section className="flex min-h-0 flex-1 flex-col border-x border-(--border) bg-(--bg-secondary)">
+        <section className="flex min-h-0 flex-1 flex-col overflow-hidden border-x border-(--border) bg-(--bg-secondary)">
           {/* Conversation Info */}
 
-          <div className="border-b border-(--border) px-5 py-3">
-            <p className="text-center text-xs text-(--text-muted)">
+          <div className="shrink-0 border-b border-(--border) px-2 py-3 sm:px-5">
+            <p className="text-center text-[11px] leading-5 text-(--text-muted) sm:text-xs">
               This conversation is between you and{" "}
               {recruiter?.fullName || "the recruiter"}.
             </p>
@@ -815,12 +742,8 @@ const handleSaveEdit = async () => {
 
           <div
             className="
-              flex-1
-              space-y-5
-              overflow-y-auto
-              px-4
-              py-6
-              sm:px-6
+              min-h-0 flex-1 space-y-4 overflow-x-hidden overflow-y-auto
+              px-2 py-4 sm:space-y-5 sm:px-4 sm:py-6 lg:px-6
             "
           >
             {/* Message Loading */}
@@ -838,221 +761,186 @@ const handleSaveEdit = async () => {
             ) : (
               <>
                 {messages.map((item) => {
-  const isMine = item.sender === "me";
-  const isEditing = editingMessageId === item.id;
+                  const isMine = item.sender === "me";
+                  const isEditing = editingMessageId === item.id;
 
-  return (
-    <div
-      key={item.id}
-      className={`flex ${
-        isMine ? "justify-end" : "justify-start"
-      }`}
-    >
-      <div
-        className={`flex max-w-[85%] flex-col sm:max-w-[70%] ${
-          isMine ? "items-end" : "items-start"
-        }`}
-      >
-        {/*
-        |--------------------------------------------------------------------------
-        | Editing Mode
-        |--------------------------------------------------------------------------
-        */}
+                  return (
+                    <div
+                      key={item.id}
+                      className={`flex min-w-0 ${
+                        isMine ? "justify-end" : "justify-start"
+                      }`}
+                    >
+                      <div
+                        className={`flex min-w-0 max-w-[92%] flex-col sm:max-w-[80%] lg:max-w-[70%] ${
+                          isMine ? "items-end" : "items-start"
+                        }`}
+                      >
+                        {/*
+                        |--------------------------------------------------------------------------
+                        | Editing Mode
+                        |--------------------------------------------------------------------------
+                        */}
 
-        {isEditing ? (
-          <div className="w-full min-w-70 max-w-125 rounded-2xl border border-(--primary) bg-(--surface) p-3 shadow-sm">
-            <textarea
-              autoFocus
-              value={editingText}
-              onChange={(e) => setEditingText(e.target.value)}
-              onKeyDown={(e) => {
-                if (e.key === "Escape") {
-                  e.preventDefault();
-                  handleCancelEdit();
-                }
+                        {isEditing ? (
+                          <div className="w-full min-w-0 max-w-full rounded-2xl border border-(--primary) bg-(--surface) p-2 shadow-sm sm:p-3">
+                            <textarea
+                              autoFocus
+                              value={editingText}
+                              onChange={(e) => setEditingText(e.target.value)}
+                              onKeyDown={(e) => {
+                                if (e.key === "Escape") {
+                                  e.preventDefault();
+                                  handleCancelEdit();
+                                }
 
-                if (e.key === "Enter" && !e.shiftKey) {
-                  e.preventDefault();
-                  handleSaveEdit();
-                }
-              }}
-              rows={3}
-              className="
-                w-full
-                resize-none
-                rounded-lg
-                border-none
-                bg-transparent
-                px-1
-                py-1
-                text-sm
-                leading-6
-                text-(--text)
-                outline-none
-                placeholder:text-(--text-muted)
-              "
-              placeholder="Edit your message..."
-            />
+                                if (e.key === "Enter" && !e.shiftKey) {
+                                  e.preventDefault();
+                                  handleSaveEdit();
+                                }
+                              }}
+                              rows={3}
+                              className="
+                                w-full resize-none rounded-lg border-none
+                                bg-transparent px-1 py-1 text-sm leading-6
+                                text-(--text) outline-none
+                                placeholder:text-(--text-muted)
+                              "
+                              placeholder="Edit your message..."
+                            />
 
-            <div className="mt-2 flex items-center justify-end gap-2 border-t border-(--border) pt-2">
-              {/*
-              Cancel
-              */}
+                            <div className="mt-2 flex flex-wrap items-center justify-end gap-2 border-t border-(--border) pt-2">
+                              {/*
+                              Cancel
+                              */}
 
-              <button
-                type="button"
-                onClick={handleCancelEdit}
-                className="
-                  inline-flex
-                  h-8
-                  items-center
-                  gap-1.5
-                  rounded-lg
-                  px-3
-                  text-xs
-                  font-medium
-                  text-(--text-muted)
-                  transition
-                  hover:bg-(--surface-hover)
-                  hover:text-(--text)
-                "
-              >
-                <X size={14} />
-                Cancel
-              </button>
+                              <button
+                                type="button"
+                                onClick={handleCancelEdit}
+                                className="
+                                  inline-flex h-8 items-center gap-1.5
+                                  rounded-lg px-2 text-xs font-medium
+                                  text-(--text-muted) transition
+                                  hover:bg-(--surface-hover)
+                                  hover:text-(--text) sm:px-3
+                                "
+                              >
+                                <X size={14} />
+                                Cancel
+                              </button>
 
-              {/*
-              Save
-              */}
+                              {/*
+                              Save
+                              */}
 
-              <button
-                type="button"
-                onClick={handleSaveEdit}
-                disabled={!editingText.trim()}
-                className="
-                  inline-flex
-                  h-8
-                  items-center
-                  gap-1.5
-                  rounded-lg
-                  bg-(--primary)
-                  px-3
-                  text-xs
-                  font-medium
-                  text-white
-                  transition
-                  hover:bg-(--primary-hover)
-                  disabled:cursor-not-allowed
-                  disabled:opacity-40
-                "
-              >
-                <Check size={14} />
-                Save
-              </button>
-            </div>
-          </div>
-        ) : (
-          <>
-            {/*
-            |--------------------------------------------------------------------------
-            | Normal Message Row
-            |--------------------------------------------------------------------------
-            */}
+                              <button
+                                type="button"
+                                onClick={handleSaveEdit}
+                                disabled={!editingText.trim()}
+                                className="
+                                  inline-flex h-8 items-center gap-1.5
+                                  rounded-lg bg-(--primary) px-2
+                                  text-xs font-medium text-white transition
+                                  hover:bg-(--primary-hover)
+                                  disabled:cursor-not-allowed
+                                  disabled:opacity-40 sm:px-3
+                                "
+                              >
+                                <Check size={14} />
+                                Save
+                              </button>
+                            </div>
+                          </div>
+                        ) : (
+                          <>
+                            {/*
+                            |--------------------------------------------------------------------------
+                            | Normal Message Row
+                            |--------------------------------------------------------------------------
+                            */}
 
-            <div className="flex items-end gap-1.5">
-              {/*
-              Message Bubble
-              */}
+                            <div className="flex min-w-0 max-w-full items-end gap-1 sm:gap-1.5">
+                              {/*
+                              Message Bubble
+                              */}
 
-              <div
-                className={`rounded-2xl px-4 py-3 text-sm leading-6 ${
-                  isMine
-                    ? "rounded-br-md bg-(--primary) text-white"
-                    : "rounded-bl-md border border-(--border) bg-(--surface) text-(--text)"
-                }`}
-              >
-                {item.text}
-              </div>
+                              <div
+                                className={`min-w-0 max-w-full break-words [overflow-wrap:anywhere] rounded-2xl px-3 py-2 text-sm leading-6 sm:px-4 sm:py-3 ${
+                                  isMine
+                                    ? "rounded-br-md bg-(--primary) text-white"
+                                    : "rounded-bl-md border border-(--border) bg-(--surface) text-(--text)"
+                                }`}
+                              >
+                                {item.text}
+                              </div>
 
-              {/*
-              |--------------------------------------------------------------------------
-              | Edit Button
-              |--------------------------------------------------------------------------
-              |
-              | just for own message .
-              |
-              */}
+                              {/*
+                              |--------------------------------------------------------------------------
+                              | Edit Button
+                              |--------------------------------------------------------------------------
+                              |
+                              | just for own message .
+                              |
+                              */}
 
-              {isMine && (
-                <button
-                  type="button"
-                  onClick={() => handleStartEdit(item)}
-                  className="
-                    mb-1
-                    flex
-                    h-7
-                    w-7
-                    shrink-0
-                    items-center
-                    justify-center
-                    rounded-md
-                    text-(--text-muted)
-                    transition
-                    hover:bg-(--surface-hover)
-                    hover:text-(--primary)
-                  "
-                  aria-label="Edit message"
-                  title="Edit message"
-                >
-                  <Edit3 size={14} />
-                </button>
-              )}
-            </div>
+                              {isMine && (
+                                <button
+                                  type="button"
+                                  onClick={() => handleStartEdit(item)}
+                                  className="
+                                    mb-1 flex h-7 w-7 shrink-0
+                                    items-center justify-center rounded-md
+                                    text-(--text-muted) transition
+                                    hover:bg-(--surface-hover)
+                                    hover:text-(--primary)
+                                  "
+                                  aria-label="Edit message"
+                                  title="Edit message"
+                                >
+                                  <Edit3 size={14} />
+                                </button>
+                              )}
+                            </div>
 
-            {/*
-            |--------------------------------------------------------------------------
-            | Message Time
-            |--------------------------------------------------------------------------
-            */}
-<div
-  className={`mt-1.5 flex items-center gap-2 px-1 text-[11px] ${
-    isMine ? "justify-end" : "justify-start"
-  }`}
->
-  {/* Message Time */}
+                            {/*
+                            |--------------------------------------------------------------------------
+                            | Message Time
+                            |--------------------------------------------------------------------------
+                            */}
 
-  <span className="text-(--text-muted)">
-    {getRelativeTime(item.createdAt)}
-  </span>
+                            <div
+                              className={`mt-1.5 flex flex-wrap items-center gap-2 px-1 text-[11px] ${
+                                isMine ? "justify-end" : "justify-start"
+                              }`}
+                            >
+                              {/* Message Time */}
 
-  {/* Edited Badge */}
+                              <span className="text-(--text-muted)">
+                                {getRelativeTime(item.createdAt)}
+                              </span>
 
-  {item.edited === 1 && (
-    <span
-      className="
-        inline-flex
-        items-center
-        rounded-full
-        border
-        border-(--border)
-        bg-(--surface)
-        px-1.5
-        py-0.5
-        text-[10px]
-        font-medium
-        text-(--text-muted)
-      "
-    >
-      Edited
-    </span>
-  )}
-</div>
-          </>
-        )}
-      </div>
-    </div>
-  );
-})}
+                              {/* Edited Badge */}
+
+                              {item.edited === 1 && (
+                                <span
+                                  className="
+                                    inline-flex items-center rounded-full
+                                    border border-(--border)
+                                    bg-(--surface) px-1.5 py-0.5
+                                    text-[10px] font-medium
+                                    text-(--text-muted)
+                                  "
+                                >
+                                  Edited
+                                </span>
+                              )}
+                            </div>
+                          </>
+                        )}
+                      </div>
+                    </div>
+                  );
+                })}
 
                 {/* 
                   
@@ -1070,7 +958,7 @@ const handleSaveEdit = async () => {
             Message Input
         ========================================================== */}
 
-        <div className="rounded-b-2xl border border-(--border) bg-(--surface) p-3 shadow-sm sm:p-4">
+        <div className="relative shrink-0 rounded-b-2xl border border-(--border) bg-(--surface) p-2 shadow-sm sm:p-4">
           <div className="relative">
             {/* =====================================================
                 Emoji Popup
@@ -1080,17 +968,11 @@ const handleSaveEdit = async () => {
               <div
                 ref={emojiPickerRef}
                 className="
-                  absolute
-                  bottom-14
-                  right-12
-                  z-50
-                  w-72
-                  rounded-2xl
-                  border
-                  border-(--border)
-                  bg-(--surface)
-                  p-3
-                  shadow-(--shadow)
+                  absolute bottom-14 left-0 right-0 z-50
+                  w-full max-w-72 rounded-2xl
+                  border border-(--border) bg-(--surface)
+                  p-3 shadow-(--shadow)
+                  sm:left-auto sm:right-12
                 "
               >
                 <div className="mb-2 flex items-center justify-between border-b border-(--border) pb-2">
@@ -1112,16 +994,9 @@ const handleSaveEdit = async () => {
                       type="button"
                       onClick={() => handleEmojiSelect(emoji)}
                       className="
-                        flex
-                        h-8
-                        w-8
-                        items-center
-                        justify-center
-                        rounded-lg
-                        text-xl
-                        transition
-                        hover:scale-110
-                        hover:bg-(--surface-hover)
+                        flex h-8 w-full min-w-0 items-center justify-center
+                        rounded-lg text-xl transition
+                        hover:scale-110 hover:bg-(--surface-hover)
                       "
                       aria-label={`Select ${emoji}`}
                     >
@@ -1136,24 +1011,16 @@ const handleSaveEdit = async () => {
                 Input
             ====================================================== */}
 
-            <div className="flex items-end gap-2 rounded-xl border border-(--border) bg-(--bg) p-2 transition focus-within:border-(--primary)">
+            <div className="flex min-w-0 items-end gap-1 rounded-xl border border-(--border) bg-(--bg) p-1.5 transition focus-within:border-(--primary) sm:gap-2 sm:p-2">
               {/* Attachment */}
 
               <button
                 type="button"
                 className="
-                  mb-1
-                  flex
-                  h-9
-                  w-9
-                  shrink-0
-                  items-center
-                  justify-center
-                  rounded-lg
-                  text-(--text-muted)
-                  transition
-                  hover:bg-(--surface-hover)
-                  hover:text-(--text)
+                  mb-1 flex h-8 w-8 shrink-0 items-center justify-center
+                  rounded-lg text-(--text-muted) transition
+                  hover:bg-(--surface-hover) hover:text-(--text)
+                  sm:h-9 sm:w-9
                 "
                 aria-label="Attach file"
               >
@@ -1169,18 +1036,10 @@ const handleSaveEdit = async () => {
                 placeholder="Write a message..."
                 rows={1}
                 className="
-                  max-h-32
-                  min-h-9
-                  flex-1
-                  resize-none
-                  border-none
-                  bg-transparent
-                  px-2
-                  py-2
-                  text-sm
-                  text-(--text)
-                  outline-none
-                  placeholder:text-(--text-muted)
+                  max-h-32 min-h-9 min-w-0 flex-1 resize-none
+                  border-none bg-transparent px-1 py-2 text-sm
+                  text-(--text) outline-none
+                  placeholder:text-(--text-muted) sm:px-2
                 "
               />
 
@@ -1190,15 +1049,8 @@ const handleSaveEdit = async () => {
                 type="button"
                 onClick={() => setShowEmojiPicker((prev) => !prev)}
                 className={`
-                  mb-1
-                  flex
-                  h-9
-                  w-9
-                  shrink-0
-                  items-center
-                  justify-center
-                  rounded-lg
-                  transition
+                  mb-1 flex h-8 w-8 shrink-0 items-center justify-center
+                  rounded-lg transition sm:h-9 sm:w-9
                   ${
                     showEmojiPicker
                       ? "bg-(--surface-hover) text-(--primary)"
@@ -1217,20 +1069,11 @@ const handleSaveEdit = async () => {
                 onClick={handleSend}
                 disabled={!message.trim()}
                 className="
-                  mb-1
-                  flex
-                  h-9
-                  w-9
-                  shrink-0
-                  items-center
-                  justify-center
-                  rounded-lg
-                  bg-(--primary)
-                  text-white
-                  transition
+                  mb-1 flex h-8 w-8 shrink-0 items-center justify-center
+                  rounded-lg bg-(--primary) text-white transition
                   hover:bg-(--primary-hover)
-                  disabled:cursor-not-allowed
-                  disabled:opacity-40
+                  disabled:cursor-not-allowed disabled:opacity-40
+                  sm:h-9 sm:w-9
                 "
                 aria-label="Send message"
               >

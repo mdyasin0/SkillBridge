@@ -11,7 +11,11 @@ import {
   RefreshCw,
   Mail,
   ChevronRight,
+  X,
+  Menu,
 } from "lucide-react";
+
+import { useEffect, useState } from "react";
 
 const sections = [
   {
@@ -72,87 +76,237 @@ const sections = [
 ];
 
 export default function PrivacyPolicy() {
+  const [sidebarOpen, setSidebarOpen] = useState(false);
+
+  useEffect(() => {
+    if (!sidebarOpen) return;
+
+    const previousOverflow = document.body.style.overflow;
+
+    const handleEscape = (event: KeyboardEvent) => {
+      if (event.key === "Escape") {
+        setSidebarOpen(false);
+      }
+    };
+
+    document.body.style.overflow = "hidden";
+    document.addEventListener("keydown", handleEscape);
+
+    return () => {
+      document.body.style.overflow = previousOverflow;
+      document.removeEventListener("keydown", handleEscape);
+    };
+  }, [sidebarOpen]);
+
+  const closeSidebar = () => {
+    setSidebarOpen(false);
+  };
+
   return (
-    <main className="min-h-screen bg-(--bg) text-(--text)">
-      {/* Hero */}
-      <section className="border-b border-(--border) bg-(--surface)">
-        <div className="mx-auto max-w-7xl px-4 py-16 sm:px-6 lg:px-8">
-          <div className="max-w-3xl">
-            <div className="mb-5 inline-flex items-center gap-2 rounded-full border border-(--border) bg-(--surface-hover) px-4 py-2 text-sm font-medium text-(--primary)">
-              <ShieldCheck size={17} />
-              Privacy & Security
+    <main className="min-h-screen min-w-0 overflow-x-clip bg-(--bg) text-(--text)">
+      {/* Main Layout */}
+      <section className="mx-auto w-full max-w-[1600px] px-3 py-5 sm:px-6 sm:py-8 lg:px-8 lg:py-10">
+        <div className="grid min-w-0 grid-cols-1 items-start gap-5 lg:grid-cols-[30%_minmax(0,1fr)] lg:gap-6 xl:gap-8">
+          {/* Mobile Menu Button */}
+          <button
+            type="button"
+            onClick={() => setSidebarOpen(true)}
+            aria-label="Open privacy policy navigation"
+            aria-controls="privacy-sidebar"
+            aria-expanded={sidebarOpen}
+            className="fixed left-0 top-1/2 z-40 flex h-12 w-10 -translate-y-1/2 items-center justify-center rounded-r-xl border border-l-0 border-(--border) bg-(--surface) text-(--primary) shadow-(--shadow) transition-colors hover:bg-(--surface-hover) focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-(--primary) lg:hidden"
+          >
+            <Menu size={22} />
+          </button>
+
+          {/* Mobile Backdrop */}
+          <button
+            type="button"
+            aria-label="Close privacy policy navigation"
+            aria-hidden={!sidebarOpen}
+            tabIndex={sidebarOpen ? 0 : -1}
+            onClick={closeSidebar}
+            className={`fixed inset-0 z-50 bg-(--text)/40 transition-opacity duration-300 lg:hidden ${
+              sidebarOpen
+                ? "visible opacity-100"
+                : "invisible pointer-events-none opacity-0"
+            }`}
+          />
+
+          {/* Sidebar */}
+          <aside
+            id="privacy-sidebar"
+            aria-label="Privacy policy navigation"
+            aria-hidden={
+              typeof window !== "undefined" &&
+              window.matchMedia("(min-width: 1024px)").matches
+                ? false
+                : !sidebarOpen
+            }
+            className={`fixed inset-y-0 left-0 z-[60] flex w-[min(82vw,360px)] flex-col overflow-y-auto border-r border-(--border) bg-(--surface) p-4 shadow-(--shadow) transition-transform duration-300 ease-in-out sm:p-5 lg:sticky lg:top-6 lg:z-auto lg:h-[calc(100vh-3rem)] lg:w-full lg:translate-x-0 lg:rounded-2xl lg:border lg:shadow-(--shadow) ${
+              sidebarOpen ? "translate-x-0" : "-translate-x-full"
+            }`}
+          >
+            {/* Mobile Sidebar Header */}
+            <div className="mb-5 flex items-center justify-between gap-3 lg:hidden">
+              <div className="flex min-w-0 items-center gap-2">
+                <ShieldCheck size={21} className="shrink-0 text-(--primary)" />
+
+                <p className="truncate text-base font-semibold text-(--text)">
+                  Privacy Navigation
+                </p>
+              </div>
+
+              <button
+                type="button"
+                onClick={closeSidebar}
+                aria-label="Close navigation"
+                className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border border-(--border) text-(--text-muted) transition-colors hover:bg-(--surface-hover) hover:text-(--text) focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-(--primary)"
+              >
+                <X size={20} />
+              </button>
             </div>
 
-            <h1 className="text-4xl font-bold tracking-tight sm:text-5xl">
-              Privacy Policy
-            </h1>
+            {/* Desktop Sidebar Header */}
+            <div className="mb-5 hidden border-b border-(--border) pb-4 lg:block">
+              <div className="flex items-center gap-3">
+                <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-(--primary)/10 text-(--primary)">
+                  <ShieldCheck size={22} />
+                </div>
 
-            <p className="mt-5 text-lg leading-8 text-(--text-muted)">
-              Your privacy matters to SkillBridge. This policy explains what
-              information we collect, how we use it, and how we protect your
-              information while you use our platform.
+                <div className="min-w-0">
+                  <h2 className="font-semibold text-(--text)">
+                    Privacy Policy
+                  </h2>
+
+                  <p className="mt-1 text-xs text-(--text-muted)">
+                    SkillBridge documentation
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            <p className="mb-3 px-3 text-xs font-semibold uppercase tracking-wider text-(--text-muted)">
+              On this page
             </p>
 
-            <div className="mt-6 flex items-center gap-2 text-sm text-(--text-muted)">
-              <span className="h-2 w-2 rounded-full bg-(--primary)" />
-              Last updated: September 4, 2026
-            </div>
-          </div>
-        </div>
-      </section>
+            <nav aria-label="Privacy policy sections" className="space-y-1">
+              {sections.map((section, index) => {
+                const Icon = section.icon;
 
-      {/* Content */}
-      <section className="mx-auto max-w-7xl px-4 py-10 sm:px-6 lg:px-8">
-        <div className="grid gap-8 lg:grid-cols-[260px_1fr]">
-          {/* Sidebar */}
-          <aside className="hidden lg:block">
-            <div className="sticky top-24 rounded-2xl border border-(--border) bg-(--surface) p-4 shadow-(--shadow)">
-              <p className="mb-3 px-3 text-xs font-semibold uppercase tracking-wider text-(--text-muted)">
-                On this page
-              </p>
+                return (
+                  <a
+                    key={section.id}
+                    href={`#${section.id}`}
+                    onClick={(event) => {
+                      event.preventDefault();
 
-              <nav className="space-y-1">
-                {sections.map((section) => {
-                  const Icon = section.icon;
+                      const target = document.getElementById(section.id);
 
-                  return (
-                    <a
-                      key={section.id}
-                      href={`#${section.id}`}
-                      className="group flex items-center justify-between rounded-xl px-3 py-2.5 text-sm text-(--text-muted) transition hover:bg-(--surface-hover) hover:text-(--text)"
-                    >
-                      <span className="flex items-center gap-2">
-                        <Icon size={16} />
+                      if (target) {
+                        window.history.replaceState(null, "", `#${section.id}`);
+
+                        target.scrollIntoView({
+                          behavior: "smooth",
+                          block: "start",
+                        });
+                      }
+
+                      closeSidebar();
+                    }}
+                    className="group flex min-w-0 items-center gap-2 rounded-xl px-3 py-3 text-sm text-(--text-muted) transition-colors hover:bg-(--surface-hover) hover:text-(--text) focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-(--primary)"
+                  >
+                    <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg bg-(--surface-hover) text-xs font-semibold text-(--primary) transition-colors group-hover:bg-(--primary)/10">
+                      {String(index + 1).padStart(2, "0")}
+                    </span>
+
+                    <span className="flex min-w-0 flex-1 items-center gap-2">
+                      <Icon
+                        size={16}
+                        className="hidden shrink-0 text-(--primary) sm:block"
+                      />
+
+                      <span className="min-w-0 wrap-break-word">
                         {section.title}
                       </span>
+                    </span>
 
-                      <ChevronRight
-                        size={15}
-                        className="opacity-0 transition group-hover:translate-x-0.5 group-hover:opacity-100"
-                      />
-                    </a>
-                  );
-                })}
-              </nav>
+                    <ChevronRight
+                      size={15}
+                      className="shrink-0 opacity-0 transition group-hover:translate-x-0.5 group-hover:opacity-100"
+                    />
+                  </a>
+                );
+              })}
+            </nav>
+
+            {/* Sidebar Footer */}
+            <div className="mt-auto pt-6">
+              <div className="rounded-xl border border-(--border) bg-(--surface-hover) p-4">
+                <div className="flex items-start gap-2">
+                  <Lock
+                    size={17}
+                    className="mt-0.5 shrink-0 text-(--primary)"
+                  />
+
+                  <div className="min-w-0">
+                    <p className="text-sm font-semibold text-(--text)">
+                      Your Privacy Matters
+                    </p>
+
+                    <p className="mt-1 text-xs leading-5 text-(--text-muted)">
+                      Learn how SkillBridge collects and protects your
+                      information.
+                    </p>
+                  </div>
+                </div>
+              </div>
             </div>
           </aside>
 
-          {/* Main document */}
-          <article className="min-w-0 rounded-2xl border border-(--border) bg-(--surface) p-6 shadow-(--shadow) sm:p-8 lg:p-10">
-            <div className="space-y-12">
+          {/* Main Document */}
+          <article className="min-w-0 rounded-2xl border border-(--border) bg-(--surface) p-4 shadow-(--shadow) sm:p-6 md:p-8 xl:p-10">
+          
+  {/* Hero */}
+            <section className="border-b border-(--border) bg-(--surface)">
+              <div className="mx-auto w-full max-w-[1600px] px-4 py-10 sm:px-6 sm:py-14 md:py-16 lg:px-8">
+                <div className="max-w-3xl">
+                  <div className="mb-4 inline-flex max-w-full items-center gap-2 rounded-full border border-(--border) bg-(--surface-hover) px-3 py-2 text-xs font-medium text-(--primary) sm:mb-5 sm:px-4 sm:text-sm">
+                    <ShieldCheck size={17} className="shrink-0" />
+                    <span>Privacy &amp; Security</span>
+                  </div>
+
+                  <h1 className="wrap-break-word text-3xl font-bold tracking-tight sm:text-4xl md:text-5xl">
+                    Privacy Policy
+                  </h1>
+
+                  <p className="mt-4 text-sm leading-7 text-(--text-muted) sm:mt-5 sm:text-base sm:leading-8 md:text-lg">
+                    Your privacy matters to SkillBridge. This policy explains
+                    what information we collect, how we use it, and how we
+                    protect your information while you use our platform.
+                  </p>
+
+                  <div className="mt-5 flex flex-wrap items-center gap-2 text-xs text-(--text-muted) sm:mt-6 sm:text-sm">
+                    <span className="h-2 w-2 shrink-0 rounded-full bg-(--primary)" />
+                    <span>Last updated: September 4, 2026</span>
+                  </div>
+                </div>
+              </div>
+            </section>
+            <div className="min-w-0 space-y-10 sm:space-y-12">
               <PolicySection
                 id="information"
                 number="01"
                 title="Information We Collect"
               >
                 <p>
-                  When you use SkillBridge, we may collect information
-                  necessary to create your account, build your professional
-                  profile, evaluate challenge performance, provide messaging
+                  When you use SkillBridge, we may collect information necessary
+                  to create your account, build your professional profile,
+                  evaluate challenge performance, provide messaging
                   functionality, and maintain platform security.
                 </p>
 
-                <ul>
+                <ul className="list-disc space-y-2 pl-5 marker:text-(--primary)">
                   <li>Name and email address</li>
                   <li>Password information in securely hashed form</li>
                   <li>Account role such as Developer or Recruiter</li>
@@ -170,15 +324,15 @@ export default function PrivacyPolicy() {
               >
                 <p>
                   To provide authentication and account management, SkillBridge
-                  stores information associated with your account. Passwords
-                  are not stored as plain text and are processed using secure
+                  stores information associated with your account. Passwords are
+                  not stored as plain text and are processed using secure
                   password hashing.
                 </p>
 
                 <p>
-                  Your account may also contain a profile image, role,
-                  account status, and other information required to operate
-                  the platform.
+                  Your account may also contain a profile image, role, account
+                  status, and other information required to operate the
+                  platform.
                 </p>
               </PolicySection>
 
@@ -188,12 +342,11 @@ export default function PrivacyPolicy() {
                 title="Developer & Recruiter Profiles"
               >
                 <p>
-                  Developers and recruiters may voluntarily provide
-                  professional information to create their SkillBridge
-                  profiles.
+                  Developers and recruiters may voluntarily provide professional
+                  information to create their SkillBridge profiles.
                 </p>
 
-                <div className="grid gap-4 sm:grid-cols-2">
+                <div className="grid min-w-0 grid-cols-1 gap-4 sm:grid-cols-2">
                   <InfoCard
                     title="Developer Profiles"
                     items={[
@@ -228,36 +381,30 @@ export default function PrivacyPolicy() {
                 title="Challenges & Performance"
               >
                 <p>
-                  SkillBridge collects information related to coding
-                  challenges, project-based assessments, submissions, scores,
-                  attempts, completion status, reviews, feedback, rankings,
-                  and badges.
+                  SkillBridge collects information related to coding challenges,
+                  project-based assessments, submissions, scores, attempts,
+                  completion status, reviews, feedback, rankings, and badges.
                 </p>
 
                 <p>
-                  This information is used to create a more meaningful
-                  technical profile and help recruiters evaluate demonstrated
-                  skills rather than relying only on resumes or certificates.
+                  This information is used to create a more meaningful technical
+                  profile and help recruiters evaluate demonstrated skills
+                  rather than relying only on resumes or certificates.
                 </p>
               </PolicySection>
 
-              <PolicySection
-                id="messaging"
-                number="05"
-                title="Messaging"
-              >
+              <PolicySection id="messaging" number="05" title="Messaging">
                 <p>
                   SkillBridge provides messaging functionality between
                   developers and recruiters. Messages, conversation metadata,
-                  timestamps, read status, and edited-message information may
-                  be stored to provide and maintain the messaging service.
+                  timestamps, read status, and edited-message information may be
+                  stored to provide and maintain the messaging service.
                 </p>
 
-                <div className="rounded-xl border border-(--border) bg-(--surface-hover) p-4">
-                  <p className="text-sm">
-                    Please do not share passwords, payment information, or
-                    other highly sensitive information through SkillBridge
-                    messages.
+                <div className="rounded-xl border border-(--border) bg-(--surface-hover) p-3 sm:p-4">
+                  <p className="text-sm leading-6">
+                    Please do not share passwords, payment information, or other
+                    highly sensitive information through SkillBridge messages.
                   </p>
                 </div>
               </PolicySection>
@@ -268,15 +415,15 @@ export default function PrivacyPolicy() {
                 title="Profile Images & Third-Party Image Hosting"
               >
                 <p>
-                  Users may upload profile photos or company logos. Depending
-                  on the implementation, uploaded images may be processed and
+                  Users may upload profile photos or company logos. Depending on
+                  the implementation, uploaded images may be processed and
                   hosted through a third-party image hosting provider such as
                   ImgBB.
                 </p>
 
                 <p>
-                  By uploading an image, you confirm that you have the right
-                  to use and publish that image.
+                  By uploading an image, you confirm that you have the right to
+                  use and publish that image.
                 </p>
               </PolicySection>
 
@@ -287,7 +434,7 @@ export default function PrivacyPolicy() {
               >
                 <p>We may use collected information to:</p>
 
-                <ul>
+                <ul className="list-disc space-y-2 pl-5 marker:text-(--primary)">
                   <li>Create and manage user accounts</li>
                   <li>Authenticate users</li>
                   <li>Provide role-based platform functionality</li>
@@ -301,29 +448,21 @@ export default function PrivacyPolicy() {
                 </ul>
               </PolicySection>
 
-              <PolicySection
-                id="security"
-                number="08"
-                title="Data Security"
-              >
+              <PolicySection id="security" number="08" title="Data Security">
                 <p>
                   SkillBridge takes reasonable technical and organizational
-                  measures to protect user information from unauthorized
-                  access, modification, disclosure, or destruction.
+                  measures to protect user information from unauthorized access,
+                  modification, disclosure, or destruction.
                 </p>
 
                 <p>
                   However, no internet-based service can guarantee absolute
-                  security. Users should maintain strong account credentials
-                  and avoid sharing account information with others.
+                  security. Users should maintain strong account credentials and
+                  avoid sharing account information with others.
                 </p>
               </PolicySection>
 
-              <PolicySection
-                id="retention"
-                number="09"
-                title="Data Retention"
-              >
+              <PolicySection id="retention" number="09" title="Data Retention">
                 <p>
                   We retain account, profile, challenge, performance, and
                   messaging information for as long as reasonably necessary to
@@ -345,9 +484,8 @@ export default function PrivacyPolicy() {
                 </p>
 
                 <p>
-                  When significant changes are made, the updated version will
-                  be published on this page with a revised “Last updated”
-                  date.
+                  When significant changes are made, the updated version will be
+                  published on this page with a revised “Last updated” date.
                 </p>
               </PolicySection>
 
@@ -359,16 +497,17 @@ export default function PrivacyPolicy() {
                 </p>
               </PolicySection>
 
-              {/* Footer notice */}
-              <div className="rounded-2xl border border-(--primary)/20 bg-(--primary)/5 p-5">
-                <div className="flex gap-3">
+              {/* Footer Notice */}
+              <div className="rounded-2xl border border-(--primary)/20 bg-(--primary)/5 p-4 sm:p-5">
+                <div className="flex min-w-0 items-start gap-3">
                   <ShieldCheck
                     className="mt-0.5 shrink-0 text-(--primary)"
                     size={20}
                   />
 
-                  <div>
+                  <div className="min-w-0">
                     <h3 className="font-semibold">Your Privacy Matters</h3>
+
                     <p className="mt-1 text-sm leading-6 text-(--text-muted)">
                       By using SkillBridge, you acknowledge that you have read
                       and understood this Privacy Policy.
@@ -396,38 +535,35 @@ function PolicySection({
   children: React.ReactNode;
 }) {
   return (
-    <section id={id} className="scroll-mt-24">
-      <div className="mb-5 flex items-start gap-4">
-        <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-(--primary)/10 text-xs font-bold text-(--primary)">
+    <section id={id} className="min-w-0 scroll-mt-20">
+      <div className="mb-4 flex min-w-0 items-start gap-3 sm:mb-5 sm:gap-4">
+        <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-xl bg-(--primary)/10 text-xs font-bold text-(--primary) sm:h-9 sm:w-9">
           {number}
         </span>
 
-        <h2 className="text-2xl font-bold tracking-tight">{title}</h2>
+        <h2 className="min-w-0 wrap-break-word pt-0.5 text-xl font-bold tracking-tight sm:text-2xl">
+          {title}
+        </h2>
       </div>
 
-      <div className="space-y-4 pl-0 text-[15px] leading-7 text-(--text-muted) sm:pl-13">
+      <div className="min-w-0 space-y-4 wrap-break-word pl-0 text-sm leading-7 text-(--text-muted) sm:pl-11 sm:text-[15px] sm:leading-7">
         {children}
       </div>
     </section>
   );
 }
 
-function InfoCard({
-  title,
-  items,
-}: {
-  title: string;
-  items: string[];
-}) {
+function InfoCard({ title, items }: { title: string; items: string[] }) {
   return (
-    <div className="rounded-xl border border-(--border) bg-(--surface-hover) p-5">
-      <h3 className="font-semibold text-(--text)">{title}</h3>
+    <div className="min-w-0 rounded-xl border border-(--border) bg-(--surface-hover) p-4 sm:p-5">
+      <h3 className="wrap-break-word font-semibold text-(--text)">{title}</h3>
 
-      <ul className="mt-3 space-y-2 text-sm">
+      <ul className="mt-3 space-y-2 text-sm leading-6 text-(--text-muted)">
         {items.map((item) => (
-          <li key={item} className="flex gap-2">
+          <li key={item} className="flex min-w-0 items-start gap-2">
             <span className="mt-2 h-1.5 w-1.5 shrink-0 rounded-full bg-(--primary)" />
-            {item}
+
+            <span className="min-w-0 wrap-break-word">{item}</span>
           </li>
         ))}
       </ul>

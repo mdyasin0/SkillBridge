@@ -1,11 +1,23 @@
 "use client";
 
 import { useEffect, useState } from "react";
-
-
 import Image from "next/image";
 import { useAuth } from "@/context/AuthContext";
-import { BriefcaseBusiness, BriefcaseBusinessIcon, Building2, CalendarDays, CheckCircle2, ExternalLink, Globe, Mail, MapPin, Phone, ShieldCheck, UserRound, Users } from "lucide-react";
+import {
+  BriefcaseBusiness,
+  BriefcaseBusinessIcon,
+  Building2,
+  CalendarDays,
+  CheckCircle2,
+  ExternalLink,
+  Globe,
+  Mail,
+  MapPin,
+  Phone,
+  ShieldCheck,
+  UserRound,
+  Users,
+} from "lucide-react";
 import { LiaLinkedin, LiaLinkedinIn } from "react-icons/lia";
 import { BsTwitter } from "react-icons/bs";
 import LoadingUI from "@/components/Loadinui";
@@ -58,14 +70,11 @@ interface RecruiterProfileResponse {
 }
 
 export default function RecruiterProfilePage() {
-
- const { user } = useAuth();
+  const { user } = useAuth();
   const userId = user.id;
 
   const [profile, setProfile] = useState<RecruiterProfile | null>(null);
-
   const [loading, setLoading] = useState(true);
-
   const [error, setError] = useState("");
 
   useEffect(() => {
@@ -97,7 +106,7 @@ export default function RecruiterProfilePage() {
 
         setProfile(result.data);
       } catch (error) {
-       toast.error(String(error));
+        toast.error(String(error));
 
         setError(
           error instanceof Error
@@ -152,9 +161,7 @@ export default function RecruiterProfilePage() {
   */
 
   if (loading) {
-    return (
-   <LoadingUI/>
-    );
+    return <LoadingUI />;
   }
 
   /*
@@ -165,20 +172,17 @@ export default function RecruiterProfilePage() {
 
   if (error || !profile) {
     return (
-      <main className="flex min-h-screen items-center justify-center bg-(--bg) px-4 text-(--text)">
-        <div className="w-full max-w-md rounded-2xl border border-(--border) bg-(--surface) p-8 text-center shadow-sm">
+      <main className="flex min-h-screen w-full items-center justify-center bg-(--bg) px-3 py-6 text-(--text) sm:px-6">
+        <div className="w-full max-w-md rounded-2xl border border-(--border) bg-(--surface) p-5 text-center shadow-(--shadow) sm:p-8">
           <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-full bg-(--bg-secondary)">
-            <UserRound
-              size={26}
-              className="text-(--text-muted)"
-            />
+            <UserRound size={26} className="text-(--text-muted)" />
           </div>
 
           <h1 className="mt-4 text-lg font-semibold">
             Recruiter profile unavailable
           </h1>
 
-          <p className="mt-2 text-sm text-(--text-muted)">
+          <p className="mt-2 break-words text-sm leading-6 text-(--text-muted)">
             {error || "We couldn't find this recruiter profile."}
           </p>
         </div>
@@ -187,26 +191,26 @@ export default function RecruiterProfilePage() {
   }
 
   return (
-    <main className="min-h-screen w-full bg-(--bg) text-(--text)">
-      <div className="mx-auto max-w-6xl px-4 py-6 sm:px-6 lg:px-8 lg:py-8">
+    <main className="min-h-screen w-full overflow-x-clip bg-(--bg) text-(--text)">
+      <div className="mx-auto w-full max-w-6xl px-3 py-4 sm:px-6 sm:py-6 lg:px-8 lg:py-8">
         {/* =====================================================
             PROFILE HERO
         ====================================================== */}
 
-        <section className="overflow-hidden rounded-3xl border border-(--border) bg-(--surface) shadow-sm">
+        <section className="overflow-hidden rounded-2xl border border-(--border) bg-(--surface) shadow-(--shadow) sm:rounded-3xl">
           {/* Cover */}
 
-          <div className="h-32 bg-(--bg-secondary) sm:h-40" />
+          <div className="h-24 bg-(--bg-secondary) sm:h-32 md:h-40" />
 
           {/* Profile Header */}
 
-          <div className="px-5 pb-6 sm:px-8 sm:pb-8">
-            <div className="-mt-14 flex flex-col gap-5 sm:-mt-16 sm:flex-row sm:items-end sm:justify-between">
-              <div className="flex flex-col gap-4 sm:flex-row sm:items-end">
+          <div className="px-4 pb-5 sm:px-6 sm:pb-7 lg:px-8 lg:pb-8">
+            <div className="-mt-12 flex min-w-0 flex-col gap-4 sm:-mt-14 md:-mt-16 md:flex-row md:items-end md:justify-between">
+              <div className="flex min-w-0 flex-col gap-4 sm:flex-row sm:items-end">
                 {/* Profile Photo */}
 
-                <div className="relative shrink-0">
-                  <div className="flex h-28 w-28 items-center justify-center overflow-hidden rounded-3xl border-4 border-(--surface) bg-(--primary) text-3xl font-bold text-white shadow-md sm:h-32 sm:w-32">
+                <div className="relative w-fit shrink-0">
+                  <div className="flex h-24 w-24 items-center justify-center overflow-hidden rounded-2xl border-4 border-(--surface) bg-(--primary) text-2xl font-bold text-(--bg-secondary) shadow-(--shadow) sm:h-28 sm:w-28 sm:text-3xl md:h-32 md:w-32">
                     {profile.profilePhoto ? (
                       <Image
                         src={profile.profilePhoto}
@@ -222,21 +226,7 @@ export default function RecruiterProfilePage() {
 
                   {isVerified && (
                     <div
-                      className="
-                        absolute
-                        -right-1
-                        -bottom-1
-                        flex
-                        h-8
-                        w-8
-                        items-center
-                        justify-center
-                        rounded-full
-                        border-4
-                        border-(--surface)
-                        bg-(--primary)
-                        text-white
-                      "
+                      className="absolute -right-1 -bottom-1 flex h-7 w-7 items-center justify-center rounded-full border-4 border-(--surface) bg-(--primary) text-(--bg-secondary) sm:h-8 sm:w-8"
                       title="Verified recruiter"
                     >
                       <CheckCircle2 size={16} />
@@ -247,45 +237,51 @@ export default function RecruiterProfilePage() {
                 {/* Main Identity */}
 
                 <div className="min-w-0 pb-1">
-                  <div className="flex flex-wrap items-center gap-2">
-                    <h1 className="text-2xl font-bold tracking-tight sm:text-3xl">
+                  <div className="flex min-w-0 flex-wrap items-center gap-2">
+                    <h1 className="min-w-0 max-w-full break-words text-xl font-bold tracking-tight sm:text-2xl md:text-3xl">
                       {profile.fullName || "Recruiter"}
                     </h1>
 
                     {isVerified && (
-                      <span className="inline-flex items-center gap-1 rounded-full border border-(--border) bg-(--bg-secondary) px-2.5 py-1 text-xs font-medium text-(--text)">
+                      <span className="inline-flex shrink-0 items-center gap-1 rounded-full border border-(--border) bg-(--bg-secondary) px-2.5 py-1 text-xs font-medium text-(--text)">
                         <ShieldCheck size={13} />
                         Verified
                       </span>
                     )}
                   </div>
 
-                  <p className="mt-1 text-sm font-medium text-(--text-muted)">
+                  <p className="mt-1 break-words text-sm font-medium text-(--text-muted)">
                     {profile.jobTitle || "Recruiter"}
                   </p>
 
-                  <div className="mt-3 flex flex-wrap gap-x-4 gap-y-2 text-xs text-(--text-muted)">
+                  <div className="mt-3 flex min-w-0 flex-wrap gap-x-4 gap-y-2 text-xs text-(--text-muted)">
                     {profile.companyName && (
-                      <span className="inline-flex items-center gap-1.5">
-                        <Building2 size={14} />
-                        {profile.companyName}
+                      <span className="inline-flex min-w-0 max-w-full items-start gap-1.5">
+                        <Building2 size={14} className="mt-0.5 shrink-0" />
+                        <span className="break-words">{profile.companyName}</span>
                       </span>
                     )}
 
                     {(profile.city || profile.country) && (
-                      <span className="inline-flex items-center gap-1.5">
-                        <MapPin size={14} />
-
-                        {[profile.city, profile.country]
-                          .filter(Boolean)
-                          .join(", ")}
+                      <span className="inline-flex min-w-0 max-w-full items-start gap-1.5">
+                        <MapPin size={14} className="mt-0.5 shrink-0" />
+                        <span className="break-words">
+                          {[profile.city, profile.country]
+                            .filter(Boolean)
+                            .join(", ")}
+                        </span>
                       </span>
                     )}
 
                     {profile.department && (
-                      <span className="inline-flex items-center gap-1.5">
-                        <BriefcaseBusiness size={14} />
-                        {profile.department}
+                      <span className="inline-flex min-w-0 max-w-full items-start gap-1.5">
+                        <BriefcaseBusiness
+                          size={14}
+                          className="mt-0.5 shrink-0"
+                        />
+                        <span className="break-words">
+                          {profile.department}
+                        </span>
                       </span>
                     )}
                   </div>
@@ -295,16 +291,14 @@ export default function RecruiterProfilePage() {
 
             {/* Quick Stats */}
 
-            <div className="mt-7 grid grid-cols-2 divide-x divide-(--border) overflow-hidden rounded-2xl border border-(--border) bg-(--bg-secondary) sm:grid-cols-4">
+            <div className="mt-6 grid grid-cols-2 gap-px overflow-hidden rounded-xl border border-(--border) bg-(--border) sm:mt-7 sm:grid-cols-4 sm:rounded-2xl">
               <StatItem
                 label="Experience"
                 value={
                   profile.experienceYears !== null &&
                   profile.experienceYears !== undefined
                     ? `${profile.experienceYears} ${
-                        profile.experienceYears === 1
-                          ? "Year"
-                          : "Years"
+                        profile.experienceYears === 1 ? "Year" : "Years"
                       }`
                     : "—"
                 }
@@ -332,12 +326,12 @@ export default function RecruiterProfilePage() {
             MAIN CONTENT
         ====================================================== */}
 
-        <div className="mt-6 grid gap-6 lg:grid-cols-3">
+        <div className="mt-4 grid min-w-0 grid-cols-1 gap-4 sm:mt-6 sm:gap-6 lg:grid-cols-3">
           {/* =================================================
               LEFT COLUMN
           ================================================= */}
 
-          <div className="space-y-6">
+          <div className="min-w-0 space-y-4 sm:space-y-6">
             {/* Contact */}
 
             <ProfileCard
@@ -444,7 +438,7 @@ export default function RecruiterProfilePage() {
               RIGHT COLUMN
           ================================================= */}
 
-          <div className="space-y-6 lg:col-span-2">
+          <div className="min-w-0 space-y-4 sm:space-y-6 lg:col-span-2">
             {/* About Recruiter */}
 
             <ProfileCard
@@ -452,7 +446,7 @@ export default function RecruiterProfilePage() {
               icon={<UserRound size={18} />}
             >
               {profile.bio ? (
-                <p className="whitespace-pre-line text-sm leading-7 text-(--text-muted)">
+                <p className="break-words whitespace-pre-line text-sm leading-7 text-(--text-muted)">
                   {profile.bio}
                 </p>
               ) : (
@@ -462,19 +456,19 @@ export default function RecruiterProfilePage() {
 
             {/* Company */}
 
-            <section className="rounded-2xl border border-(--border) bg-(--surface) p-5 shadow-sm sm:p-6">
-              <div className="flex items-start justify-between gap-4">
-                <div className="flex items-center gap-3">
+            <section className="min-w-0 rounded-2xl border border-(--border) bg-(--surface) p-4 shadow-(--shadow) sm:p-5 md:p-6">
+              <div className="flex min-w-0 flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
+                <div className="flex min-w-0 items-center gap-3">
                   <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-(--bg-secondary) text-(--primary)">
                     <Building2 size={20} />
                   </div>
 
-                  <div>
-                    <h2 className="text-base font-semibold">
+                  <div className="min-w-0">
+                    <h2 className="break-words text-base font-semibold">
                       Company Information
                     </h2>
 
-                    <p className="mt-0.5 text-xs text-(--text-muted)">
+                    <p className="mt-0.5 break-words text-xs leading-5 text-(--text-muted)">
                       Organization represented by this recruiter
                     </p>
                   </div>
@@ -485,22 +479,7 @@ export default function RecruiterProfilePage() {
                     href={profile.companyWebsite}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="
-                      inline-flex
-                      h-9
-                      items-center
-                      gap-1.5
-                      rounded-lg
-                      border
-                      border-(--border)
-                      px-3
-                      text-xs
-                      font-medium
-                      text-(--text-muted)
-                      transition
-                      hover:bg-(--surface-hover)
-                      hover:text-(--text)
-                    "
+                    className="inline-flex min-h-9 w-fit max-w-full shrink-0 items-center justify-center gap-1.5 rounded-lg border border-(--border) px-3 py-2 text-xs font-medium text-(--text-muted) transition-colors hover:bg-(--surface-hover) hover:text-(--text)"
                   >
                     <Globe size={14} />
                     Website
@@ -511,8 +490,8 @@ export default function RecruiterProfilePage() {
 
               {/* Company Identity */}
 
-              <div className="mt-6 flex flex-col gap-4 rounded-xl border border-(--border) bg-(--bg-secondary) p-4 sm:flex-row sm:items-center">
-                <div className="flex h-16 w-16 shrink-0 items-center justify-center overflow-hidden rounded-xl border border-(--border) bg-(--surface) text-xl font-bold">
+              <div className="mt-5 flex min-w-0 flex-col gap-3 rounded-xl border border-(--border) bg-(--bg-secondary) p-3 sm:mt-6 sm:flex-row sm:items-center sm:gap-4 sm:p-4">
+                <div className="flex h-14 w-14 shrink-0 items-center justify-center overflow-hidden rounded-xl border border-(--border) bg-(--surface) text-xl font-bold sm:h-16 sm:w-16">
                   {profile.companyLogo ? (
                     <Image
                       src={profile.companyLogo}
@@ -527,11 +506,11 @@ export default function RecruiterProfilePage() {
                 </div>
 
                 <div className="min-w-0">
-                  <h3 className="text-lg font-semibold">
+                  <h3 className="break-words text-lg font-semibold">
                     {profile.companyName || "Company name unavailable"}
                   </h3>
 
-                  <p className="mt-1 text-sm text-(--text-muted)">
+                  <p className="mt-1 break-words text-sm text-(--text-muted)">
                     {profile.industry || "Industry not specified"}
                   </p>
                 </div>
@@ -539,12 +518,12 @@ export default function RecruiterProfilePage() {
 
               {/* Company Description */}
 
-              <div className="mt-6">
+              <div className="mt-5 min-w-0 sm:mt-6">
                 <h3 className="text-sm font-semibold">
                   About the Company
                 </h3>
 
-                <p className="mt-2 whitespace-pre-line text-sm leading-7 text-(--text-muted)">
+                <p className="mt-2 break-words whitespace-pre-line text-sm leading-7 text-(--text-muted)">
                   {profile.companyDescription ||
                     "No company description has been provided."}
                 </p>
@@ -552,7 +531,7 @@ export default function RecruiterProfilePage() {
 
               {/* Company Details */}
 
-              <div className="mt-6 grid gap-4 border-t border-(--border) pt-6 sm:grid-cols-2">
+              <div className="mt-5 grid min-w-0 grid-cols-1 gap-3 border-t border-(--border) pt-5 sm:mt-6 sm:grid-cols-2 sm:gap-4 sm:pt-6">
                 <DetailBox
                   icon={<Building2 size={17} />}
                   label="Industry"
@@ -585,7 +564,7 @@ export default function RecruiterProfilePage() {
               {/* Company LinkedIn */}
 
               {profile.companyLinkedin && (
-                <div className="mt-6 border-t border-(--border) pt-5">
+                <div className="mt-5 border-t border-(--border) pt-4 sm:mt-6 sm:pt-5">
                   <SocialLink
                     icon={<LiaLinkedin size={17} />}
                     label="Company LinkedIn"
@@ -601,7 +580,7 @@ export default function RecruiterProfilePage() {
               title="Recruitment Focus"
               icon={<BriefcaseBusinessIcon size={18} />}
             >
-              <div className="grid gap-4 sm:grid-cols-2">
+              <div className="grid min-w-0 grid-cols-1 gap-3 sm:grid-cols-2 sm:gap-4">
                 <DetailBox
                   icon={<BriefcaseBusiness size={17} />}
                   label="Specialization"
@@ -639,8 +618,8 @@ export default function RecruiterProfilePage() {
               title="Verification"
               icon={<ShieldCheck size={18} />}
             >
-              <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-                <div className="flex items-start gap-3">
+              <div className="flex min-w-0 flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+                <div className="flex min-w-0 items-start gap-3">
                   <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-(--bg-secondary)">
                     <ShieldCheck
                       size={20}
@@ -648,14 +627,14 @@ export default function RecruiterProfilePage() {
                     />
                   </div>
 
-                  <div>
-                    <p className="text-sm font-semibold">
+                  <div className="min-w-0">
+                    <p className="break-words text-sm font-semibold">
                       {isVerified
                         ? "Verified Recruiter"
                         : "Verification Pending"}
                     </p>
 
-                    <p className="mt-1 text-xs leading-5 text-(--text-muted)">
+                    <p className="mt-1 break-words text-xs leading-5 text-(--text-muted)">
                       {isVerified
                         ? "This recruiter profile has been verified."
                         : "This recruiter has not completed verification yet."}
@@ -664,12 +643,12 @@ export default function RecruiterProfilePage() {
                 </div>
 
                 {profile.verified_at && (
-                  <div className="text-left sm:text-right">
+                  <div className="min-w-0 text-left sm:shrink-0 sm:text-right">
                     <p className="text-[11px] text-(--text-muted)">
                       Verified on
                     </p>
 
-                    <p className="mt-1 text-xs font-medium">
+                    <p className="mt-1 break-words text-xs font-medium">
                       {formatDate(profile.verified_at)}
                     </p>
                   </div>
@@ -679,19 +658,19 @@ export default function RecruiterProfilePage() {
 
             {/* Profile Metadata */}
 
-            <div className="grid gap-4 text-xs text-(--text-muted) sm:grid-cols-2">
-              <div className="rounded-xl border border-(--border) bg-(--surface) px-4 py-3">
+            <div className="grid min-w-0 grid-cols-1 gap-3 text-xs text-(--text-muted) sm:grid-cols-2 sm:gap-4">
+              <div className="min-w-0 rounded-xl border border-(--border) bg-(--surface) px-4 py-3">
                 <span>Profile created</span>
 
-                <p className="mt-1 font-medium text-(--text)">
+                <p className="mt-1 break-words font-medium text-(--text)">
                   {formatDate(profile.created_at)}
                 </p>
               </div>
 
-              <div className="rounded-xl border border-(--border) bg-(--surface) px-4 py-3">
+              <div className="min-w-0 rounded-xl border border-(--border) bg-(--surface) px-4 py-3">
                 <span>Last updated</span>
 
-                <p className="mt-1 font-medium text-(--text)">
+                <p className="mt-1 break-words font-medium text-(--text)">
                   {formatDate(profile.updated_at)}
                 </p>
               </div>
@@ -717,12 +696,12 @@ function StatItem({
   value: string;
 }) {
   return (
-    <div className="px-4 py-4 sm:px-5">
-      <p className="text-[11px] font-medium uppercase tracking-wide text-(--text-muted)">
+    <div className="min-w-0 bg-(--bg-secondary) px-3 py-3.5 sm:px-4 sm:py-4 lg:px-5">
+      <p className="break-words text-[10px] font-medium uppercase tracking-wide text-(--text-muted) sm:text-[11px]">
         {label}
       </p>
 
-      <p className="mt-1 truncate text-sm font-semibold text-(--text)">
+      <p className="mt-1 break-words text-sm font-semibold text-(--text)">
         {value}
       </p>
     </div>
@@ -745,16 +724,18 @@ function ProfileCard({
   children: React.ReactNode;
 }) {
   return (
-    <section className="rounded-2xl border border-(--border) bg-(--surface) p-5 shadow-sm sm:p-6">
-      <div className="flex items-center gap-3 border-b border-(--border) pb-4">
-        <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-(--bg-secondary) text-(--primary)">
+    <section className="min-w-0 rounded-2xl border border-(--border) bg-(--surface) p-4 shadow-(--shadow) sm:p-5 md:p-6">
+      <div className="flex min-w-0 items-center gap-3 border-b border-(--border) pb-4">
+        <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-(--bg-secondary) text-(--primary)">
           {icon}
         </div>
 
-        <h2 className="text-base font-semibold">{title}</h2>
+        <h2 className="min-w-0 break-words text-base font-semibold">
+          {title}
+        </h2>
       </div>
 
-      <div className="pt-5">{children}</div>
+      <div className="min-w-0 pt-4 sm:pt-5">{children}</div>
     </section>
   );
 }
@@ -777,12 +758,12 @@ function InfoRow({
   href?: string;
 }) {
   return (
-    <div className="flex gap-3 border-b border-(--border) py-3.5 last:border-b-0 last:pb-0 first:pt-0">
+    <div className="flex min-w-0 gap-3 border-b border-(--border) py-3.5 last:border-b-0 last:pb-0 first:pt-0">
       <div className="mt-0.5 shrink-0 text-(--text-muted)">
         {icon}
       </div>
 
-      <div className="min-w-0">
+      <div className="min-w-0 flex-1">
         <p className="text-[11px] font-medium uppercase tracking-wide text-(--text-muted)">
           {label}
         </p>
@@ -791,12 +772,12 @@ function InfoRow({
           href ? (
             <a
               href={href}
-              className="mt-1 block wrap-break-word text-sm font-medium text-(--text) hover:text-(--primary)"
+              className="mt-1 block break-words text-sm font-medium text-(--text) transition-colors hover:text-(--primary)"
             >
               {value}
             </a>
           ) : (
-            <p className="mt-1 wrap-break-word text-sm font-medium">
+            <p className="mt-1 break-words text-sm font-medium">
               {value}
             </p>
           )
@@ -826,12 +807,12 @@ function DetailBox({
   value?: string | null;
 }) {
   return (
-    <div className="flex gap-3 rounded-xl border border-(--border) bg-(--bg-secondary) p-4">
+    <div className="flex min-w-0 gap-3 rounded-xl border border-(--border) bg-(--bg-secondary) p-3.5 sm:p-4">
       <div className="mt-0.5 shrink-0 text-(--text-muted)">
         {icon}
       </div>
 
-      <div className="min-w-0">
+      <div className="min-w-0 flex-1">
         <p className="text-[11px] font-medium uppercase tracking-wide text-(--text-muted)">
           {label}
         </p>
@@ -861,10 +842,12 @@ function SocialLink({
 }) {
   if (!href) {
     return (
-      <div className="flex items-center gap-3 py-2 text-sm text-(--text-muted)">
-        {icon}
-        <span>{label}</span>
-        <span className="ml-auto text-xs">Not provided</span>
+      <div className="flex min-w-0 items-center gap-3 py-2 text-sm text-(--text-muted)">
+        <span className="shrink-0">{icon}</span>
+        <span className="min-w-0 break-words">{label}</span>
+        <span className="ml-auto shrink-0 text-right text-xs">
+          Not provided
+        </span>
       </div>
     );
   }
@@ -874,27 +857,19 @@ function SocialLink({
       href={href}
       target="_blank"
       rel="noopener noreferrer"
-      className="
-        flex
-        items-center
-        gap-3
-        rounded-xl
-        px-3
-        py-2.5
-        text-sm
-        transition
-        hover:bg-(--surface-hover)
-      "
+      className="flex min-w-0 items-center gap-3 rounded-xl px-3 py-2.5 text-sm transition-colors hover:bg-(--surface-hover)"
     >
-      <span className="text-(--text-muted)">
+      <span className="shrink-0 text-(--text-muted)">
         {icon}
       </span>
 
-      <span className="font-medium">{label}</span>
+      <span className="min-w-0 break-words font-medium">
+        {label}
+      </span>
 
       <ExternalLink
         size={14}
-        className="ml-auto text-(--text-muted)"
+        className="ml-auto shrink-0 text-(--text-muted)"
       />
     </a>
   );
@@ -908,7 +883,7 @@ EMPTY VALUE
 
 function EmptyValue({ text }: { text: string }) {
   return (
-    <p className="text-sm text-(--text-muted)">
+    <p className="break-words text-sm leading-6 text-(--text-muted)">
       {text}
     </p>
   );

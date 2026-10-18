@@ -1,3 +1,4 @@
+
 "use client";
 
 import { useAuth } from "@/context/AuthContext";
@@ -5,7 +6,7 @@ import { signOut } from "next-auth/react";
 import Image from "next/image";
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
-import LoadingUI from "./Loadinui";
+
 
 const Navbar = () => {
   const [open, setOpen] = useState(false);
@@ -15,8 +16,7 @@ const Navbar = () => {
 
   const dropdownRef = useRef<HTMLDivElement>(null);
 
-
-  // close dropdown on outside click
+  // Close dropdown on outside click
   useEffect(() => {
     const handler = (e: MouseEvent) => {
       if (
@@ -31,85 +31,111 @@ const Navbar = () => {
     return () => document.removeEventListener("mousedown", handler);
   }, []);
 
+  // Close mobile menu after navigation
+  const closeMobileMenu = () => {
+    setOpen(false);
+    setDropdown(false);
+  };
+
+  const dashboardLink =
+    isLoggedIn && user?.role === "recruiter"
+      ? { href: "/pages/recruiter", label: "Recruiter" }
+      : isLoggedIn && user?.role === "developer"
+        ? { href: "/pages/developer", label: "Developer" }
+        : isLoggedIn && user?.role === "admin"
+          ? { href: "/pages/admin", label: "Admin" }
+          : null;
+
   return (
-    <header className="w-full sticky top-0 z-50 border-b border-(--border) bg-(--bg-secondary)/80 backdrop-blur-md">
-      <div className="max-w-7xl mx-auto px-4 md:px-6 h-16 flex items-center justify-between">
+    <header className="sticky top-0 z-50 w-full border-b border-(--border) bg-(--bg-secondary)/90 backdrop-blur-md">
+      <div className="mx-auto flex min-h-16 max-w-7xl items-center justify-between gap-3 px-3 sm:px-4 md:px-6">
         {/* Logo */}
-        
-        <Link href="/" className="text-xl font-bold text-(--text)">
-          Skill<span className="text-(--primary)">Bridge</span> 
+        <Link
+          href="/"
+          onClick={closeMobileMenu}
+          className="shrink-0 text-lg font-bold text-(--text) sm:text-xl"
+        >
+          Skill<span className="text-(--primary)">Bridge</span>
         </Link>
 
-        {/* Desktop Nav */}
-        <nav className="hidden md:flex items-center gap-6 text-sm text-(--text-muted)">
-          <Link href="/">Home</Link>
+        {/* Desktop Navigation */}
+        <nav className="hidden items-center gap-4 text-sm text-(--text-muted) md:flex xl:gap-6">
+          <Link
+            href="/"
+            className="transition-colors hover:text-(--primary)"
+          >
+            Home
+          </Link>
 
-
-          {isLoggedIn && user?.role === "recruiter" && (
-            <Link href="/pages/recruiter">Recruiter</Link>
-          )}
-
-          {isLoggedIn && user?.role === "developer" && (
-            <Link href="/pages/developer">Developer</Link>
-          )}
-
-          {isLoggedIn && user?.role === "admin" && (
-            <Link href="/pages/admin">Admin</Link>
+          {dashboardLink && (
+            <Link
+              href={dashboardLink.href}
+              className="transition-colors hover:text-(--primary)"
+            >
+              {dashboardLink.label}
+            </Link>
           )}
         </nav>
 
-        {/* Right Side */}
-        <div className="hidden md:flex items-center gap-4">
+        {/* Desktop Right Side */}
+        <div className="hidden items-center gap-3 lg:flex xl:gap-4">
           {loading ? (
-            <span className="text-sm text-gray-400">Loading...</span>
+            <span className="text-sm text-(--text-muted)">Loading...</span>
           ) : isLoggedIn && user ? (
             <div className="relative" ref={dropdownRef}>
-              {/* Avatar Button */}
               <button
+                type="button"
                 onClick={() => setDropdown(!dropdown)}
-                className="flex items-center gap-2"
+                aria-label="Open profile menu"
+                aria-expanded={dropdown}
+                className="flex items-center gap-2 rounded-full border border-(--border) p-1 transition-colors hover:bg-(--surface-hover)"
               >
                 <Image
                   src={user.image || "/avatar.png"}
                   alt="user"
                   width={36}
                   height={36}
-                  className="rounded-full border"
+                  className="rounded-full border border-(--border) object-cover"
                 />
               </button>
 
-              {/* Dropdown */}
               {dropdown && (
-                <div className="absolute right-0 mt-3 w-64 bg-white shadow-lg rounded-xl border p-4 z-50">
+                <div className="absolute right-0 top-full z-50 mt-3 w-64 max-w-[calc(100vw-1.5rem)] rounded-xl border border-(--border) bg-(--surface) p-4 text-(--text) shadow-lg">
                   {/* User Info */}
-                  <div className="flex items-center gap-3 mb-3">
+                  <div className="mb-3 flex min-w-0 items-center gap-3">
                     <Image
                       src={user.image || "/avatar.png"}
                       alt="user"
-                      width={36}
-                      height={36}
-                      className="rounded-full border"
+                      width={40}
+                      height={40}
+                      className="shrink-0 rounded-full border border-(--border) object-cover"
                     />
 
-                    <div>
-                      <p className="font-semibold text-sm text-black">
+                    <div className="min-w-0">
+                      <p className="truncate text-sm font-semibold text-(--text)">
                         {user.name}
                       </p>
-                      <p className="text-xs text-gray-500">{user.email}</p>
+                      <p className="truncate text-xs text-(--text-muted)">
+                        {user.email}
+                      </p>
                     </div>
                   </div>
 
                   {/* Role */}
-                  <p className="text-xs mb-3 text-gray-600">
-                    Role: <span className="font-medium">{user.role}</span>
+                  <p className="mb-3 text-xs text-(--text-muted)">
+                    Role:{" "}
+                    <span className="font-medium text-(--text)">
+                      {user.role}
+                    </span>
                   </p>
 
-                  <hr className="my-2" />
+                  <div className="my-2 border-t border-(--border)" />
 
                   {/* Logout */}
                   <button
+                    type="button"
                     onClick={() => signOut({ callbackUrl: "/auth/login" })}
-                    className="w-full text-left text-red-500 text-sm py-2 hover:bg-red-50 rounded-md"
+                    className="w-full rounded-md px-3 py-2 text-left text-sm text-(--primary) transition-colors hover:bg-(--surface-hover)"
                   >
                     Logout
                   </button>
@@ -118,11 +144,16 @@ const Navbar = () => {
             </div>
           ) : (
             <>
-              <Link href="/auth/login">Login</Link>
+              <Link
+                href="/auth/login"
+                className="text-sm text-(--text-muted) transition-colors hover:text-(--primary)"
+              >
+                Login
+              </Link>
 
               <Link
                 href="/auth/register"
-                className="px-4 py-2 rounded-md bg-(--primary) text-white"
+                className="rounded-md bg-(--primary) px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-(--primary-hover)"
               >
                 Get Started
               </Link>
@@ -130,41 +161,110 @@ const Navbar = () => {
           )}
         </div>
 
-        {/* Mobile Button */}
+        {/* Compact Navigation Toggle: Mobile, Tablet and Small Laptop */}
         <button
+          type="button"
           onClick={() => setOpen(!open)}
-          className="md:hidden text-(--text) text-xl"
+          aria-label={open ? "Close navigation menu" : "Open navigation menu"}
+          aria-expanded={open}
+          className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg border border-(--border) text-xl text-(--text) transition-colors hover:bg-(--surface-hover) md:hidden"
         >
-          ☰
+          {open ? "✕" : "☰"}
         </button>
       </div>
 
-      {/* Mobile Menu */}
+      {/* Compact Navigation Menu */}
       {open && (
-        <div className="md:hidden px-4 pb-4 space-y-3 text-(--text-muted) bg-(--bg-secondary) border-t border-(--border)">
-          <Link href="/">Home</Link>
-         
+        <div className="max-h-[calc(100dvh-4rem)] overflow-y-auto border-t border-(--border) bg-(--bg-secondary) px-3 pb-5 pt-3 sm:px-4 md:hidden">
+          <nav className="flex flex-col gap-1 text-sm text-(--text-muted)">
+            {/* Home */}
+            <Link
+              href="/"
+              onClick={closeMobileMenu}
+              className="rounded-lg px-3 py-3 transition-colors hover:bg-(--surface-hover) hover:text-(--primary)"
+            >
+              Home
+            </Link>
 
-          <hr />
+            {/* Role-specific Dashboard */}
+            {dashboardLink && (
+              <Link
+                href={dashboardLink.href}
+                onClick={closeMobileMenu}
+                className="rounded-lg px-3 py-3 transition-colors hover:bg-(--surface-hover) hover:text-(--primary)"
+              >
+                {dashboardLink.label}
+              </Link>
+            )}
 
-          {isLoggedIn && user?.role === "recruiter" && (
-            <Link href="/pages/recruiter">Recruiter</Link>
-          )}
+            <div className="my-2 border-t border-(--border)" />
 
-          {isLoggedIn && user?.role === "developer" && (
-            <Link href="/pages/developer">Developer</Link>
-          )}
+            {/* Authentication / Profile */}
+            {loading ? (
+              <div className="px-3 py-3 text-(--text-muted)">
+                Loading...
+              </div>
+            ) : isLoggedIn && user ? (
+              <>
+                {/* User Info */}
+                <div className="flex min-w-0 items-center gap-3 rounded-lg bg-(--surface-hover) p-3">
+                  <Image
+                    src={user.image || "/avatar.png"}
+                    alt="user"
+                    width={44}
+                    height={44}
+                    className="shrink-0 rounded-full border border-(--border) object-cover"
+                  />
 
-          {isLoggedIn && user?.role === "admin" && (
-            <Link href="/pages/admin">Admin</Link>
-          )}
+                  <div className="min-w-0 flex-1">
+                    <p className="truncate text-sm font-semibold text-(--text)">
+                      {user.name}
+                    </p>
+                    <p className="truncate text-xs text-(--text-muted)">
+                      {user.email}
+                    </p>
+                    <p className="mt-1 text-xs text-(--text-muted)">
+                      Role:{" "}
+                      <span className="font-medium text-(--text)">
+                        {user.role}
+                      </span>
+                    </p>
+                  </div>
+                </div>
 
-          <hr />
+                {/* Logout */}
+                <button
+                  type="button"
+                  onClick={() => {
+                    setOpen(false);
+                    setDropdown(false);
+                    signOut({ callbackUrl: "/auth/login" });
+                  }}
+                  className="mt-2 w-full rounded-lg px-3 py-3 text-left text-sm text-(--primary) transition-colors hover:bg-(--surface-hover)"
+                >
+                  Logout
+                </button>
+              </>
+            ) : (
+              <>
+                <Link
+                  href="/auth/login"
+                  onClick={closeMobileMenu}
+                  className="rounded-lg px-3 py-3 transition-colors hover:bg-(--surface-hover) hover:text-(--primary)"
+                >
+                  Login
+                </Link>
 
-          <Link href="/auth/login">Login</Link>
-          <Link href="/auth/register" className="text-(--primary)">
-            Get Started
-          </Link>
+                <Link
+                  href="/auth/register"
+                  onClick={closeMobileMenu}
+                  className="rounded-lg bg-(--primary) px-3 py-3 text-center font-medium text-white transition-colors hover:bg-(--primary-hover)"
+                >
+                  Get Started
+                </Link>
+              </>
+            )}
+          </nav>
         </div>
       )}
     </header>

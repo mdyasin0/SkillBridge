@@ -1,3 +1,4 @@
+
 "use client";
 
 import LoadingUI from "@/components/Loadinui";
@@ -25,7 +26,7 @@ export default function UIChallengesPage() {
         setLoading(false);
       });
   }, []);
-
+console.log(data);
   const handleDelete = async (id: number) => {
     const confirmDelete = window.confirm(
       "Are you sure you want to delete this challenge?"
@@ -36,9 +37,12 @@ export default function UIChallengesPage() {
     try {
       setDeletingId(id);
 
-      const res = await fetch(`/api/ui_challenge_manage/uichallengedelete/${id}`, {
-        method: "DELETE",
-      });
+      const res = await fetch(
+        `/api/ui_challenge_manage/uichallengedelete/${id}`,
+        {
+          method: "DELETE",
+        }
+      );
 
       const result = await res.json();
 
@@ -60,94 +64,117 @@ export default function UIChallengesPage() {
   };
 
   if (loading) {
-    return<LoadingUI/>;
+    return <LoadingUI />;
   }
 
   return (
-    <div className="max-w-7xl mx-auto p-8">
-      <h1 className="text-3xl font-bold mb-8">
+    <div className="mx-auto w-full min-w-0 max-w-7xl px-3 py-4 sm:px-5 sm:py-6 md:px-6 md:py-8">
+      <h1
+        className="mb-5 text-2xl font-bold sm:mb-8 sm:text-3xl"
+        style={{
+          color: "var(--text)",
+        }}
+      >
         UI Challenges
       </h1>
 
       <div
-        className="rounded-xl overflow-hidden border"
+        className="w-full min-w-0 overflow-hidden rounded-xl border"
         style={{
           background: "var(--surface)",
           borderColor: "var(--border)",
           boxShadow: "var(--shadow)",
         }}
       >
-        <table className="w-full">
-          <thead
-            style={{
-              background: "var(--surface-hover)",
-            }}
-          >
-            <tr>
-              <th className="text-left p-4">Title</th>
-              <th className="text-left p-4">Technology</th>
-              <th className="text-left p-4">Difficulty</th>
-              <th className="text-center p-4">Action</th>
-            </tr>
-          </thead>
-
-          <tbody>
-            {data.map((challenge) => (
-              <tr
-                key={challenge.id}
-                className="border-t"
-                style={{
-                  borderColor: "var(--border)",
-                }}
-              >
-                <td className="p-4">{challenge.title}</td>
-
-                <td className="p-4">
-                  {challenge.technology}
-                </td>
-
-                <td className="p-4">
-                  {challenge.difficulty}
-                </td>
-
-                <td className="p-4">
-                  <div className="flex justify-center gap-3">
-                    <Link
-                      href={`/pages/admin/ui-challenge-manage/ui-challenges-lists/${challenge.id}`}
-                      className="px-4 py-2 rounded-lg text-white"
-                      style={{
-                        background: "var(--primary)",
-                      }}
-                    >
-                      View Details
-                    </Link>
-
-                    <button
-                      onClick={() =>
-                        handleDelete(challenge.id)
-                      }
-                      disabled={deletingId === challenge.id}
-                      className="px-4 py-2 rounded-lg text-white disabled:opacity-50"
-                      style={{
-                        background: "#EF4444",
-                      }}
-                    >
-                      {deletingId === challenge.id
-                        ? "Deleting..."
-                        : "Delete"}
-                    </button>
-                    <Link
-  href={`/pages/admin/ui-challenge-manage/edituichallenge/${challenge.id}`}
-  className="px-4 py-2 rounded-lg text-white bg-green-600"
->
-  Update
-</Link>
-                  </div>
-                </td>
+        <div className="w-full overflow-x-auto">
+          <table className="w-full min-w-[650px] border-collapse text-left">
+            <thead
+              style={{
+                background: "var(--surface-hover)",
+                color: "var(--text)",
+              }}
+            >
+              <tr>
+                <th className="p-3 text-sm font-semibold sm:p-4 sm:text-base">
+                  Title
+                </th>
+                <th className="p-3 text-sm font-semibold sm:p-4 sm:text-base">
+                  Technology
+                </th>
+                <th className="p-3 text-sm font-semibold sm:p-4 sm:text-base">
+                  Difficulty
+                </th>
+                <th className="p-3 text-center text-sm font-semibold sm:p-4 sm:text-base">
+                  Action
+                </th>
               </tr>
-            ))}
-          </tbody>
-        </table>
+            </thead>
+
+            <tbody>
+              {data.map((challenge) => (
+                <tr
+                  key={challenge.id}
+                  className="border-t transition-colors"
+                  style={{
+                    borderColor: "var(--border)",
+                    color: "var(--text)",
+                  }}
+                >
+                  <td className="max-w-xs break-words p-3 text-sm sm:p-4 sm:text-base">
+                    {challenge.title}
+                  </td>
+
+                  <td className="p-3 text-sm sm:p-4 sm:text-base">
+                    {challenge.technology}
+                  </td>
+
+                  <td className="p-3 text-sm sm:p-4 sm:text-base">
+                    {challenge.difficulty}
+                  </td>
+
+                  <td className="p-3 sm:p-4">
+                    <div className="flex flex-wrap items-center justify-center gap-2 sm:gap-3">
+                      <Link
+                        href={`/pages/admin/ui-challenge-manage/ui-challenges-lists/${challenge.id}`}
+                        className="inline-flex items-center justify-center rounded-lg px-3 py-2 text-center text-sm font-medium text-white transition-colors hover:opacity-90 sm:px-4"
+                        style={{
+                          background: "var(--primary)",
+                        }}
+                      >
+                        View Details
+                      </Link>
+
+                      <button
+                        onClick={() => handleDelete(challenge.id)}
+                        disabled={deletingId === challenge.id}
+                        className="inline-flex items-center justify-center rounded-lg px-3 py-2 text-sm font-medium transition-colors hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-50 sm:px-4"
+                        style={{
+                          background: "var(--surface-hover)",
+                          color: "var(--text)",
+                          border: "1px solid var(--border)",
+                        }}
+                      >
+                        {deletingId === challenge.id
+                          ? "Deleting..."
+                          : "Delete"}
+                      </button>
+
+                      <Link
+                        href={`/pages/admin/ui-challenge-manage/edituichallenge/${challenge.id}`}
+                        className="inline-flex items-center justify-center rounded-lg px-3 py-2 text-center text-sm font-medium text-white transition-colors hover:opacity-90 sm:px-4"
+                        style={{
+                          background: "var(--primary-hover)",
+                        }}
+                      >
+                        Update
+                      </Link>
+                    </div>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
       </div>
     </div>
   );

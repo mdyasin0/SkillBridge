@@ -409,12 +409,23 @@ u.created_at ASC
     short_description
   FROM technology_badges
 `);
-    const badgeMap = new Map(
-      technologyBadges.map((badge: any) => [
-        badge.title.trim().toLowerCase(),
-        badge,
-      ]),
-    );
+ 
+type TechnologyBadge = {
+  id: number;
+  title: string;
+  icon: string | null;
+  short_description: string | null;
+};
+
+const badgeMap = new Map<string, TechnologyBadge>(
+  technologyBadges.map(
+    (badge: TechnologyBadge) => [
+      badge.title.trim().toLowerCase(),
+      badge,
+    ]
+  )
+);
+
     const calculateBadges = (rows: any[], type: "project" | "problem") => {
       const approvedRows = rows.filter((item) => {
         return item.check_status === "approved";

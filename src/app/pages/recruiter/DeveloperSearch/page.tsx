@@ -448,53 +448,60 @@ export default function DeveloperSearch() {
         {/* ---------------------------------------------------------------- */}{" "}
         {/* Search + Filter + Sort */}{" "}
         {/* ---------------------------------------------------------------- */}{" "}
-        <div className="flex items-center gap-3">
-          {" "}
-          {/* Search */}{" "}
-          <div className=" flex min-w-0 flex-1 items-center gap-3 rounded-2xl border border-(--border) bg-(--surface) px-4 py-3 shadow-(--shadow) transition focus-within:border-(--primary)/40 focus-within:ring-2 focus-within:ring-(--primary)/10 ">
-            {" "}
-            <Search size={19} className="shrink-0 text-(--text-muted)" />{" "}
-            <input
-              type="text"
-              value={searchQuery}
-              onChange={(event) => setSearchQuery(event.target.value)}
-              placeholder="Search developers by name, title, skill, country, bio..."
-              className="min-w-0 flex-1 bg-transparent text-sm outline-none placeholder:text-(--text-muted)"
-            />{" "}
-          </div>{" "}
-          {/* Filter + Sort */}{" "}
-          <div className="flex shrink-0 items-center gap-3">
-            {" "}
-            {/* Filter Button */}{" "}
-            <button
-              type="button"
-              onClick={toggleFilters}
-              aria-expanded={showFilters}
-              className={` flex items-center justify-center gap-2 rounded-xl border px-4 py-2.5 text-sm font-semibold transition ${showFilters ? "border-(--primary)/30 bg-(--primary)/10 text-(--primary)" : "border-(--border) bg-(--surface) hover:bg-(--surface-hover)"} `}
-            >
-              {" "}
-              <SlidersHorizontal size={16} /> Filters{" "}
-              <ChevronDown
-                size={15}
-                className={` ml-1 text-(--text-muted) transition-transform duration-200 ${showFilters ? "rotate-180" : ""} `}
-              />{" "}
-            </button>{" "}
-            {/* Sort Button */}{" "}
-            <button
-              type="button"
-              onClick={toggleSorting}
-              aria-expanded={showSorting}
-              className={` flex items-center justify-center gap-2 rounded-xl border px-4 py-2.5 text-sm font-semibold transition ${showSorting ? "border-(--primary)/30 bg-(--primary)/10 text-(--primary)" : "border-(--border) bg-(--surface) hover:bg-(--surface-hover)"} `}
-            >
-              {" "}
-              <ArrowUpDown size={16} /> Sort{" "}
-              <ChevronDown
-                size={15}
-                className={` ml-1 text-(--text-muted) transition-transform duration-200 ${showSorting ? "rotate-180" : ""} `}
-              />{" "}
-            </button>{" "}
-          </div>{" "}
-        </div>{" "}
+       <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
+  <div className="flex min-w-0 flex-1 items-center gap-3 rounded-2xl border border-(--border) bg-(--surface) px-4 py-3 shadow-(--shadow) transition focus-within:border-(--primary) focus-within:ring-2 focus-within:ring-(--primary)/10">
+    <Search size={19} className="shrink-0 text-(--text-muted)" />
+    <input
+      type="text"
+      value={searchQuery}
+      onChange={(event) => setSearchQuery(event.target.value)}
+      placeholder="Search developers by  title, skill, country, bio..."
+      className="min-w-0 w-full flex-1 bg-transparent text-sm text-(--text) outline-none placeholder:text-(--text-muted)"
+    />
+  </div>
+
+  <div className="grid grid-cols-2 gap-3 sm:flex sm:shrink-0">
+    <button
+      type="button"
+      onClick={toggleFilters}
+      aria-expanded={showFilters}
+      className={`flex min-w-0 items-center justify-center gap-2 rounded-xl border px-3 py-3 text-sm font-semibold transition sm:px-4 ${
+        showFilters
+          ? "border-(--primary)/30 bg-(--primary)/10 text-(--primary)"
+          : "border-(--border) bg-(--surface) text-(--text) hover:bg-(--surface-hover)"
+      }`}
+    >
+      <SlidersHorizontal size={16} />
+      Filters
+      <ChevronDown
+        size={15}
+        className={`text-(--text-muted) transition-transform duration-200 ${
+          showFilters ? "rotate-180" : ""
+        }`}
+      />
+    </button>
+
+    <button
+      type="button"
+      onClick={toggleSorting}
+      aria-expanded={showSorting}
+      className={`flex min-w-0 items-center justify-center gap-2 rounded-xl border px-3 py-3 text-sm font-semibold transition sm:px-4 ${
+        showSorting
+          ? "border-(--primary)/30 bg-(--primary)/10 text-(--primary)"
+          : "border-(--border) bg-(--surface) text-(--text) hover:bg-(--surface-hover)"
+      }`}
+    >
+      <ArrowUpDown size={16} />
+      Sort
+      <ChevronDown
+        size={15}
+        className={`text-(--text-muted) transition-transform duration-200 ${
+          showSorting ? "rotate-180" : ""
+        }`}
+      />
+    </button>
+  </div>
+</div>{" "}
         {/* ---------------------------------------------------------------- */}{" "}
         {/* Filter Panel */}{" "}
         {/* ---------------------------------------------------------------- */}{" "}
@@ -656,23 +663,16 @@ export default function DeveloperSearch() {
       {/* ================================================================== */}{" "}
       <section>
         {filteredDevelopers.length > 0 ? (
-          <div
-            className="
-        grid
-        grid-cols-1
-        gap-5
-        lg:grid-cols-2
-      "
-          >
-            {visibleDevelopers.map((developer) => (
-              <DeveloperCard
-                key={developer.id}
-                developer={developer}
-                saved={saved}
-                onSave={() => setSaved((value) => !value)}
-              />
-            ))}
-          </div>
+          <div className="grid grid-cols-1 gap-4 sm:gap-5 xl:grid-cols-2">
+  {visibleDevelopers.map((developer) => (
+    <DeveloperCard
+      key={developer.id}
+      developer={developer}
+      saved={saved}
+      onSave={() => setSaved((value) => !value)}
+    />
+  ))}
+</div>
         ) : (
           <div
             className="
@@ -840,31 +840,50 @@ function DeveloperCard({
                 </p>
               </div>
 
-              {/* Save */}
-              <button
-                type="button"
-                onClick={onSave}
-                aria-label="Save developer"
-                className="
-                  flex
-                  h-10
-                  w-10
-                  shrink-0
-                  items-center
-                  justify-center
-                  rounded-xl
-                  border
-                  border-(--border)
-                  transition
-                  hover:bg-(--surface-hover)
-                "
-              >
-                {saved ? (
-                  <BookmarkCheck size={18} className="text-(--primary)" />
-                ) : (
-                  <Bookmark size={18} />
-                )}
-              </button>
+             
+{/* Save - Coming Soon */}
+<div className="group relative shrink-0">
+  <button
+    type="button"
+    aria-label="Save feature coming soon"
+    className="
+      flex h-10 w-10 items-center justify-center
+      rounded-xl border border-(--border)
+      bg-(--surface)
+      text-(--text-muted)
+      cursor-not-allowed
+      transition duration-200
+      hover:border-(--primary)/30
+      hover:bg-(--primary)/5
+      hover:text-(--primary)
+    "
+  >
+    <Bookmark size={18} />
+  </button>
+
+  {/* Hover Tooltip */}
+  <div
+    className="
+      pointer-events-none absolute right-0 top-full z-50 mt-2
+      w-52 rounded-xl border border-(--border)
+      bg-(--surface) px-3 py-2.5
+      text-xs text-(--text)
+      opacity-0 invisible translate-y-1
+      shadow-(--shadow)
+      transition-all duration-200
+      group-hover:visible group-hover:translate-y-0
+      group-hover:opacity-100
+    "
+  >
+    <p className="font-semibold text-(--primary)">
+      Coming Soon
+    </p>
+    <p className="mt-1 leading-5 text-(--text-muted)">
+      Save feature is not available yet.
+    </p>
+  </div>
+</div>
+
             </div>
 
             {/* Basic info */}
@@ -897,25 +916,25 @@ function DeveloperCard({
         {/* Main Metrics                                                      */}
         {/* ---------------------------------------------------------------- */}
 
-        <div className="mt-6 grid grid-cols-3 gap-3">
-          <Metric
-            icon={<Star size={16} />}
-            label="Skill Score"
-            value={`${developer.score}/100`}
-          />
+        <div className="mt-6 grid grid-cols-1 gap-3 min-[420px]:grid-cols-3">
+  <Metric
+    icon={<Star size={16} />}
+    label="Skill Score"
+    value={`${developer.score}/100`}
+  />
 
-          <Metric
-            icon={<Trophy size={16} />}
-            label="Global Rank"
-            value={`#${developer.rank}`}
-          />
+  <Metric
+    icon={<Trophy size={16} />}
+    label="Global Rank"
+    value={`#${developer.rank}`}
+  />
 
-          <Metric
-            icon={<Code2 size={16} />}
-            label="Badges"
-            value={developer.badges}
-          />
-        </div>
+  <Metric
+    icon={<Code2 size={16} />}
+    label="Badges"
+    value={developer.badges}
+  />
+</div>
 
         {/* ---------------------------------------------------------------- */}
         {/* Technology Stack                                                  */}
@@ -1089,26 +1108,19 @@ function Metric({
   value: string | number | null;
 }) {
   return (
-    <div
-      className="
-        rounded-2xl
-        border
-        border-(--border)
-        bg-(--surface-hover)/60
-        px-3
-        py-3.5
-      "
-    >
-      <div className="flex items-center gap-1.5 text-(--text-muted)">
-        {icon}
+    <div className="min-w-0 rounded-2xl border border-(--border) bg-(--surface-hover)/60 px-3 py-3.5">
+  <div className="flex min-w-0 flex-wrap items-center gap-1.5 text-(--text-muted)">
+    {icon}
 
-        <span className="text-[10px] font-semibold uppercase tracking-wide">
-          {label}
-        </span>
-      </div>
+    <span className="break-words text-[10px] font-semibold uppercase tracking-wide">
+      {label}
+    </span>
+  </div>
 
-      <p className="mt-1.5 text-base font-bold">{value}</p>
-    </div>
+  <p className="mt-1.5 break-words text-base font-bold text-(--text)">
+    {value}
+  </p>
+</div>
   );
 }
 
@@ -1125,18 +1137,11 @@ function AvailabilityBadge({
 
   return (
     <span
-      className={`
-        rounded-full
-        px-2.5
-        py-1
-        text-[10px]
-        font-semibold
-          ${
-            isAvailable
-              ? "bg-emerald-500/10 text-emerald-600"
-              : "bg-slate-500/10 text-slate-500"
-          }
-      `}
+      className={`rounded-full border px-2.5 py-1 text-[10px] font-semibold ${
+        isAvailable
+          ? "border-(--primary)/30 bg-(--primary)/10 text-(--primary)"
+          : "border-(--border) bg-(--surface-hover) text-(--text-muted)"
+      }`}
     >
       {availability}
     </span>

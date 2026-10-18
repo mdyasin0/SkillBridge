@@ -1,3 +1,4 @@
+
 "use client";
 
 import { useForm } from "react-hook-form";
@@ -8,6 +9,7 @@ import { useAuth } from "@/context/AuthContext";
 import { IoIosClose } from "react-icons/io";
 import { useRouter } from "next/navigation";
 import { toast } from "react-toastify";
+
 const profileSchema = z.object({
   title: z.string().trim().min(3, "Title is required"),
   bio: z
@@ -18,7 +20,6 @@ const profileSchema = z.object({
     .number()
     .min(0, "Years cannot be negative")
     .max(50, "Maximum 50 years"),
-
   experienceMonths: z
     .number()
     .min(0, "Months cannot be negative")
@@ -34,6 +35,7 @@ const profileSchema = z.object({
 });
 
 type ProfileForm = z.infer<typeof profileSchema>;
+
 export default function CompleteProfilePage() {
   const router = useRouter();
   const [skills, setSkills] = useState<string[]>([]);
@@ -43,7 +45,6 @@ export default function CompleteProfilePage() {
   const [languageInput, setLanguageInput] = useState("");
   const { user } = useAuth();
   const userId = user?.id;
-  
 
   const {
     register,
@@ -53,24 +54,22 @@ export default function CompleteProfilePage() {
     formState: { errors, isSubmitting, isDirty },
   } = useForm<ProfileForm>({
     resolver: zodResolver(profileSchema),
-
     defaultValues: {
       title: "",
       bio: "",
       experienceYears: 0,
-
       experienceMonths: 0,
       country: "",
       education: "",
       skills: [],
       techStack: "",
-
       languages: [],
       github: "",
       portfolio: "",
       linkedin: "",
     },
   });
+
   const bio = watch("bio") || "";
 
   const onSubmit = async (data: ProfileForm) => {
@@ -107,13 +106,12 @@ export default function CompleteProfilePage() {
 
       toast.info(result.message);
       router.push("/");
-      
     } catch (error) {
       toast.error(String(error));
-
       toast.info("Something went wrong");
     }
   };
+
   const addSkill = () => {
     const value = skillInput.trim();
 
@@ -135,6 +133,7 @@ export default function CompleteProfilePage() {
 
     setSkillInput("");
   };
+
   const removeSkill = (skill: string) => {
     const updatedSkills = skills.filter((s) => s !== skill);
 
@@ -144,6 +143,7 @@ export default function CompleteProfilePage() {
       shouldValidate: true,
     });
   };
+
   const addLanguage = () => {
     const value = languageInput.trim();
 
@@ -165,6 +165,7 @@ export default function CompleteProfilePage() {
 
     setLanguageInput("");
   };
+
   const removeLanguage = (language: string) => {
     const updatedLanguages = languages.filter((l) => l !== language);
 
@@ -190,70 +191,75 @@ export default function CompleteProfilePage() {
     };
   }, [isDirty, isSubmitting]);
 
+  const inputClass =
+    "box-border w-full min-w-0 rounded-lg border border-(--border) bg-(--bg-secondary) p-3 text-(--text) outline-none transition-colors placeholder:text-(--text-muted) focus:border-(--primary) focus:ring-2 focus:ring-(--primary)/20";
+
+  const labelClass = "mb-2 block text-sm font-medium text-(--text)";
+
+  const errorClass = "mt-1 text-sm text-(--text-muted)";
+
   return (
-    <div className="min-h-screen bg-(--bg) py-10 px-4">
-      <div className="mx-auto max-w-3xl rounded-2xl border border-(--border) bg-(--surface) p-8 shadow-(--shadow)">
-        <div className="mb-8 text-center">
-          <h1 className="text-3xl font-bold text-(--text)">
+    <div className="min-h-screen bg-(--bg) px-3 py-5 transition-colors duration-300 sm:px-5 sm:py-8 lg:px-8 lg:py-10">
+      <div className="mx-auto w-full max-w-3xl rounded-xl border border-(--border) bg-(--surface) p-4 shadow-(--shadow) transition-colors duration-300 sm:rounded-2xl sm:p-6 md:p-8">
+        <div className="mb-6 text-center sm:mb-8">
+          <h1 className="text-2xl font-bold leading-tight text-(--text) sm:text-3xl">
             Complete Your Profile
           </h1>
 
-          <p className="mt-2 text-sm text-(--text-muted)">
+          <p className="mx-auto mt-2 max-w-2xl text-sm leading-6 text-(--text-muted)">
             Complete your developer profile to start taking assessments and get
             discovered by recruiters.
           </p>
         </div>
 
-        <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
+        <form onSubmit={handleSubmit(onSubmit)} className="space-y-5 sm:space-y-6">
           {/* Title */}
-          <div>
-            <label className="mb-2 block font-medium">Title</label>
+          <div className="min-w-0">
+            <label className={labelClass}>Title</label>
 
             <input
               {...register("title")}
-              placeholder="Enter your full name"
-              className="w-full rounded-lg border border-(--border) bg-(--bg-secondary) p-3 outline-none focus:border-(--primary)"
+              placeholder="Enter title 'Full stack developer'"
+              className={inputClass}
             />
 
             {errors.title && (
-              <p className="mt-1 text-sm text-red-500">
-                {errors.title.message}
-              </p>
+              <p className={errorClass}>{errors.title.message}</p>
             )}
           </div>
 
           {/* Bio */}
-          <div>
-            <label className="mb-2 block font-medium">Bio</label>
+          <div className="min-w-0">
+            <label className={labelClass}>Bio</label>
 
             <textarea
               rows={4}
               maxLength={160}
               {...register("bio")}
               placeholder="Write a short introduction..."
-              className="w-full rounded-lg border border-(--border) bg-(--bg-secondary) p-3 outline-none focus:border-(--primary)"
+              className={`${inputClass} min-h-28 resize-y`}
             />
 
-            <div className="mt-1 flex justify-between">
+            <div className="mt-1 flex flex-wrap items-start justify-between gap-2">
               {errors.bio ? (
-                <p className="text-sm text-red-500">{errors.bio.message}</p>
+                <p className={errorClass}>{errors.bio.message}</p>
               ) : (
                 <span />
               )}
 
-              <p className="text-sm text-(--text-muted)">{bio.length}/160</p>
+              <p className="shrink-0 text-sm text-(--text-muted)">
+                {bio.length}/160
+              </p>
             </div>
           </div>
 
-          <div className="grid gap-5 md:grid-cols-3">
+          <div className="grid grid-cols-1 gap-4 sm:gap-5 md:grid-cols-3">
             {/* Experience Years */}
-            <div>
-              <label className="mb-2 block font-medium">
-                Experience (Years)
-              </label>
+            <div className="min-w-0">
+              <label className={labelClass}>Experience (Years)</label>
 
               <input
-                className="w-full rounded-lg border border-(--border) p-3"
+                className={inputClass}
                 type="number"
                 {...register("experienceYears", {
                   valueAsNumber: true,
@@ -261,20 +267,18 @@ export default function CompleteProfilePage() {
               />
 
               {errors.experienceYears && (
-                <p className="text-sm text-red-500">
+                <p className={errorClass}>
                   {errors.experienceYears.message}
                 </p>
               )}
             </div>
 
             {/* Experience Months */}
-            <div>
-              <label className="mb-2 block font-medium">
-                Experience (Months)
-              </label>
+            <div className="min-w-0">
+              <label className={labelClass}>Experience (Months)</label>
 
               <input
-                className="w-full rounded-lg border border-(--border) p-3"
+                className={inputClass}
                 type="number"
                 {...register("experienceMonths", {
                   valueAsNumber: true,
@@ -282,57 +286,61 @@ export default function CompleteProfilePage() {
               />
 
               {errors.experienceMonths && (
-                <p className="text-sm text-red-500">
+                <p className={errorClass}>
                   {errors.experienceMonths.message}
                 </p>
               )}
             </div>
 
             {/* Country */}
-            <div>
-              <label className="mb-2 block font-medium">Country</label>
+            <div className="min-w-0">
+              <label className={labelClass}>Country</label>
 
               <input
                 {...register("country")}
                 placeholder="Bangladesh"
-                className="w-full rounded-lg border border-(--border) bg-(--bg-secondary) p-3 outline-none focus:border-(--primary)"
+                className={inputClass}
               />
 
               {errors.country && (
-                <p className="text-sm text-red-500">{errors.country.message}</p>
+                <p className={errorClass}>{errors.country.message}</p>
               )}
             </div>
           </div>
 
           {/* Education */}
-          <div>
-            <label className="mb-2 block font-medium">Education</label>
+          <div className="min-w-0">
+            <label className={labelClass}>Education</label>
 
             <input
               {...register("education")}
               placeholder="BSc in Computer Science"
-              className="w-full rounded-lg border border-(--border) bg-(--bg-secondary) p-3 outline-none focus:border-(--primary)"
+              className={inputClass}
             />
+
             {errors.education && (
-              <p className="text-sm text-red-500">{errors.education.message}</p>
+              <p className={errorClass}>{errors.education.message}</p>
             )}
           </div>
 
           {/* Skills */}
-          <div>
-            <label className="mb-2 block font-medium">Skills</label>
+          <div className="min-w-0">
+            <label className={labelClass}>Skills</label>
+
             <div className="mt-3 flex flex-wrap gap-2">
               {skills.map((skill) => (
                 <button
                   type="button"
                   key={skill}
                   onClick={() => removeSkill(skill)}
-                  className="rounded-full bg-(--primary) px-3 py-1 text-sm text-white"
+                  className="inline-flex max-w-full items-center gap-1 rounded-full bg-(--primary) px-3 py-1.5 text-sm text-white transition-colors hover:bg-(--primary-hover)"
                 >
-                  {skill} <IoIosClose />
+                  <span className="break-words">{skill}</span>
+                  <IoIosClose className="shrink-0 text-lg" />
                 </button>
               ))}
             </div>
+
             <input
               value={skillInput}
               onChange={(e) => setSkillInput(e.target.value)}
@@ -343,39 +351,43 @@ export default function CompleteProfilePage() {
                 }
               }}
               placeholder="Type a skill and press Enter (e.g. React)"
-              className="w-full rounded-lg border border-(--border) bg-(--bg-secondary) p-3 outline-none focus:border-(--primary)"
+              className={`${inputClass} mt-3`}
             />
+
             {errors.skills && (
-              <p className="text-sm text-red-500">{errors.skills.message}</p>
+              <p className={errorClass}>{errors.skills.message}</p>
             )}
           </div>
 
           {/* Tech Stack */}
-          <div>
-            <label className="mb-2 block font-medium">Tech Stack</label>
+          <div className="min-w-0">
+            <label className={labelClass}>Tech Stack</label>
 
             <input
               {...register("techStack")}
               placeholder="MERN Stack"
-              className="w-full rounded-lg border border-(--border) bg-(--bg-secondary) p-3 outline-none focus:border-(--primary)"
+              className={inputClass}
             />
+
             {errors.techStack && (
-              <p className="text-sm text-red-500">{errors.techStack.message}</p>
+              <p className={errorClass}>{errors.techStack.message}</p>
             )}
           </div>
 
           {/* Languages */}
-          <div>
-            <label className="mb-2 block font-medium">Languages</label>
+          <div className="min-w-0">
+            <label className={labelClass}>Languages</label>
+
             <div className="mt-3 flex flex-wrap gap-2">
               {languages.map((language) => (
                 <button
                   type="button"
                   key={language}
                   onClick={() => removeLanguage(language)}
-                  className="rounded-full bg-(--primary) px-3 py-1 text-sm text-white"
+                  className="inline-flex max-w-full items-center gap-1 rounded-full bg-(--primary) px-3 py-1.5 text-sm text-white transition-colors hover:bg-(--primary-hover)"
                 >
-                  {language} <IoIosClose />
+                  <span className="break-words">{language}</span>
+                  <IoIosClose className="shrink-0 text-lg" />
                 </button>
               ))}
             </div>
@@ -390,59 +402,63 @@ export default function CompleteProfilePage() {
                 }
               }}
               placeholder="Type a language and press Enter (e.g. JavaScript)"
-              className="w-full rounded-lg border border-(--border) bg-(--bg-secondary) p-3 outline-none focus:border-(--primary)"
+              className={`${inputClass} mt-3`}
             />
+
             {errors.languages && (
-              <p className="text-sm text-red-500">{errors.languages.message}</p>
+              <p className={errorClass}>{errors.languages.message}</p>
             )}
           </div>
 
           {/* GitHub */}
-          <div>
-            <label className="mb-2 block font-medium">GitHub</label>
+          <div className="min-w-0">
+            <label className={labelClass}>GitHub</label>
 
             <input
               {...register("github")}
               placeholder="https://github.com/username"
-              className="w-full rounded-lg border border-(--border) bg-(--bg-secondary) p-3 outline-none focus:border-(--primary)"
+              className={inputClass}
             />
+
             {errors.github && (
-              <p className="text-sm text-red-500">{errors.github.message}</p>
+              <p className={errorClass}>{errors.github.message}</p>
             )}
           </div>
 
           {/* Portfolio */}
-          <div>
-            <label className="mb-2 block font-medium">Portfolio</label>
+          <div className="min-w-0">
+            <label className={labelClass}>Portfolio</label>
 
             <input
               {...register("portfolio")}
               placeholder="https://yourportfolio.com"
-              className="w-full rounded-lg border border-(--border) bg-(--bg-secondary) p-3 outline-none focus:border-(--primary)"
+              className={inputClass}
             />
+
             {errors.portfolio && (
-              <p className="text-sm text-red-500">{errors.portfolio.message}</p>
+              <p className={errorClass}>{errors.portfolio.message}</p>
             )}
           </div>
 
           {/* LinkedIn */}
-          <div>
-            <label className="mb-2 block font-medium">LinkedIn</label>
+          <div className="min-w-0">
+            <label className={labelClass}>LinkedIn</label>
 
             <input
               {...register("linkedin")}
               placeholder="https://linkedin.com/in/username"
-              className="w-full rounded-lg border border-(--border) bg-(--bg-secondary) p-3 outline-none focus:border-(--primary)"
+              className={inputClass}
             />
+
             {errors.linkedin && (
-              <p className="text-sm text-red-500">{errors.linkedin.message}</p>
+              <p className={errorClass}>{errors.linkedin.message}</p>
             )}
           </div>
 
           <button
             disabled={isSubmitting}
             type="submit"
-            className="w-full rounded-lg bg-(--primary) py-3 font-semibold text-white disabled:opacity-60"
+            className="w-full rounded-lg bg-(--primary) px-4 py-3 font-semibold text-white transition-colors hover:bg-(--primary-hover) focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-(--primary) disabled:cursor-not-allowed disabled:opacity-60"
           >
             {isSubmitting ? "Saving..." : "Save & Continue"}
           </button>

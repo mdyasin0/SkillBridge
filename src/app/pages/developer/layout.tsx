@@ -1,3 +1,4 @@
+
 "use client";
 
 import { useAuth } from "@/context/AuthContext";
@@ -6,6 +7,7 @@ import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { toast } from "react-toastify";
+import { ArrowRight, X } from "lucide-react";
 
 const routes = [
   { name: "Home", path: "/" },
@@ -27,6 +29,26 @@ export default function DeveloperLayout({
 
   const [profileChecking, setProfileChecking] = useState(true);
   const [profileCompleted, setProfileCompleted] = useState(false);
+
+  // Mobile sidebar state
+  const [sidebarOpen, setSidebarOpen] = useState(false);
+
+  // Close sidebar when route changes
+  useEffect(() => {
+    setSidebarOpen(false);
+  }, [pathname]);
+
+  // Prevent background scrolling while mobile sidebar is open
+  useEffect(() => {
+    if (!sidebarOpen) return;
+
+    const previousOverflow = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+
+    return () => {
+      document.body.style.overflow = previousOverflow;
+    };
+  }, [sidebarOpen]);
 
   useEffect(() => {
     if (loading) return;
@@ -89,8 +111,7 @@ export default function DeveloperLayout({
 
       setProfileCompleted(data.profileCompleted);
 
-      // if Profile is incomplete
-      // just  access in create-profile route 
+      // If profile is incomplete, allow access only to create-profile
       if (
         data.profileCompleted === false &&
         pathname !== "/pages/developer/create-profile"
@@ -105,7 +126,7 @@ export default function DeveloperLayout({
   };
 
   /*
-   * if Route changes profile status will be   checked
+   * If route changes, profile status will be checked.
    */
   useEffect(() => {
     if (
@@ -182,25 +203,94 @@ export default function DeveloperLayout({
   }
 
   return (
-    <div className="flex min-h-screen" style={{ background: "var(--bg)" }}>
+    <div
+      className="flex min-h-screen"
+      style={{ background: "var(--bg)" }}
+    >
+      {/* Mobile overlay */}
+      <div
+        aria-hidden="true"
+        onClick={() => setSidebarOpen(false)}
+        className={`
+          fixed inset-0 z-40 md:hidden
+          transition-opacity duration-300
+          ${
+            sidebarOpen
+              ? "opacity-100 pointer-events-auto"
+              : "opacity-0 pointer-events-none"
+          }
+        `}
+        style={{
+          background: "var(--text)",
+          opacity: sidebarOpen ? 0.35 : 0,
+        }}
+      />
+
       {/* Sidebar */}
       <aside
-        className="w-64 p-4 border-r"
+        id="developer-sidebar"
+        aria-label="Developer navigation"
+        aria-hidden={
+          typeof window !== "undefined" &&
+          window.matchMedia("(max-width: 767px)").matches
+            ? !sidebarOpen
+            : undefined
+        }
+        className={`
+          fixed inset-y-0 left-0 z-50
+          flex h-dvh w-72 max-w-[85vw] flex-col
+          border-r p-4
+          transition-transform duration-300 ease-in-out
+          md:sticky md:top-0 md:z-auto
+          md:h-screen md:w-64 md:max-w-none
+          md:shrink-0 md:translate-x-0
+          ${
+            sidebarOpen
+              ? "translate-x-0"
+              : "-translate-x-full"
+          }
+        `}
         style={{
           background: "var(--surface)",
           borderColor: "var(--border)",
         }}
       >
-        <h2 className="text-xl font-semibold mb-6">
-          Developer Panel
-        </h2>
+        {/* Sidebar header */}
+        <div
+          className="mb-6 flex items-center justify-between gap-3"
+        >
+          <h2
+            className="text-xl font-semibold"
+            style={{ color: "var(--text)" }}
+          >
+            Developer Panel
+          </h2>
 
-        <nav className="flex flex-col gap-2">
+          {/* Mobile close button */}
+          <button
+            type="button"
+            onClick={() => setSidebarOpen(false)}
+            aria-label="Close navigation menu"
+            className="
+              flex h-10 w-10 shrink-0 items-center justify-center
+              rounded-lg transition-colors
+              md:hidden
+            "
+            style={{
+              color: "var(--text)",
+              background: "var(--surface-hover)",
+            }}
+          >
+            <X size={22} />
+          </button>
+        </div>
+
+        {/* Navigation */}
+        <nav className="flex flex-1 flex-col gap-2 overflow-y-auto">
           {routes.map((route) => {
             /*
              * PROFILE INCOMPLETE
-             *
-             * at that time just  Create Profile is showed
+             * Only Create Profile is shown.
              */
             if (
               !profileCompleted &&
@@ -211,8 +301,7 @@ export default function DeveloperLayout({
 
             /*
              * PROFILE COMPLETE
-             *
-             * Create Profile is  not showed
+             * Create Profile is hidden.
              */
             if (
               profileCompleted &&
@@ -229,12 +318,31 @@ export default function DeveloperLayout({
               <Link
                 key={route.path}
                 href={route.path}
-                className="px-4 py-2 rounded-md transition-all"
+                onClick={() => setSidebarOpen(false)}
+                aria-current={isActive ? "page" : undefined}
+                className="
+                  flex items-center rounded-lg px-4 py-3
+                  font-medium transition-colors duration-200
+                "
                 style={{
                   background: isActive
                     ? "var(--primary)"
                     : "transparent",
-                  color: isActive ? "#fff" : "var(--text)",
+                  color: isActive
+                    ? "var(--bg-secondary)"
+                    : "var(--text)",
+                }}
+                onMouseEnter={(event) => {
+                  if (!isActive) {
+                    event.currentTarget.style.background =
+                      "var(--surface-hover)";
+                  }
+                }}
+                onMouseLeave={(event) => {
+                  if (!isActive) {
+                    event.currentTarget.style.background =
+                      "transparent";
+                  }
                 }}
               >
                 {route.name}
@@ -246,11 +354,41 @@ export default function DeveloperLayout({
 
       {/* Right Content */}
       <main
-        className="flex-1 p-6"
+        className="min-w-0 flex-1 p-4 sm:p-6"
         style={{ background: "var(--bg-secondary)" }}
       >
         {children}
       </main>
+
+      {/* Fixed floating arrow - mobile only */}
+      <button
+        type="button"
+        onClick={() => setSidebarOpen(true)}
+        aria-label="Open navigation menu"
+        aria-controls="developer-sidebar"
+        aria-expanded={sidebarOpen}
+        className={`
+          fixed left-0 top-1/2 z-[60]
+          flex h-12 w-9 -translate-y-1/2
+          items-center justify-center
+          rounded-r-xl border border-l-0
+          shadow-lg transition-all duration-300
+          md:hidden
+          ${
+            sidebarOpen
+              ? "pointer-events-none -translate-x-full opacity-0"
+              : "translate-x-0 opacity-100"
+          }
+        `}
+        style={{
+          background: "var(--surface)",
+          color: "var(--text)",
+          borderColor: "var(--border)",
+          boxShadow: "var(--shadow)",
+        }}
+      >
+        <ArrowRight size={21} />
+      </button>
     </div>
   );
 }

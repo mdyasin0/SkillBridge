@@ -1,7 +1,12 @@
+
 "use client";
 
 import { useEffect, useState } from "react";
-import { MdDeveloperMode, MdManageAccounts, MdOutlineAdminPanelSettings } from "react-icons/md";
+import {
+  MdDeveloperMode,
+  MdManageAccounts,
+  MdOutlineAdminPanelSettings,
+} from "react-icons/md";
 import { toast } from "react-toastify";
 
 type User = {
@@ -33,10 +38,19 @@ export default function UserTable() {
         setFiltered(data.data);
       });
   }, []);
-  const totalDevelopers = users.filter((u) => u.role === "developer").length;
 
-  const totalRecruiters = users.filter((u) => u.role === "recruiter").length;
-  const totaladmins = users.filter((u) => u.role === "admin").length;
+  const totalDevelopers = users.filter(
+    (u) => u.role === "developer",
+  ).length;
+
+  const totalRecruiters = users.filter(
+    (u) => u.role === "recruiter",
+  ).length;
+
+  const totaladmins = users.filter(
+    (u) => u.role === "admin",
+  ).length;
+
   useEffect(() => {
     let data = [...users];
 
@@ -86,25 +100,25 @@ export default function UserTable() {
     setFiltered(data);
   }, [search, roleFilter, timeValue, timeUnit, users]);
 
-  
-
   const getStatusBadge = (status: User["status"]): string => {
-    const base = "px-2 py-1 text-xs rounded-full font-medium";
+    const base =
+      "inline-flex items-center whitespace-nowrap rounded-full px-2.5 py-1 text-xs font-medium";
 
     switch (status) {
       case "active":
-        return `${base} bg-green-100 text-green-700`;
+        return `${base} border border-green-500/30 bg-green-500/10 text-green-700 dark:text-green-400`;
 
       case "suspended":
-        return `${base} bg-yellow-100 text-yellow-700`;
+        return `${base} border border-amber-500/30 bg-amber-500/10 text-amber-700 dark:text-amber-400`;
 
       case "banned":
-        return `${base} bg-red-100 text-red-700`;
+        return `${base} border border-red-500/30 bg-red-500/10 text-red-700 dark:text-red-400`;
 
       default:
         return base;
     }
   };
+
   const handleAction = async (id: number, action: string) => {
     try {
       const res = await fetch(`/api/usermanage/${action}`, {
@@ -117,23 +131,23 @@ export default function UserTable() {
 
       const data = await res.json();
 
-      //  ERROR CASE
+      // ERROR CASE
       if (!res.ok) {
         toast.error(data.message || "Something went wrong ");
         return;
       }
 
-      //  SUCCESS ALERT
+      // SUCCESS ALERT
       toast.success(data.message || "Action successful ");
 
-      //  DELETE CASE
+      // DELETE CASE
       if (action === "delete") {
         setUsers((prev) => prev.filter((u) => u.id !== id));
         setFiltered((prev) => prev.filter((u) => u.id !== id));
         return;
       }
 
-      //  STATUS UPDATE CASE
+      // STATUS UPDATE CASE
       const newStatus =
         action === "ban"
           ? "banned"
@@ -157,57 +171,70 @@ export default function UserTable() {
       toast.error(String(error));
     }
   };
+
   return (
-    <div className="p-6 space-y-4">
+    <div className="w-full min-w-0 space-y-4 p-3 sm:p-4 md:p-6">
       {/* Summary Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+      <div className="mb-4 grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3 sm:gap-4">
         {/* Developers */}
-        <div className="p-4 rounded-lg border bg-(--surface) shadow-sm flex items-center justify-between hover:shadow-md transition">
-          <div>
-            <p className="text-sm text-gray-500">Total Developers</p>
-            <h2 className="text-2xl font-bold">{totalDevelopers}</h2>
+        <div className="flex min-w-0 items-center justify-between gap-3 rounded-xl border border-(--border) bg-(--surface) p-4 shadow-sm transition-shadow hover:shadow-md sm:p-5">
+          <div className="min-w-0">
+            <p className="text-sm text-(--text-muted)">
+              Total Developers
+            </p>
+            <h2 className="mt-1 text-2xl font-bold text-(--text)">
+              {totalDevelopers}
+            </h2>
           </div>
 
-          <div className="w-10 h-10 rounded-full bg-blue-100 flex items-center justify-center">
-           <MdDeveloperMode />
+          <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full border border-(--primary)/20 bg-(--primary)/10 text-(--primary)">
+            <MdDeveloperMode size={24} />
           </div>
         </div>
 
         {/* Recruiters */}
-        <div className="p-4 rounded-lg border bg-(--surface) shadow-sm flex items-center justify-between hover:shadow-md transition">
-          <div>
-            <p className="text-sm text-gray-500">Total Recruiters</p>
-            <h2 className="text-2xl font-bold">{totalRecruiters}</h2>
+        <div className="flex min-w-0 items-center justify-between gap-3 rounded-xl border border-(--border) bg-(--surface) p-4 shadow-sm transition-shadow hover:shadow-md sm:p-5">
+          <div className="min-w-0">
+            <p className="text-sm text-(--text-muted)">
+              Total Recruiters
+            </p>
+            <h2 className="mt-1 text-2xl font-bold text-(--text)">
+              {totalRecruiters}
+            </h2>
           </div>
 
-          <div className="w-10 h-10 rounded-full bg-green-100 flex items-center justify-center">
-         <MdManageAccounts />
+          <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full border border-(--primary)/20 bg-(--primary)/10 text-(--primary)">
+            <MdManageAccounts size={24} />
           </div>
         </div>
 
-           {/* admins */}
-        <div className="p-4 rounded-lg border bg-(--surface) shadow-sm flex items-center justify-between hover:shadow-md transition">
-          <div>
-            <p className="text-sm text-gray-500">Total Admins</p>
-            <h2 className="text-2xl font-bold">{totaladmins}</h2>
+        {/* Admins */}
+        <div className="flex min-w-0 items-center justify-between gap-3 rounded-xl border border-(--border) bg-(--surface) p-4 shadow-sm transition-shadow hover:shadow-md sm:p-5">
+          <div className="min-w-0">
+            <p className="text-sm text-(--text-muted)">
+              Total Admins
+            </p>
+            <h2 className="mt-1 text-2xl font-bold text-(--text)">
+              {totaladmins}
+            </h2>
           </div>
 
-          <div className="w-10 h-10 rounded-full bg-green-100 flex items-center justify-center">
-        <MdOutlineAdminPanelSettings />
+          <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full border border-(--primary)/20 bg-(--primary)/10 text-(--primary)">
+            <MdOutlineAdminPanelSettings size={24} />
           </div>
         </div>
       </div>
 
       {/* Filters */}
-      <div className="flex flex-wrap gap-3">
+      <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-4">
         <input
           placeholder="Search name or email..."
-          className="border px-3 py-2 rounded bg-(--surface) focus:outline-none focus:ring-2 focus:ring-blue-400"
+          className="w-full min-w-0 rounded-lg border border-(--border) bg-(--surface) px-3 py-2.5 text-sm text-(--text) placeholder:text-(--text-muted) outline-none transition focus:border-(--primary) focus:ring-2 focus:ring-(--primary)/20"
           onChange={(e) => setSearch(e.target.value)}
         />
 
         <select
-          className="border px-3 py-2 rounded bg-(--surface) cursor-pointer"
+          className="w-full min-w-0 cursor-pointer rounded-lg border border-(--border) bg-(--surface) px-3 py-2.5 text-sm text-(--text) outline-none transition focus:border-(--primary) focus:ring-2 focus:ring-(--primary)/20"
           onChange={(e) => setRoleFilter(e.target.value)}
         >
           <option value="all">All</option>
@@ -219,12 +246,13 @@ export default function UserTable() {
         <input
           type="number"
           placeholder="Time"
-          className="border px-3 py-2 rounded w-24 bg-(--surface)"
+          className="w-full min-w-0 rounded-lg border border-(--border) bg-(--surface) px-3 py-2.5 text-sm text-(--text) placeholder:text-(--text-muted) outline-none transition focus:border-(--primary) focus:ring-2 focus:ring-(--primary)/20"
           onChange={(e) => setTimeValue(Number(e.target.value))}
         />
-{/* for finding users base on registered time  */}
+
+        {/* For finding users based on registered time */}
         <select
-          className="border px-3 py-2 rounded bg-(--surface) cursor-pointer"
+          className="w-full min-w-0 cursor-pointer rounded-lg border border-(--border) bg-(--surface) px-3 py-2.5 text-sm text-(--text) outline-none transition focus:border-(--primary) focus:ring-2 focus:ring-(--primary)/20"
           onChange={(e) => setTimeUnit(e.target.value)}
         >
           <option value="hours">Hours</option>
@@ -236,16 +264,28 @@ export default function UserTable() {
       </div>
 
       {/* Table */}
-      <div className="overflow-x-auto rounded-lg border shadow-sm">
-        <table className="w-full text-sm">
-          <thead className="bg-(--surface-hover) text-gray-600">
+      <div className="w-full min-w-0 overflow-x-auto rounded-xl border border-(--border) bg-(--surface) shadow-sm">
+        <table className="w-full min-w-[900px] text-left text-sm text-(--text)">
+          <thead className="bg-(--surface-hover) text-(--text-muted)">
             <tr>
-              <th className="p-3 text-left">Name</th>
-              <th className="p-3 text-left">Email</th>
-              <th className="p-3 text-center">Role</th>
-              <th className="p-3 text-center">Status</th>
-              <th className="p-3 text-center">Created</th>
-              <th className="p-3 text-center">Actions</th>
+              <th className="whitespace-nowrap p-3 font-semibold sm:p-4">
+                Name
+              </th>
+              <th className="whitespace-nowrap p-3 font-semibold sm:p-4">
+                Email
+              </th>
+              <th className="whitespace-nowrap p-3 text-center font-semibold sm:p-4">
+                Role
+              </th>
+              <th className="whitespace-nowrap p-3 text-center font-semibold sm:p-4">
+                Status
+              </th>
+              <th className="whitespace-nowrap p-3 text-center font-semibold sm:p-4">
+                Created
+              </th>
+              <th className="whitespace-nowrap p-3 text-center font-semibold sm:p-4">
+                Actions
+              </th>
             </tr>
           </thead>
 
@@ -253,29 +293,37 @@ export default function UserTable() {
             {filtered.map((user) => (
               <tr
                 key={user.id}
-                className="border-t hover:bg-(--surface-hover) transition"
+                className="border-t border-(--border) transition-colors hover:bg-(--surface-hover)"
               >
-                <td className="p-3 font-medium">{user.name}</td>
+                <td className="max-w-56 p-3 font-medium sm:p-4">
+                  <span className="block truncate">{user.name}</span>
+                </td>
 
-                <td className="p-3 max-w-50 truncate">{user.email}</td>
+                <td className="max-w-64 p-3 sm:p-4">
+                  <span className="block truncate text-(--text-muted)">
+                    {user.email}
+                  </span>
+                </td>
 
-                <td className="p-3 text-center capitalize">{user.role}</td>
+                <td className="p-3 text-center capitalize sm:p-4">
+                  {user.role}
+                </td>
 
-                <td className="p-3 text-center">
+                <td className="p-3 text-center sm:p-4">
                   <span className={getStatusBadge(user.status)}>
                     {user.status}
                   </span>
                 </td>
 
-                <td className="p-3 text-center">
+                <td className="whitespace-nowrap p-3 text-center text-(--text-muted) sm:p-4">
                   {new Date(user.created_at).toLocaleString()}
                 </td>
 
-                <td className="p-3">
-                  <div className="flex flex-wrap justify-center gap-2">
+                <td className="p-3 sm:p-4">
+                  <div className="flex min-w-max flex-wrap justify-center gap-2">
                     <button
-                      className={`px-2 py-1 rounded text-xs bg-red-500 text-white hover:bg-red-600 active:scale-95 transition cursor-pointer ${
-                        activeAction === user.id && "opacity-70"
+                      className={`cursor-pointer rounded-lg border border-red-500/30 bg-red-500/10 px-3 py-1.5 text-xs font-medium text-red-700 transition hover:bg-red-500/20 active:scale-95 dark:text-red-400 ${
+                        activeAction === user.id ? "opacity-70" : ""
                       }`}
                       onClick={() => handleAction(user.id, "ban")}
                     >
@@ -283,21 +331,21 @@ export default function UserTable() {
                     </button>
 
                     <button
-                      className="px-2 py-1 rounded text-xs bg-yellow-500 text-white hover:bg-yellow-600 active:scale-95 transition cursor-pointer"
+                      className="cursor-pointer rounded-lg border border-amber-500/30 bg-amber-500/10 px-3 py-1.5 text-xs font-medium text-amber-700 transition hover:bg-amber-500/20 active:scale-95 dark:text-amber-400"
                       onClick={() => handleAction(user.id, "suspend")}
                     >
                       Suspend
                     </button>
 
                     <button
-                      className="px-2 py-1 rounded text-xs bg-green-500 text-white hover:bg-green-600 active:scale-95 transition cursor-pointer"
+                      className="cursor-pointer rounded-lg border border-green-500/30 bg-green-500/10 px-3 py-1.5 text-xs font-medium text-green-700 transition hover:bg-green-500/20 active:scale-95 dark:text-green-400"
                       onClick={() => handleAction(user.id, "restore")}
                     >
                       Restore
                     </button>
 
                     <button
-                      className="px-2 py-1 rounded text-xs bg-gray-600 text-white hover:bg-gray-700 active:scale-95 transition cursor-pointer"
+                      className="cursor-pointer rounded-lg border border-(--border) bg-(--surface-hover) px-3 py-1.5 text-xs font-medium text-(--text) transition hover:opacity-80 active:scale-95"
                       onClick={() => handleAction(user.id, "delete")}
                     >
                       Delete

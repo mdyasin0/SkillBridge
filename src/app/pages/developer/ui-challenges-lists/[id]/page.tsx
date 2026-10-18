@@ -142,21 +142,21 @@ useEffect(() => {
     title: "Submit Project?",
     html: (
       <div className="text-left">
-        <div className="mb-5 flex items-center gap-3 rounded-xl border border-amber-200 bg-amber-50 p-4">
-          <div className="flex h-11 w-11 items-center justify-center rounded-full bg-amber-500 text-white">
-            <CiWarning size={24} />
-          </div>
+       <div className="mb-5 flex flex-col gap-3 rounded-xl border border-[var(--border)] bg-[var(--bg-secondary)] p-3 sm:flex-row sm:items-center sm:p-4">
+  <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-[var(--primary)] text-white">
+    <CiWarning size={24} />
+  </div>
 
-          <div>
-            <h3 className="font-semibold text-slate-900">
-              Final Submission Confirmation
-            </h3>
+  <div className="min-w-0">
+    <h3 className="font-semibold text-[var(--text)]">
+      Final Submission Confirmation
+    </h3>
 
-            <p className="mt-1 text-sm text-slate-600">
-              Please review your submission carefully before continuing.
-            </p>
-          </div>
-        </div>
+    <p className="mt-1 text-sm text-[var(--text-muted)]">
+      Please review your submission carefully before continuing.
+    </p>
+  </div>
+</div>
 
         <div className="rounded-xl border border-slate-200 bg-slate-50 p-4">
           <ul className="space-y-3 text-sm text-slate-700">
@@ -179,10 +179,10 @@ useEffect(() => {
               </span>
             </li>
 
-            <li className="flex items-start gap-3 rounded-lg border border-red-200 bg-red-50 p-3">
+            <li className="flex items-start gap-3 rounded-lg border border-[var(--border)] bg-[var(--bg-secondary)] p-3">
               <RxCross2 className="mt-1 text-red-600" />
 
-              <span className="font-medium text-red-700">
+              <span className="font-medium text-[var(--primary)]">
                 After submission you <strong>cannot edit or update</strong>{" "}
                 your project information.
               </span>
@@ -196,8 +196,8 @@ useEffect(() => {
     reverseButtons: true,
     confirmButtonText: "Submit Project",
     cancelButtonText: "Cancel",
-    confirmButtonColor: "#2563EB",
-    cancelButtonColor: "#CBD5E1",
+    confirmButtonColor: "var(--primary)",
+    cancelButtonColor: "var(--surface-hover)",
 
     width: 650,
 
@@ -205,7 +205,7 @@ useEffect(() => {
       popup: "rounded-3xl shadow-2xl",
       title: "text-2xl font-bold",
       confirmButton: "rounded-xl px-6 py-3 font-semibold",
-      cancelButton: "rounded-xl px-6 py-3 font-semibold text-slate-700",
+      cancelButton: "rounded-xl px-6 py-3 font-semibold text-[var(--text)]",
     },
   });
 
@@ -233,7 +233,7 @@ useEffect(() => {
         icon: "error",
         title: "Submission Failed",
         text: data.message,
-        confirmButtonColor: "#DC2626",
+        confirmButtonColor: "var(--primary)",
         customClass: {
           popup: "rounded-3xl",
           confirmButton: "rounded-xl px-6 py-3 font-semibold",
@@ -247,7 +247,7 @@ useEffect(() => {
       icon: "success",
       title: "Project Submitted",
       text: data.message,
-      confirmButtonColor: "#2563EB",
+      confirmButtonColor: "var(--primary)",
       customClass: {
         popup: "rounded-3xl",
         confirmButton: "rounded-xl px-6 py-3 font-semibold",
@@ -266,7 +266,7 @@ useEffect(() => {
       icon: "error",
       title: "Server Error",
       text: "Something went wrong. Please try again.",
-      confirmButtonColor: "#DC2626",
+      confirmButtonColor: "var(--primary)",
       customClass: {
         popup: "rounded-3xl",
         confirmButton: "rounded-xl px-6 py-3 font-semibold",
@@ -279,9 +279,9 @@ useEffect(() => {
   }
   return (
     <>
-      <div className="max-w-6xl mx-auto p-8">
+      <div className="mx-auto w-full max-w-6xl px-3 py-4 sm:px-6 sm:py-6 lg:px-8 lg:py-8">
         <div
-          className="rounded-2xl border p-8"
+          className="rounded-2xl border p-4 sm:p-6 md:p-8"
           style={{
             background: "var(--surface)",
             borderColor: "var(--border)",
@@ -300,10 +300,10 @@ useEffect(() => {
     <div
       className={`my-6 overflow-hidden rounded-2xl border ${
         isResubmission
-          ? "border-blue-200 bg-blue-50"
+          ? "border-[var(--border)] bg-[var(--bg-secondary)]"
           : isTimeOver
-          ? "border-red-200 bg-red-50"
-          : "border-amber-200 bg-amber-50"
+          ? "border-[var(--border)] bg-[var(--bg-secondary)]"
+          : "border-[var(--border)] bg-[var(--bg-secondary)]"
       }`}
     >
       <div className="flex flex-col gap-4 p-5 sm:flex-row sm:items-center sm:justify-between">
@@ -311,10 +311,10 @@ useEffect(() => {
           <div
             className={`flex h-12 w-12 shrink-0 items-center justify-center rounded-xl text-xl font-bold ${
               isResubmission
-                ? "bg-blue-100 text-blue-700"
+                ? "bg-blue-100 text-[var(--primary)]"
                 : isTimeOver
-                ? "bg-red-100 text-red-700"
-                : "bg-amber-100 text-amber-700"
+                ? "bg-red-100 text-[var(--primary)]"
+                : "bg-amber-100 text-[var(--primary)]"
             }`}
           >
             {isResubmission ? "↻" : "◷"}
@@ -324,10 +324,10 @@ useEffect(() => {
             <p
               className={`text-sm font-medium ${
                 isResubmission
-                  ? "text-blue-700"
+                  ? "text-[var(--primary)]"
                   : isTimeOver
-                  ? "text-red-700"
-                  : "text-amber-700"
+                  ? "text-[var(--primary)]"
+                  : "text-[var(--primary)]"
               }`}
             >
               {isResubmission
@@ -338,16 +338,16 @@ useEffect(() => {
             <h2
               className={`mt-1 wrap-break-word text-3xl font-bold tracking-tight sm:text-4xl ${
                 isResubmission
-                  ? "text-blue-800"
+                  ? "text-[var(--text)]"
                   : isTimeOver
-                  ? "text-red-700"
-                  : "text-amber-800"
+                  ? "text-[var(--primary)]"
+                  : "text-[var(--text)]"
               }`}
             >
               {timeLeft || "--:--:--"}
             </h2>
 
-            <p className="mt-1 text-xs text-gray-600">
+            <p className="mt-1 text-xs text-[var(--text-muted)]">
               {isResubmission
                 ? "Time elapsed since resubmission started"
                 : isTimeOver
@@ -357,12 +357,12 @@ useEffect(() => {
           </div>
         </div>
 
-        <div className="rounded-xl border border-black/5 bg-white/70 px-5 py-3 sm:min-w-36 sm:text-right">
-          <p className="text-xs font-medium uppercase tracking-wide text-gray-500">
+        <div className="rounded-xl border border-black/5 bg-[var(--surface)] px-5 py-3 sm:min-w-36 sm:text-right">
+          <p className="text-xs font-medium uppercase tracking-wide text-[var(--text-muted)]">
             Time Limit
           </p>
 
-          <p className="mt-1 text-xl font-bold text-gray-800">
+          <p className="mt-1 text-xl font-bold text-[var(--text)]">
             {challenge.timeLimit} Minutes
           </p>
         </div>
@@ -409,7 +409,7 @@ useEffect(() => {
           </div>
         </div>
         <div
-          className="mt-10 rounded-2xl border p-8"
+          className="mt-10 rounded-2xl border p-4 sm:p-6 md:p-8"
           style={{
             background: "var(--surface)",
             borderColor: "var(--border)",
@@ -433,7 +433,7 @@ useEffect(() => {
                 value={liveLink}
                 onChange={(e) => setLiveLink(e.target.value)}
                 placeholder="https://your-project.vercel.app"
-                className="w-full rounded-lg border p-3 outline-none"
+                className="w-full min-w-0 rounded-lg border border-[var(--border)] bg-[var(--bg-secondary)] p-3 text-[var(--text)] outline-none transition-colors placeholder:text-[var(--text-muted)] focus:border-[var(--primary)] focus:ring-2 focus:ring-[var(--primary)]/20"
               />
             </div>
 
@@ -448,7 +448,7 @@ useEffect(() => {
                 value={githubLink}
                 onChange={(e) => setGithubLink(e.target.value)}
                 placeholder="https://github.com/username/project"
-                className="w-full rounded-lg border p-3 outline-none"
+                className="w-full min-w-0 rounded-lg border border-[var(--border)] bg-[var(--bg-secondary)] p-3 text-[var(--text)] outline-none transition-colors placeholder:text-[var(--text-muted)] focus:border-[var(--primary)] focus:ring-2 focus:ring-[var(--primary)]/20"
               />
             </div>
 
@@ -463,13 +463,13 @@ useEffect(() => {
                 value={documentLink}
                 onChange={(e) => setDocumentLink(e.target.value)}
                 placeholder="https://docs.google.com/..."
-                className="w-full rounded-lg border p-3 outline-none"
+                className="w-full min-w-0 rounded-lg border border-[var(--border)] bg-[var(--bg-secondary)] p-3 text-[var(--text)] outline-none transition-colors placeholder:text-[var(--text-muted)] focus:border-[var(--primary)] focus:ring-2 focus:ring-[var(--primary)]/20"
               />
             </div>
 
             <button
               type="submit"
-              className="rounded-lg w-full bg-blue-600 px-6 py-3 font-semibold text-white hover:bg-blue-700"
+              className="w-full rounded-lg bg-[var(--primary)] px-6 py-3 font-semibold text-white transition-colors hover:bg-[var(--primary-hover)]"
             >
               Submit Project
             </button>

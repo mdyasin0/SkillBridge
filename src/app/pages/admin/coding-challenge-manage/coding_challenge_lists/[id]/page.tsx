@@ -1,4 +1,3 @@
-
 "use client";
 
 import LoadingUI from "@/components/Loadinui";
@@ -65,8 +64,11 @@ export default function ChallengeDetails() {
 
   if (error || !challenge) {
     return (
-      <div className="max-w-5xl mx-auto p-8">
-        <p className="text-red-500">
+      <div className="w-full max-w-5xl mx-auto px-4 py-6 sm:px-6 sm:py-8 lg:px-8">
+        <p
+          className="break-words"
+          style={{ color: "var(--text)" }}
+        >
           {error || "Challenge not found"}
         </p>
       </div>
@@ -74,54 +76,66 @@ export default function ChallengeDetails() {
   }
 
   return (
-    <div className="max-w-5xl mx-auto p-8">
+    <div className="w-full max-w-5xl mx-auto px-4 py-5 sm:px-6 sm:py-8 lg:px-8">
       <div
-        className="rounded-xl p-8 border"
+        className="rounded-xl p-4 sm:p-6 lg:p-8 border shadow-sm"
         style={{
           background: "var(--surface)",
           borderColor: "var(--border)",
+          color: "var(--text)",
+          boxShadow: "var(--shadow)",
         }}
       >
-        <h1 className="text-3xl font-bold mb-6">
+        <h1
+          className="text-2xl sm:text-3xl font-bold mb-5 sm:mb-6 break-words"
+          style={{ color: "var(--text)" }}
+        >
           {challenge.title}
         </h1>
 
-        <div className="space-y-4">
-          <p>
+        <div className="space-y-4 sm:space-y-5">
+          <p className="break-words whitespace-pre-wrap leading-relaxed">
             <b>Description:</b>
             <br />
             {challenge.description}
           </p>
 
-          <p>
+          <p className="break-words">
             <b>Difficulty:</b> {challenge.difficulty}
           </p>
 
-          <p>
+          <p className="break-words">
             <b>Category:</b> {challenge.category}
           </p>
 
-          <p>
+          <p className="break-words">
             <b>Time Limit:</b> {challenge.timeLimit} sec
           </p>
 
-          <p>
+          <p className="break-words">
             <b>Max Attempt:</b> {challenge.maxAttempt}
           </p>
 
-          <p>
+          <p className="break-words whitespace-pre-wrap leading-relaxed">
             <b>Hint:</b> {challenge.hint || "No hint available"}
           </p>
 
-          <div>
-            <h2 className="font-bold text-xl mb-3">
+          <div className="min-w-0">
+            <h2
+              className="font-bold text-lg sm:text-xl mb-3"
+              style={{ color: "var(--text)" }}
+            >
               Starter Code
             </h2>
 
             <pre
-              className="p-4 rounded-lg overflow-auto whitespace-pre-wrap"
+              className="p-3 sm:p-4 rounded-lg overflow-x-auto whitespace-pre-wrap break-words text-sm sm:text-base max-w-full"
               style={{
                 background: "var(--bg)",
+                color: "var(--text)",
+                border: "1px solid var(--border)",
+                overflowWrap: "anywhere",
+                WebkitOverflowScrolling: "touch",
               }}
             >
               {challenge.starterCode || "No starter code available"}

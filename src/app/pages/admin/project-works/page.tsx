@@ -1,8 +1,10 @@
+
 "use client";
 import { useAuth } from "@/context/AuthContext";
 import { Search } from "lucide-react";
 import React, { useEffect, useState } from "react";
 import { toast } from "react-toastify";
+
 type SubmitInfo = {
   githubLink: string;
   liveLink: string;
@@ -38,6 +40,7 @@ export type Submission = {
   submission_created_at: string;
   submission_updated_at: string;
 };
+
 const Project_works = () => {
   const [data, setData] = useState<Submission[]>([]);
   const { user } = useAuth();
@@ -57,19 +60,22 @@ const Project_works = () => {
   const [search, setSearch] = useState("");
 
   const [selected, setSelected] = useState<Submission | null>(null);
+
   const getData = async () => {
     const res = await fetch(`/api/project_works?status=${status}`);
 
     const json = await res.json();
-    
+
     setData(json.data);
     setCounts(json.meta.counts);
   };
+
   useEffect(() => {
     if (user?.id) {
       getData();
     }
   }, [status, user?.id]);
+
   const submitReview = async () => {
     try {
       setLoading(true);
@@ -102,7 +108,7 @@ const Project_works = () => {
         toast.error(json.message);
       }
     } catch (error) {
-      toast.error( String(error));
+      toast.error(String(error));
     } finally {
       setLoading(false);
     }
@@ -116,10 +122,11 @@ const Project_works = () => {
       item.email.toLowerCase().includes(keyword)
     );
   });
+
   return (
     <>
-      <div>
-        <h1 className="text-2xl font-bold text-(--text)">
+      <div className="w-full min-w-0">
+        <h1 className="text-xl font-bold text-(--text) sm:text-2xl">
           Project Submissions
         </h1>
 
@@ -128,9 +135,9 @@ const Project_works = () => {
         </p>
       </div>
 
-      {/* search box */}
+      {/* Search box */}
 
-      <div className="relative mt-10 w-full lg:w-80">
+      <div className="relative mt-6 w-full sm:mt-8 lg:mt-10 lg:w-80">
         <Search
           size={18}
           className="absolute left-4 top-1/2 -translate-y-1/2 text-(--text-muted)"
@@ -141,68 +148,71 @@ const Project_works = () => {
           value={search}
           onChange={(e) => setSearch(e.target.value)}
           className="
-    h-11
-    w-full
-    rounded-xl
-    border
-    border-(--border)
-    bg-(--bg)
-    pl-11
-    pr-4
-    outline-none
-    transition
-    focus:border-(--primary)
-    focus:ring-4
-    focus:ring-blue-100
-    "
+            h-11
+            w-full
+            rounded-xl
+            border
+            border-(--border)
+            bg-(--surface)
+            pl-11
+            pr-4
+            text-(--text)
+            outline-none
+            transition
+            placeholder:text-(--text-muted)
+            focus:border-(--primary)
+            focus:ring-2
+            focus:ring-(--primary)
+          "
         />
       </div>
 
-      {/* filter button  */}
+      {/* Filter buttons */}
 
-      <div className="flex mt-5 gap-3">
+      <div className="mt-5 flex w-full flex-wrap gap-3">
         <button
           onClick={() => setStatus("pending")}
-          className={`px-5 py-2 rounded-xl font-medium transition
-
-${status === "pending" ? "bg-(--primary) text-white" : "bg-(--surface) border"}
-
-`}
+          className={`min-h-10 rounded-xl border px-4 py-2 text-sm font-medium transition sm:px-5 sm:text-base ${
+            status === "pending"
+              ? "border-(--primary) bg-(--primary) text-white"
+              : "border-(--border) bg-(--surface) text-(--text) hover:bg-(--surface-hover)"
+          }`}
         >
           Pending ({counts.pending})
         </button>
 
         <button
           onClick={() => setStatus("approved")}
-          className={`px-5 py-2 rounded-xl font-medium transition
-
-${status === "approved" ? "bg-(--primary) text-white" : "bg-(--surface) border"}
-
-`}
+          className={`min-h-10 rounded-xl border px-4 py-2 text-sm font-medium transition sm:px-5 sm:text-base ${
+            status === "approved"
+              ? "border-(--primary) bg-(--primary) text-white"
+              : "border-(--border) bg-(--surface) text-(--text) hover:bg-(--surface-hover)"
+          }`}
         >
           Approved ({counts.approved})
         </button>
       </div>
 
-      {/* table  */}
-      <div className="overflow-hidden mt-5 rounded-2xl border border-(--border) bg-(--surface) shadow-sm">
-        <div className="overflow-x-auto">
-          <table className="min-w-full border-collapse">
+      {/* Table */}
+
+      <div className="mt-5 w-full min-w-0 overflow-hidden rounded-2xl border border-(--border) bg-(--surface) shadow-sm">
+        <div className="w-full overflow-x-auto overscroll-x-contain">
+          <table className="w-full min-w-[600px] border-collapse text-(--text)">
             <thead className="sticky top-0 z-10 bg-(--surface-hover)">
               <tr className="border-b border-(--border)">
-                <th className="w-16 px-6 py-4 text-center text-xs font-semibold uppercase tracking-wider text-(--text-muted)">
+                <th className="w-16 px-4 py-4 text-center text-xs font-semibold uppercase tracking-wider text-(--text-muted) sm:px-6">
                   #
                 </th>
 
-                <th className="px-6 py-4 text-left text-xs font-semibold uppercase tracking-wider text-(--text-muted)">
+                <th className="px-4 py-4 text-left text-xs font-semibold uppercase tracking-wider text-(--text-muted) sm:px-6">
                   Candidate
                 </th>
 
-                <th className="px-6 py-4 text-left text-xs font-semibold uppercase tracking-wider text-(--text-muted)">
+                <th className="px-4 py-4 text-left text-xs font-semibold uppercase tracking-wider text-(--text-muted) sm:px-6">
                   Email Address
                 </th>
 
-                <th className="w-52 px-6 py-4 text-center text-xs font-semibold uppercase tracking-wider text-(--text-muted)">
+                <th className="w-52 px-4 py-4 text-center text-xs font-semibold uppercase tracking-wider text-(--text-muted) sm:px-6">
                   Submission
                 </th>
               </tr>
@@ -215,40 +225,46 @@ ${status === "approved" ? "bg-(--primary) text-white" : "bg-(--surface) border"}
                   className="border-b border-(--border) transition-colors hover:bg-(--surface-hover)"
                 >
                   {/* Serial */}
-                  <td className="px-6 py-4 text-center font-medium">
+
+                  <td className="px-4 py-4 text-center font-medium sm:px-6">
                     {index + 1}
                   </td>
 
                   {/* Name */}
-                  <td className="px-6 py-4">
+
+                  <td className="px-4 py-4 sm:px-6">
                     <div className="flex items-center gap-3">
-                      <div className="flex h-10 w-10 items-center justify-center rounded-full bg-(--primary) text-sm font-semibold text-white">
+                      <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-(--primary) text-sm font-semibold text-white">
                         {item.name.charAt(0).toUpperCase()}
                       </div>
 
-                      <div>
-                        <p className="font-semibold text-(--text)">
+                      <div className="min-w-0">
+                        <p className="break-words font-semibold text-(--text)">
                           {item.name}
                         </p>
 
-                        <p className="text-xs text-(--text-muted)">Candidate</p>
+                        <p className="text-xs text-(--text-muted)">
+                          Candidate
+                        </p>
                       </div>
                     </div>
                   </td>
 
                   {/* Email */}
-                  <td className="px-6 py-4">
+
+                  <td className="break-all px-4 py-4 sm:px-6">
                     <span className="text-sm text-(--text-muted)">
                       {item.email}
                     </span>
                   </td>
 
                   {/* Action */}
-                  <td className="px-6 py-4">
+
+                  <td className="px-4 py-4 sm:px-6">
                     <div className="flex justify-center">
                       <button
                         onClick={() => setSelected(item)}
-                        className="inline-flex h-10 items-center rounded-lg bg-(--primary) px-5 text-sm font-medium text-white transition-all duration-200 hover:bg-(--primary-hover) hover:shadow-md active:scale-95"
+                        className="inline-flex min-h-10 items-center justify-center whitespace-nowrap rounded-lg bg-(--primary) px-4 py-2 text-sm font-medium text-white transition-all duration-200 hover:bg-(--primary-hover) hover:shadow-md active:scale-95 sm:px-5"
                       >
                         View Details
                       </button>
@@ -261,7 +277,7 @@ ${status === "approved" ? "bg-(--primary) text-white" : "bg-(--surface) border"}
                 <tr>
                   <td
                     colSpan={4}
-                    className="py-14 text-center text-sm text-(--text-muted)"
+                    className="px-4 py-14 text-center text-sm text-(--text-muted)"
                   >
                     No submissions found.
                   </td>
@@ -273,27 +289,32 @@ ${status === "approved" ? "bg-(--primary) text-white" : "bg-(--surface) border"}
       </div>
 
       {selected && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4">
+        <div className="fixed inset-0 z-50 flex items-center justify-center overflow-y-auto bg-(--text)/60 p-3 sm:p-5">
           <div
             className="
-        w-full
-        max-w-3xl
-        max-h-[90vh]
-        overflow-y-auto
-        rounded-2xl
-        bg-(--surface)
-        shadow-2xl
-        border
-        border-(--border)
-      "
+              my-auto
+              flex
+              max-h-[calc(100dvh-1.5rem)]
+              w-full
+              max-w-3xl
+              flex-col
+              overflow-hidden
+              rounded-2xl
+              border
+              border-(--border)
+              bg-(--surface)
+              shadow-2xl
+              sm:max-h-[90dvh]
+            "
           >
             {/* Header */}
-            <div className="sticky top-0 z-10 flex items-center justify-between border-b border-(--border) bg-(--surface) px-6 py-4">
-              <h2 className="text-xl font-bold text-(--text)">
+
+            <div className="sticky top-0 z-10 flex shrink-0 flex-wrap items-center justify-between gap-3 border-b border-(--border) bg-(--surface) px-4 py-4 sm:px-6">
+              <h2 className="text-lg font-bold text-(--text) sm:text-xl">
                 Submission Details
               </h2>
 
-              <div className="flex items-center gap-3">
+              <div className="flex flex-wrap items-center gap-2 sm:gap-3">
                 <button
                   onClick={() => {
                     if (selected) {
@@ -305,7 +326,7 @@ ${status === "approved" ? "bg-(--primary) text-white" : "bg-(--surface) border"}
 
                     setShowReviewForm((prev) => !prev);
                   }}
-                  className="rounded-lg bg-(--primary) px-4 py-2 text-sm font-medium text-white transition hover:bg-(--primary-hover)"
+                  className="min-h-9 rounded-lg bg-(--primary) px-3 py-2 text-xs font-medium text-white transition hover:bg-(--primary-hover) sm:px-4 sm:text-sm"
                 >
                   {showReviewForm
                     ? "Cancel Review"
@@ -316,31 +337,39 @@ ${status === "approved" ? "bg-(--primary) text-white" : "bg-(--surface) border"}
 
                 <button
                   onClick={() => setSelected(null)}
-                  className="flex h-9 w-9 items-center justify-center rounded-lg hover:bg-(--surface-hover)"
+                  aria-label="Close submission details"
+                  className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg text-(--text) hover:bg-(--surface-hover)"
                 >
                   ✕
                 </button>
               </div>
             </div>
 
-            <div className="space-y-6 p-6">
+            <div className="min-h-0 flex-1 space-y-6 overflow-y-auto p-4 sm:p-6">
               {/* Candidate Information */}
+
               <div>
-                <h3 className="mb-4 text-sm font-semibold uppercase tracking-wider text-(--text-muted)">
+                <h3 className="mb-4 text-xs font-semibold uppercase tracking-wider text-(--text-muted) sm:text-sm">
                   Candidate Information
                 </h3>
 
                 <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
-                  <div className="rounded-xl border border-(--border) bg-(--bg) p-4">
+                  <div className="min-w-0 rounded-xl border border-(--border) bg-(--bg) p-4">
                     <p className="text-xs text-(--text-muted)">
                       Candidate Name
                     </p>
-                    <p className="mt-1 font-semibold">{selected.name}</p>
+
+                    <p className="mt-1 break-words font-semibold text-(--text)">
+                      {selected.name}
+                    </p>
                   </div>
 
-                  <div className="rounded-xl border border-(--border) bg-(--bg) p-4">
-                    <p className="text-xs text-(--text-muted)">Email Address</p>
-                    <p className="mt-1 break-all font-semibold">
+                  <div className="min-w-0 rounded-xl border border-(--border) bg-(--bg) p-4">
+                    <p className="text-xs text-(--text-muted)">
+                      Email Address
+                    </p>
+
+                    <p className="mt-1 break-all font-semibold text-(--text)">
                       {selected.email}
                     </p>
                   </div>
@@ -348,80 +377,88 @@ ${status === "approved" ? "bg-(--primary) text-white" : "bg-(--surface) border"}
               </div>
 
               {/* Challenge */}
+
               <div>
-                <h3 className="mb-4 text-sm font-semibold uppercase tracking-wider text-(--text-muted)">
+                <h3 className="mb-4 text-xs font-semibold uppercase tracking-wider text-(--text-muted) sm:text-sm">
                   Challenge Information
                 </h3>
 
                 <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
-                  <div className="rounded-xl border border-(--border) bg-(--bg) p-4">
+                  <div className="min-w-0 rounded-xl border border-(--border) bg-(--bg) p-4">
                     <p className="text-xs text-(--text-muted)">
                       Challenge Title
                     </p>
-                    <p className="mt-1 font-semibold">{selected.title}</p>
+
+                    <p className="mt-1 break-words font-semibold text-(--text)">
+                      {selected.title}
+                    </p>
                   </div>
 
-                  <div className="rounded-xl border border-(--border) bg-(--bg) p-4">
+                  <div className="min-w-0 rounded-xl border border-(--border) bg-(--bg) p-4">
                     <p className="text-xs text-(--text-muted)">Category</p>
-                    <p className="mt-1 font-semibold">{selected.category}</p>
+
+                    <p className="mt-1 break-words font-semibold text-(--text)">
+                      {selected.category}
+                    </p>
                   </div>
 
-                  <div className="rounded-xl border border-(--border) bg-(--bg) p-4 md:col-span-2">
+                  <div className="min-w-0 rounded-xl border border-(--border) bg-(--bg) p-4 md:col-span-2">
                     <p className="text-xs text-(--text-muted)">Description</p>
-                    <p className="mt-2 leading-7">{selected.description}</p>
+
+                    <p className="mt-2 whitespace-pre-wrap break-words leading-7 text-(--text)">
+                      {selected.description}
+                    </p>
                   </div>
                 </div>
               </div>
 
               {/* Submission */}
+
               <div>
-                <h3 className="mb-4 text-sm font-semibold uppercase tracking-wider text-(--text-muted)">
+                <h3 className="mb-4 text-xs font-semibold uppercase tracking-wider text-(--text-muted) sm:text-sm">
                   Submission Information
                 </h3>
 
                 <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
-                  <div className="rounded-xl border border-(--border) bg-(--bg) p-4">
+                  <div className="min-w-0 rounded-xl border border-(--border) bg-(--bg) p-4">
                     <p className="text-xs text-(--text-muted)">
                       Reviewe Status
                     </p>
 
-                    <span
-                      className={`mt-2 inline-flex rounded-full px-3 py-1 text-sm font-medium ${
-                        selected.check_status === "approved"
-                          ? "bg-green-100 text-green-700"
-                          : "bg-yellow-100 text-yellow-700"
-                      }`}
-                    >
+                    <span className="mt-2 inline-flex max-w-full break-words rounded-full bg-(--surface-hover) px-3 py-1 text-sm font-medium text-(--text)">
                       {selected.check_status}
                     </span>
                   </div>
 
-                  <div className="rounded-xl border border-(--border) bg-(--bg) p-4">
-                    <p className="text-xs text-(--text-muted)">submit Status</p>
+                  <div className="min-w-0 rounded-xl border border-(--border) bg-(--bg) p-4">
+                    <p className="text-xs text-(--text-muted)">
+                      submit Status
+                    </p>
 
-                    <span className="mt-2 inline-flex rounded-full bg-blue-100 px-3 py-1 text-sm font-medium text-blue-700">
+                    <span className="mt-2 inline-flex max-w-full break-words rounded-full bg-(--surface-hover) px-3 py-1 text-sm font-medium text-(--text)">
                       {selected.status}
                     </span>
                   </div>
 
-                  <div className="rounded-xl border border-(--border) bg-(--bg) p-4">
+                  <div className="min-w-0 rounded-xl border border-(--border) bg-(--bg) p-4">
                     <p className="text-xs text-(--text-muted)">Started At</p>
 
-                    <p className="mt-1 font-medium">
+                    <p className="mt-1 break-words font-medium text-(--text)">
                       {new Date(selected.start_time).toLocaleString()}
                     </p>
                   </div>
 
-                  <div className="rounded-xl border border-(--border) bg-(--bg) p-4">
+                  <div className="min-w-0 rounded-xl border border-(--border) bg-(--bg) p-4">
                     <p className="text-xs text-(--text-muted)">Submitted At</p>
 
-                    <p className="mt-1 font-medium">
+                    <p className="mt-1 break-words font-medium text-(--text)">
                       {selected.submitted_at
                         ? new Date(selected.submitted_at).toLocaleString()
                         : "Not Submitted"}
                     </p>
                   </div>
-                  <div className="rounded-xl border border-(--border) bg-(--bg) p-4">
+
+                  <div className="min-w-0 rounded-xl border border-(--border) bg-(--bg) p-4">
                     <p className="text-xs text-(--text-muted)">Max Attempts</p>
 
                     <p className="mt-1 font-semibold text-(--text)">
@@ -429,7 +466,7 @@ ${status === "approved" ? "bg-(--primary) text-white" : "bg-(--surface) border"}
                     </p>
                   </div>
 
-                  <div className="rounded-xl border border-(--border) bg-(--bg) p-4">
+                  <div className="min-w-0 rounded-xl border border-(--border) bg-(--bg) p-4">
                     <p className="text-xs text-(--text-muted)">
                       Submit Attempts
                     </p>
@@ -439,7 +476,7 @@ ${status === "approved" ? "bg-(--primary) text-white" : "bg-(--surface) border"}
                     </p>
                   </div>
 
-                  <div className="rounded-xl border border-(--border) bg-(--bg) p-4 md:col-span-2">
+                  <div className="min-w-0 rounded-xl border border-(--border) bg-(--bg) p-4 md:col-span-2">
                     <p className="mb-3 text-xs text-(--text-muted)">
                       Submission Links
                     </p>
@@ -449,7 +486,7 @@ ${status === "approved" ? "bg-(--primary) text-white" : "bg-(--surface) border"}
                         href={selected.submit_info?.githubLink}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="block rounded-lg border border-(--border) p-3 transition hover:bg-(--surface-hover)"
+                        className="block break-all rounded-lg border border-(--border) p-3 text-(--text) transition hover:bg-(--surface-hover)"
                       >
                         🔗 GitHub Repository
                       </a>
@@ -458,7 +495,7 @@ ${status === "approved" ? "bg-(--primary) text-white" : "bg-(--surface) border"}
                         href={selected.submit_info?.liveLink}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="block rounded-lg border border-(--border) p-3 transition hover:bg-(--surface-hover)"
+                        className="block break-all rounded-lg border border-(--border) p-3 text-(--text) transition hover:bg-(--surface-hover)"
                       >
                         🌐 Live Project
                       </a>
@@ -467,21 +504,32 @@ ${status === "approved" ? "bg-(--primary) text-white" : "bg-(--surface) border"}
                         href={selected.submit_info?.documentLink}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="block rounded-lg border border-(--border) p-3 transition hover:bg-(--surface-hover)"
+                        className="block break-all rounded-lg border border-(--border) p-3 text-(--text) transition hover:bg-(--surface-hover)"
                       >
                         📄 Documentation
                       </a>
                     </div>
                   </div>
 
-                  <div className="rounded-xl border border-(--border) bg-(--bg) p-4 md:col-span-2">
+                  <div className="min-w-0 rounded-xl border border-(--border) bg-(--bg) p-4 md:col-span-2">
                     <p className="text-xs text-(--text-muted)">
                       Admin Feedback
                     </p>
 
-                    <p className="mt-2">
+                    <p className="mt-2 whitespace-pre-wrap break-words text-(--text)">
                       {selected.feedback ?? "No feedback provided yet."}
                     </p>
+
+                  </div>
+                  <div className="min-w-0 rounded-xl border border-(--border) bg-(--bg) p-4 md:col-span-2">
+                    <p className="text-xs text-(--text-muted)">
+                    Score
+                    </p>
+
+                    <p className="mt-2 whitespace-pre-wrap break-words text-(--text)">
+                      {selected. score ?? "No feedback provided yet."}
+                    </p>
+                    
                   </div>
                 </div>
               </div>
@@ -489,17 +537,19 @@ ${status === "approved" ? "bg-(--primary) text-white" : "bg-(--surface) border"}
           </div>
         </div>
       )}
+
       {showReviewForm && selected && (
-        <div className="fixed inset-0 z-60 flex items-center justify-center bg-black/50">
-          <div className="w-full max-w-xl rounded-2xl bg-(--surface) p-6 shadow-2xl">
-            <div className="mb-5 flex items-center justify-between">
-              <div>
-                <h3 className="text-xl font-bold">
+        <div className="fixed inset-0 z-[60] flex items-center justify-center overflow-y-auto bg-(--text)/60 p-3 sm:p-5">
+          <div className="my-auto max-h-[calc(100dvh-1.5rem)] w-full max-w-xl overflow-y-auto rounded-2xl border border-(--border) bg-(--surface) p-4 shadow-2xl sm:max-h-[90dvh] sm:p-6">
+            <div className="mb-5 flex items-start justify-between gap-3">
+              <div className="min-w-0">
+                <h3 className="text-lg font-bold text-(--text) sm:text-xl">
                   {selected?.check_status === "approved"
                     ? "Update Review"
                     : "Submit Review"}
                 </h3>
-                <h6 className="text-sm">
+
+                <h6 className="mt-2 text-sm leading-6 text-(--text-muted)">
                   There will be no penalty for the first attempt; based on the
                   original score (100), 5% will be deducted from the score for
                   each additional attempt after the first.
@@ -508,7 +558,8 @@ ${status === "approved" ? "bg-(--primary) text-white" : "bg-(--surface) border"}
 
               <button
                 onClick={() => setShowReviewForm(false)}
-                className="rounded-lg p-2 hover:bg-(--surface-hover)"
+                aria-label="Close review form"
+                className="shrink-0 rounded-lg p-2 text-(--text) hover:bg-(--surface-hover)"
               >
                 ✕
               </button>
@@ -517,7 +568,9 @@ ${status === "approved" ? "bg-(--primary) text-white" : "bg-(--surface) border"}
             {/* Feedback */}
 
             <div className="mb-5">
-              <label className="mb-2 block text-sm font-medium">Feedback</label>
+              <label className="mb-2 block text-sm font-medium text-(--text)">
+                Feedback
+              </label>
 
               <textarea
                 rows={6}
@@ -528,14 +581,16 @@ ${status === "approved" ? "bg-(--primary) text-white" : "bg-(--surface) border"}
                     feedback: e.target.value,
                   })
                 }
-                className="w-full rounded-xl border border-(--border) p-4"
+                className="w-full resize-y rounded-xl border border-(--border) bg-(--surface) p-4 text-(--text) outline-none transition placeholder:text-(--text-muted) focus:border-(--primary) focus:ring-2 focus:ring-(--primary)"
               />
             </div>
 
             {/* Score */}
 
             <div className="mb-6">
-              <label className="mb-2 block text-sm font-medium">Score</label>
+              <label className="mb-2 block text-sm font-medium text-(--text)">
+                Score
+              </label>
 
               <input
                 type="number"
@@ -548,14 +603,14 @@ ${status === "approved" ? "bg-(--primary) text-white" : "bg-(--surface) border"}
                     score: e.target.value,
                   })
                 }
-                className="h-11 w-40 rounded-xl border border-(--border) px-4"
+                className="h-11 w-full rounded-xl border border-(--border) bg-(--surface) px-4 text-(--text) outline-none transition focus:border-(--primary) focus:ring-2 focus:ring-(--primary) sm:w-40"
               />
             </div>
 
-            <div className="flex justify-end gap-3">
+            <div className="flex flex-wrap justify-end gap-3">
               <button
                 onClick={() => setShowReviewForm(false)}
-                className="rounded-xl border px-5 py-2"
+                className="min-h-10 rounded-xl border border-(--border) px-5 py-2 text-sm font-medium text-(--text) transition hover:bg-(--surface-hover)"
               >
                 Cancel
               </button>
@@ -563,7 +618,7 @@ ${status === "approved" ? "bg-(--primary) text-white" : "bg-(--surface) border"}
               <button
                 onClick={submitReview}
                 disabled={loading}
-                className="rounded-xl bg-(--primary) px-6 py-2 text-white disabled:opacity-50"
+                className="min-h-10 rounded-xl bg-(--primary) px-5 py-2 text-sm font-medium text-white transition hover:bg-(--primary-hover) disabled:cursor-not-allowed disabled:opacity-50 sm:px-6"
               >
                 {loading
                   ? "Saving..."

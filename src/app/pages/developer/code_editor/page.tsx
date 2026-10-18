@@ -1,3 +1,4 @@
+
 "use client";
 
 import { useEffect, useMemo, useRef, useState } from "react";
@@ -10,6 +11,7 @@ import withReactContent from "sweetalert2-react-content";
 import Swal from "sweetalert2";
 import { useRouter } from "next/navigation";
 import { toast } from "react-toastify";
+
 interface Challenge {
   id: number;
   title: string;
@@ -20,7 +22,6 @@ interface Challenge {
   maxAttempt: number;
   starterCode: string;
   hint: string;
-  
 
   solutionId: number | null;
   score: number | null;
@@ -51,8 +52,22 @@ export default function ChallengeWorkspace({ challenge }: Props) {
   const [isSubmitted, setIsSubmitted] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isFullscreen, setIsFullscreen] = useState(false);
+  const [isMobile, setIsMobile] = useState(false);
   const [timeLeft, setTimeLeft] = useState(challenge.timeLimit * 60);
   const MySwal = useMemo(() => withReactContent(Swal), []);
+
+  // Responsive layout: stack the problem and editor on small screens.
+  useEffect(() => {
+    const updateLayout = () => {
+      setIsMobile(window.innerWidth < 768);
+    };
+
+    updateLayout();
+    window.addEventListener("resize", updateLayout);
+
+    return () => window.removeEventListener("resize", updateLayout);
+  }, []);
+
   const handleSubmit = async (
     autoSubmit = false,
     reason: "timeout" | "leave" = "timeout",
@@ -64,7 +79,7 @@ export default function ChallengeWorkspace({ challenge }: Props) {
         const result = await MySwal.fire({
           title: "Submit Solution?",
           html: `
-      <div style="text-align:left">
+      <div style="text-align:left;color:var(--text)">
         <p style="margin-bottom:12px;">
           You are about to submit your solution for review.
         </p>
@@ -76,7 +91,7 @@ export default function ChallengeWorkspace({ challenge }: Props) {
           <li>If you still have attempts remaining, you may resubmit later.</li>
         </ul>
 
-        <p style="margin-top:16px;font-weight:600;color:#dc2626;">
+        <p style="margin-top:16px;font-weight:600;color:var(--primary);">
           Are you sure you want to continue?
         </p>
       </div>
@@ -84,16 +99,17 @@ export default function ChallengeWorkspace({ challenge }: Props) {
           icon: "warning",
           width: 650,
           background: "var(--surface)",
+          color: "var(--text)",
           showCancelButton: true,
           reverseButtons: true,
           focusCancel: true,
           confirmButtonText: "Yes, Submit",
           cancelButtonText: "Cancel",
-          confirmButtonColor: "#16a34a",
-          cancelButtonColor: "#6b7280",
+          confirmButtonColor: "var(--primary)",
+          cancelButtonColor: "var(--text-muted)",
           customClass: {
             popup: "rounded-3xl",
-            title: "text-2xl font-bold text-[var(--text)]",
+            title: "text-2xl font-bold !text-[var(--text)]",
             confirmButton: "rounded-xl px-6 py-3 font-semibold",
             cancelButton: "rounded-xl px-6 py-3 font-semibold",
           },
@@ -101,8 +117,10 @@ export default function ChallengeWorkspace({ challenge }: Props) {
 
         if (!result.isConfirmed) return;
       }
+
       submittingRef.current = true;
       setIsSubmitting(true);
+
       const res = await fetch("/api/solution_code_submit", {
         method: "PUT",
         headers: {
@@ -124,6 +142,7 @@ export default function ChallengeWorkspace({ challenge }: Props) {
         });
         return;
       }
+
       setIsSubmitted(true);
 
       if (autoSubmit) {
@@ -134,14 +153,18 @@ export default function ChallengeWorkspace({ challenge }: Props) {
             reason === "leave"
               ? "Your solution has been automatically submitted because you left the challenge."
               : "Your time has ended. Your solution was automatically submitted.",
-          confirmButtonColor: "#2563eb",
+          confirmButtonColor: "var(--primary)",
+          background: "var(--surface)",
+          color: "var(--text)",
         });
       } else {
         await MySwal.fire({
           icon: "success",
           title: "Submitted Successfully",
           text: "Your solution has been submitted for review.",
-          confirmButtonColor: "#16a34a",
+          confirmButtonColor: "var(--primary)",
+          background: "var(--surface)",
+          color: "var(--text)",
         });
       }
 
@@ -149,18 +172,21 @@ export default function ChallengeWorkspace({ challenge }: Props) {
 
       return;
     } catch (error) {
-    toast.error(String(error));
+      toast.error(String(error));
 
       MySwal.fire({
         icon: "error",
         title: "Server Error",
         text: "Something went wrong. Please try again.",
+        background: "var(--surface)",
+        color: "var(--text)",
       });
     } finally {
       submittingRef.current = false;
       setIsSubmitting(false);
     }
   };
+
   useEffect(() => {
     const updateTimer = () => {
       if (!challenge.start_time) return;
@@ -169,7 +195,10 @@ export default function ChallengeWorkspace({ challenge }: Props) {
       const duration = challenge.timeLimit * 60 * 1000;
       const endTime = startTime + duration;
 
-      const remaining = Math.max(0, Math.floor((endTime - Date.now()) / 1000));
+      const remaining = Math.max(
+        0,
+        Math.floor((endTime - Date.now()) / 1000),
+      );
 
       setTimeLeft(remaining);
 
@@ -205,7 +234,6 @@ export default function ChallengeWorkspace({ challenge }: Props) {
     const handleBeforeUnload = (e: BeforeUnloadEvent) => {
       if (!isSubmitted && code !== challenge.starterCode) {
         e.preventDefault();
-
         e.returnValue = "";
       }
     };
@@ -218,61 +246,86 @@ export default function ChallengeWorkspace({ challenge }: Props) {
   }, [code, isSubmitted, challenge.starterCode]);
 
   return (
-    <div className="h-screen flex flex-col bg-zinc-950 text-white">
+    <div className="flex h-[100dvh] min-h-0 flex-col overflow-hidden bg-[var(--bg)] text-[var(--text)] transition-colors duration-300">
       {/* Main Layout */}
       {isFullscreen ? (
-        <div className="flex-1 flex flex-col">
+        <div className="flex min-h-0 flex-1 flex-col">
           {/* Toolbar */}
-
-          <div className="border-b border-zinc-800 p-3 flex justify-between">
-            <span>Fullscreen Mode</span>
+          <div className="flex shrink-0 items-center justify-between gap-3 border-b border-[var(--border)] bg-[var(--surface)] p-3 sm:p-4">
+            <span className="text-sm font-semibold sm:text-base">
+              Fullscreen Mode
+            </span>
 
             <button
               onClick={() => setIsFullscreen(false)}
-              className="bg-zinc-800 px-3 py-2 rounded-lg"
+              aria-label="Exit fullscreen mode"
+              className="inline-flex shrink-0 items-center justify-center rounded-lg border border-[var(--border)] bg-[var(--surface-hover)] p-2 text-[var(--text)] transition-colors hover:opacity-80"
             >
               <Minimize2 size={18} />
             </button>
           </div>
 
-          <Editor
-            height="100%"
-            value={code}
-            theme="vs-dark"
-            onChange={(value) => setCode(value || "")}
-          />
+          <div className="min-h-0 flex-1">
+            <Editor
+              height="100%"
+              value={code}
+              theme="vs-dark"
+              onChange={(value) => setCode(value || "")}
+              options={{
+                minimap: { enabled: false },
+                fontSize: 14,
+                automaticLayout: true,
+                scrollBeyondLastLine: false,
+                wordWrap: "on",
+              }}
+            />
+          </div>
         </div>
       ) : (
-        <PanelGroup direction="horizontal" className="flex-1">
+        <PanelGroup
+          direction={isMobile ? "vertical" : "horizontal"}
+          className="min-h-0 flex-1"
+        >
           {/* Left Problem Panel */}
-          <Panel defaultSize={35} minSize={25}>
-            <div className="h-full border-r border-zinc-800 overflow-y-auto p-5">
-              <h2 className="text-xl font-semibold mb-3">Problem Statement</h2>
+          <Panel
+            defaultSize={isMobile ? 40 : 35}
+            minSize={isMobile ? 25 : 25}
+          >
+            <div className="flex h-full min-h-0 flex-col overflow-y-auto border-b border-[var(--border)] bg-[var(--bg-secondary)] p-3 sm:p-5 md:border-b-0 md:border-r">
+              <h2 className="mb-3 text-lg font-semibold sm:text-xl">
+                Problem Statement
+              </h2>
 
-              <p className="text-zinc-300 mb-5">{challenge.description}</p>
+              <p className="mb-5 whitespace-pre-wrap break-words text-sm leading-7 text-[var(--text-muted)] sm:text-base">
+                {challenge.description}
+              </p>
 
-              <div className="mt-6">
-                <h3 className="font-semibold mb-2">Hint</h3>
+              <div className="mt-2 sm:mt-4">
+                <h3 className="mb-2 font-semibold">Hint</h3>
 
-                <div className="bg-zinc-900 p-3 rounded-lg">
-                  <p>{challenge.hint}</p>
+                <div className="rounded-lg border border-[var(--border)] bg-[var(--surface)] p-3 sm:p-4">
+                  <p className="whitespace-pre-wrap break-words text-sm leading-6 text-[var(--text-muted)] sm:text-base">
+                    {challenge.hint}
+                  </p>
                 </div>
               </div>
             </div>
           </Panel>
 
-          <PanelResizeHandle className="w-0.5 bg-zinc-800 hover:bg-zinc-600 transition-colors" />
-          {/* Right Editor Section */}
+          <PanelResizeHandle className="h-1 shrink-0 bg-[var(--border)] transition-colors hover:bg-[var(--primary)] md:h-auto md:w-1" />
 
-          <Panel defaultSize={65}>
-            <div className="h-full flex flex-col">
-              <div className="border-b border-zinc-800 p-3 flex items-center justify-between">
-                <div className="flex gap-3">
-                </div>
+          {/* Right Editor Section */}
+          <Panel defaultSize={isMobile ? 60 : 65} minSize={30}>
+            <div className="flex h-full min-h-0 min-w-0 flex-col bg-[var(--surface)]">
+              <div className="flex shrink-0 items-center justify-between gap-3 border-b border-[var(--border)] bg-[var(--bg-secondary)] p-2.5 sm:p-3">
+                <div className="flex min-w-0 flex-1 gap-3"></div>
 
                 <button
                   onClick={() => setIsFullscreen(!isFullscreen)}
-                  className="bg-zinc-800 px-3 py-2 rounded-lg"
+                  aria-label={
+                    isFullscreen ? "Exit fullscreen mode" : "Enter fullscreen mode"
+                  }
+                  className="inline-flex shrink-0 items-center justify-center rounded-lg border border-[var(--border)] bg-[var(--surface-hover)] p-2 text-[var(--text)] transition-colors hover:opacity-80"
                 >
                   {isFullscreen ? (
                     <Minimize2 size={18} />
@@ -281,8 +334,9 @@ export default function ChallengeWorkspace({ challenge }: Props) {
                   )}
                 </button>
               </div>
+
               {/* Editor */}
-              <div className="flex-1">
+              <div className="min-h-0 min-w-0 flex-1 overflow-hidden">
                 <Editor
                   height="100%"
                   value={code}
@@ -299,25 +353,29 @@ export default function ChallengeWorkspace({ challenge }: Props) {
               </div>
 
               {/* Top Bar */}
-              <div className="border-b border-zinc-800 px-4 py-3 flex justify-between items-center">
-                <div>
-                  <h1 className="font-bold text-lg">{challenge.title}</h1>
+              <div className="flex shrink-0 flex-col gap-3 border-t border-[var(--border)] bg-[var(--bg-secondary)] px-3 py-3 sm:flex-row sm:items-center sm:justify-between sm:px-4">
+                <div className="min-w-0">
+                  <h1 className="break-words text-base font-bold sm:text-lg">
+                    {challenge.title}
+                  </h1>
 
-                  <p className="text-sm text-zinc-400">
+                  <p className="mt-1 text-sm text-[var(--text-muted)]">
                     {challenge.difficulty}
                   </p>
                 </div>
 
-                <div className="flex items-center gap-3">
-                  <div className="flex items-center gap-2 text-yellow-400">
-                    <Clock size={18} />
-                    <span>{formatTime(timeLeft)}</span>
+                <div className="flex w-full shrink-0 items-center justify-between gap-3 sm:w-auto sm:justify-end">
+                  <div className="flex items-center gap-2 whitespace-nowrap text-[var(--primary)]">
+                    <Clock size={18} className="shrink-0" />
+                    <span className="font-mono text-sm font-semibold tabular-nums sm:text-base">
+                      {formatTime(timeLeft)}
+                    </span>
                   </div>
 
                   <button
                     onClick={() => handleSubmit()}
                     disabled={isSubmitting || isSubmitted}
-                    className="bg-green-600 px-3 py-2 rounded-lg flex items-center gap-2 hover:bg-green-500 disabled:opacity-50 disabled:cursor-not-allowed"
+                    className="inline-flex shrink-0 items-center justify-center gap-2 rounded-lg bg-[var(--primary)] px-4 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-[var(--primary-hover)] disabled:cursor-not-allowed disabled:opacity-50 sm:px-5"
                   >
                     <Send size={16} />
                     {isSubmitting ? "Submitting..." : "Submit"}
@@ -326,7 +384,7 @@ export default function ChallengeWorkspace({ challenge }: Props) {
               </div>
 
               {/* Bottom Panel */}
-              <div className="h-64 border-t border-zinc-800 grid grid-cols-2"></div>
+              <div className="h-12 shrink-0 border-t border-[var(--border)] bg-[var(--surface)] sm:h-16 md:h-64"></div>
             </div>
           </Panel>
         </PanelGroup>

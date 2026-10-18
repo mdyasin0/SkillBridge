@@ -1,12 +1,13 @@
+
 "use client";
 
 import { useAuth } from "@/context/AuthContext";
 import { signOut } from "next-auth/react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
-
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { toast } from "react-toastify";
+import { ArrowRight, X } from "lucide-react";
 
 const routes = [
   { name: "Home", path: "/" },
@@ -43,11 +44,31 @@ export default function AdminLayout({
 
   const { user, isLoggedIn, loading } = useAuth();
 
+  // Mobile sidebar state
+  const [sidebarOpen, setSidebarOpen] = useState(false);
+
+  // Close sidebar when route changes
   useEffect(() => {
-    // Session/user information is loading now 
+    setSidebarOpen(false);
+  }, [pathname]);
+
+  // Prevent background scrolling while mobile sidebar is open
+  useEffect(() => {
+    if (!sidebarOpen) return;
+
+    const previousOverflow = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+
+    return () => {
+      document.body.style.overflow = previousOverflow;
+    };
+  }, [sidebarOpen]);
+
+  useEffect(() => {
+    // Session/user information is loading now
     if (loading) return;
 
-    // if User is not  login 
+    // if User is not login
     if (!isLoggedIn) {
       router.replace("/pages/auth-required");
       return;
@@ -67,15 +88,15 @@ export default function AdminLayout({
       return;
     }
 
-    // User login , but he is  not admin 
+    // User login, but he is not admin
     if (user?.role !== "admin") {
       router.replace("/pages/unauthorized");
       return;
     }
   }, [loading, isLoggedIn, user, router]);
 
-  // in the time of Authentication / Authorization checking 
-  // or about user's unauthorized/inactive  protected content will not be showed
+  // Authentication / Authorization checking
+  // Protected content will not be shown to unauthorized/inactive users
   if (
     loading ||
     !isLoggedIn ||
@@ -85,13 +106,13 @@ export default function AdminLayout({
   ) {
     return (
       <div
-        className="min-h-screen flex items-center justify-center"
+        className="flex min-h-screen items-center justify-center"
         style={{ background: "var(--bg)" }}
       >
         <div className="flex flex-col items-center gap-4">
           {/* Spinner */}
           <div
-            className="w-10 h-10 border-4 rounded-full animate-spin"
+            className="h-10 w-10 animate-spin rounded-full border-4"
             style={{
               borderColor: "var(--border)",
               borderTopColor: "var(--primary)",
@@ -107,7 +128,7 @@ export default function AdminLayout({
             </p>
 
             <p
-              className="text-sm mt-1"
+              className="mt-1 text-sm"
               style={{ color: "var(--text-secondary)" }}
             >
               Please wait a moment
@@ -119,18 +140,85 @@ export default function AdminLayout({
   }
 
   return (
-    <div className="flex min-h-screen" style={{ background: "var(--bg)" }}>
+    <div
+      className="flex min-h-screen"
+      style={{ background: "var(--bg)" }}
+    >
+      {/* Mobile overlay */}
+      <div
+        aria-hidden="true"
+        onClick={() => setSidebarOpen(false)}
+        className={`
+          fixed inset-0 z-40 md:hidden
+          transition-opacity duration-300
+          ${
+            sidebarOpen
+              ? "pointer-events-auto opacity-100"
+              : "pointer-events-none opacity-0"
+          }
+        `}
+        style={{
+          background: "var(--text)",
+          opacity: sidebarOpen ? 0.35 : 0,
+        }}
+      />
+
       {/* Sidebar */}
       <aside
-        className="w-64 p-4 border-r"
+        id="admin-sidebar"
+        aria-label="Admin navigation"
+        aria-hidden={
+          typeof window !== "undefined" &&
+          window.matchMedia("(max-width: 767px)").matches
+            ? !sidebarOpen
+            : undefined
+        }
+        className={`
+          fixed inset-y-0 left-0 z-50
+          flex h-dvh w-72 max-w-[85vw] shrink-0 flex-col
+          border-r p-4
+          transition-transform duration-300 ease-in-out
+          ${
+            sidebarOpen ? "translate-x-0" : "-translate-x-full"
+          }
+          md:sticky md:top-0 md:z-auto
+          md:h-screen md:w-64 md:max-w-none
+          md:translate-x-0
+        `}
         style={{
           background: "var(--surface)",
           borderColor: "var(--border)",
         }}
       >
-        <h2 className="text-xl font-semibold mb-6">Admin Panel</h2>
+        {/* Sidebar header */}
+        <div className="mb-6 flex items-center justify-between gap-3">
+          <h2
+            className="text-xl font-semibold"
+            style={{ color: "var(--text)" }}
+          >
+            Admin Panel
+          </h2>
 
-        <nav className="flex flex-col gap-2">
+          {/* Mobile close button */}
+          <button
+            type="button"
+            onClick={() => setSidebarOpen(false)}
+            aria-label="Close navigation menu"
+            className="
+              flex h-10 w-10 shrink-0 items-center justify-center
+              rounded-lg transition-colors md:hidden
+            "
+            style={{
+              color: "var(--text)",
+              background: "var(--surface-hover)",
+            }}
+          >
+            <X size={22} />
+          </button>
+        </div>
+
+        {/* Navigation */}
+        <nav className="flex flex-1 flex-col gap-2 overflow-y-auto">
           {routes.map((route) => {
             const isActive =
               pathname === route.path ||
@@ -140,10 +228,30 @@ export default function AdminLayout({
               <Link
                 key={route.path}
                 href={route.path}
-                className="px-4 py-2 rounded-md transition-all"
+                onClick={() => setSidebarOpen(false)}
+                aria-current={isActive ? "page" : undefined}
+                className="
+                  flex items-center rounded-lg px-4 py-3
+                  font-medium transition-colors duration-200
+                "
                 style={{
-                  background: isActive ? "var(--primary)" : "transparent",
-                  color: isActive ? "#fff" : "var(--text)",
+                  background: isActive
+                    ? "var(--primary)"
+                    : "transparent",
+                  color: isActive
+                    ? "var(--bg-secondary)"
+                    : "var(--text)",
+                }}
+                onMouseEnter={(event) => {
+                  if (!isActive) {
+                    event.currentTarget.style.background =
+                      "var(--surface-hover)";
+                  }
+                }}
+                onMouseLeave={(event) => {
+                  if (!isActive) {
+                    event.currentTarget.style.background = "transparent";
+                  }
                 }}
               >
                 {route.name}
@@ -155,11 +263,41 @@ export default function AdminLayout({
 
       {/* Right Content */}
       <main
-        className="flex-1 p-6"
+        className="min-w-0 flex-1 p-4 sm:p-6"
         style={{ background: "var(--bg-secondary)" }}
       >
         {children}
       </main>
+
+      {/* Fixed floating arrow - mobile only */}
+      <button
+        type="button"
+        onClick={() => setSidebarOpen(true)}
+        aria-label="Open navigation menu"
+        aria-controls="admin-sidebar"
+        aria-expanded={sidebarOpen}
+        className={`
+          fixed left-0 top-1/2 z-[60]
+          flex h-12 w-9 -translate-y-1/2
+          items-center justify-center
+          rounded-r-xl border border-l-0
+          shadow-lg transition-all duration-300
+          md:hidden
+          ${
+            sidebarOpen
+              ? "pointer-events-none -translate-x-full opacity-0"
+              : "translate-x-0 opacity-100"
+          }
+        `}
+        style={{
+          background: "var(--surface)",
+          color: "var(--text)",
+          borderColor: "var(--border)",
+          boxShadow: "var(--shadow)",
+        }}
+      >
+        <ArrowRight size={21} />
+      </button>
     </div>
   );
 }

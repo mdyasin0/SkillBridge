@@ -1,3 +1,4 @@
+
 "use client";
 
 import { useEffect, useState } from "react";
@@ -48,16 +49,12 @@ export default function MessageDeveloperList() {
       try {
         setLoading(true);
 
-        const response = await fetch(
-          `/api/conversations?userId=${user.id}`,
-        );
+        const response = await fetch(`/api/conversations?userId=${user.id}`);
 
         const result = await response.json();
 
-
-
         if (!response.ok) {
-       toast.error(result);
+          toast.error(result);
 
           return;
         }
@@ -79,27 +76,21 @@ export default function MessageDeveloperList() {
   ==================================================
   */
 
-  const getDeveloperInfo = (
-    conversation: Conversation,
-  ) => {
+  const getDeveloperInfo = (conversation: Conversation) => {
     const currentUserId = String(user?.id);
 
-    if (
-      String(conversation.senderId) === currentUserId
-    ) {
+    if (String(conversation.senderId) === currentUserId) {
       return {
         id: conversation.receiverId,
         name: conversation.receiverName,
-        developerPhoto:
-          conversation.developerPhoto,
+        developerPhoto: conversation.developerPhoto,
       };
     }
 
     return {
       id: conversation.senderId,
       name: conversation.senderName,
-      developerPhoto:
-        conversation.developerPhoto,
+      developerPhoto: conversation.developerPhoto,
     };
   };
 
@@ -109,15 +100,10 @@ export default function MessageDeveloperList() {
   ==================================================
   */
 
-  const handleDeveloperClick = (
-    conversation: Conversation,
-  ) => {
-    const developer =
-      getDeveloperInfo(conversation);
+  const handleDeveloperClick = (conversation: Conversation) => {
+    const developer = getDeveloperInfo(conversation);
 
-    router.push(
-      `/pages/recruiter/MessagePage?developerId=${developer.id}`,
-    );
+    router.push(`/pages/recruiter/MessagePage?developerId=${developer.id}`);
   };
 
   /*
@@ -127,9 +113,7 @@ export default function MessageDeveloperList() {
   */
 
   if (loading) {
-    return (
-     <LoadingUI/>
-    );
+    return <LoadingUI />;
   }
 
   /*
@@ -140,7 +124,7 @@ export default function MessageDeveloperList() {
 
   if (conversations.length === 0) {
     return (
-      <div className="p-4 text-center text-sm text-(--text-muted)">
+      <div className="w-full px-3 py-6 text-center text-sm text-(--text-muted) sm:px-4">
         No conversations yet.
       </div>
     );
@@ -153,33 +137,40 @@ export default function MessageDeveloperList() {
   */
 
   return (
-    <div className="w-full">
+    <div className="w-full min-w-0 overflow-x-hidden">
       {conversations.map((conversation) => {
-        const developer =
-          getDeveloperInfo(conversation);
+        const developer = getDeveloperInfo(conversation);
 
-        const unreadCount =
-          Number(conversation.unreadCount) || 0;
+        const unreadCount = Number(conversation.unreadCount) || 0;
 
         return (
           <button
             key={conversation.conversationId}
             type="button"
-            onClick={() =>
-              handleDeveloperClick(conversation)
-            }
+            onClick={() => handleDeveloperClick(conversation)}
             className="
               flex
               w-full
+              min-w-0
               items-center
               gap-3
               border-b
               border-(--border)
-              px-4
+              bg-(--surface)
+              px-3
               py-3
               text-left
-              transition
+              transition-colors
+              duration-200
               hover:bg-(--surface-hover)
+              focus-visible:outline-2
+              focus-visible:outline-offset-[-2px]
+              focus-visible:outline-(--primary)
+              active:bg-(--surface-hover)
+              sm:gap-3.5
+              sm:px-4
+              sm:py-3.5
+              md:gap-4
             "
           >
             {/* ==========================================
@@ -189,8 +180,8 @@ export default function MessageDeveloperList() {
             <div
               className="
                 flex
-                h-11
-                w-11
+                h-10
+                w-10
                 shrink-0
                 items-center
                 justify-center
@@ -200,17 +191,17 @@ export default function MessageDeveloperList() {
                 text-sm
                 font-semibold
                 text-white
+                sm:h-11
+                sm:w-11
               "
             >
               {developer.developerPhoto ? (
                 <Image
                   src={developer.developerPhoto}
-                  alt={
-                    developer.name ||
-                    "Developer"
-                  }
+                  alt={developer.name || "Developer"}
                   width={44}
                   height={44}
+                  sizes="(max-width: 639px) 40px, 44px"
                   className="
                     h-full
                     w-full
@@ -223,11 +214,7 @@ export default function MessageDeveloperList() {
                     ?.trim()
                     .split(/\s+/)
                     .slice(0, 2)
-                    .map((word) =>
-                      word
-                        .charAt(0)
-                        .toUpperCase(),
-                    )
+                    .map((word) => word.charAt(0).toUpperCase())
                     .join("")}
                 </span>
               )}
@@ -240,13 +227,14 @@ export default function MessageDeveloperList() {
             <div className="min-w-0 flex-1">
               {/* Name + unread badge */}
 
-              <div className="flex items-center gap-2">
+              <div className="flex min-w-0 items-center gap-2">
                 <p
                   className={`
                     min-w-0
                     flex-1
                     truncate
                     text-sm
+                    leading-5
                     ${
                       unreadCount > 0
                         ? "font-bold text-(--text)"
@@ -275,12 +263,11 @@ export default function MessageDeveloperList() {
                       px-1.5
                       text-[10px]
                       font-bold
+                      leading-none
                       text-white
                     "
                   >
-                    {unreadCount > 99
-                      ? "99+"
-                      : unreadCount}
+                    {unreadCount > 99 ? "99+" : unreadCount}
                   </span>
                 )}
               </div>
@@ -290,8 +277,12 @@ export default function MessageDeveloperList() {
               <p
                 className={`
                   mt-0.5
-                  truncate
+                  overflow-hidden
+                  text-ellipsis
+                  whitespace-nowrap
                   text-xs
+                  leading-5
+                  sm:text-[13px]
                   ${
                     unreadCount > 0
                       ? "font-medium text-(--text)"

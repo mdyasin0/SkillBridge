@@ -1,3 +1,4 @@
+
 "use client";
 
 import { useState } from "react";
@@ -41,7 +42,7 @@ export default function LoginPage() {
       return;
     }
 
-    //  SUCCESS SWEET ALERT
+    // SUCCESS SWEET ALERT
     Swal.fire({
       icon: "success",
       title: "Login Successful",
@@ -50,16 +51,19 @@ export default function LoginPage() {
     });
 
     // redirect after alert
-  router.push("/");
+    router.push("/");
   };
 
   return (
     <div
-      className="min-h-screen flex items-center justify-center px-4"
-      style={{ background: "var(--bg)" }}
+      className="flex min-h-screen min-h-[100dvh] w-full items-center justify-center px-4 py-8 sm:px-6 sm:py-10"
+      style={{
+        background: "var(--bg)",
+        color: "var(--text)",
+      }}
     >
       <div
-        className="w-full max-w-md p-6 rounded-xl"
+        className="w-full max-w-md rounded-xl p-5 sm:p-7 md:p-8"
         style={{
           background: "var(--surface)",
           boxShadow: "var(--shadow)",
@@ -67,8 +71,14 @@ export default function LoginPage() {
         }}
       >
         {/* Title */}
-        <h1 className="text-2xl font-bold mb-1">Welcome Back</h1>
-        <p style={{ color: "var(--text-muted)" }} className="mb-5">
+        <h1 className="mb-1 text-2xl font-bold sm:text-3xl">
+          Welcome Back
+        </h1>
+
+        <p
+          className="mb-5 text-sm leading-relaxed sm:text-base"
+          style={{ color: "var(--text-muted)" }}
+        >
           Login to continue your SkillBridge journey
         </p>
 
@@ -77,7 +87,7 @@ export default function LoginPage() {
           name="email"
           type="email"
           placeholder="Email"
-          className="w-full p-3 rounded mb-1 outline-none"
+          className="mb-1 w-full min-w-0 rounded-lg p-3 text-sm outline-none transition-colors sm:text-base"
           style={{
             border: "1px solid var(--border)",
             background: "var(--bg-secondary)",
@@ -87,7 +97,12 @@ export default function LoginPage() {
         />
 
         {errors.email && (
-          <p className="text-red-500 text-sm mb-3">{errors.email}</p>
+          <p
+            className="mb-3 text-sm"
+            style={{ color: "var(--primary)" }}
+          >
+            {errors.email}
+          </p>
         )}
 
         {/* Password */}
@@ -96,7 +111,7 @@ export default function LoginPage() {
             name="password"
             placeholder="Password"
             type={showPassword ? "text" : "password"}
-            className="w-full p-3 rounded pr-16 outline-none"
+            className="w-full min-w-0 rounded-lg p-3 pr-16 text-sm outline-none transition-colors sm:text-base"
             style={{
               border: "1px solid var(--border)",
               background: "var(--bg-secondary)",
@@ -108,7 +123,7 @@ export default function LoginPage() {
           <button
             type="button"
             onClick={() => setShowPassword(!showPassword)}
-            className="absolute right-3 top-3 text-sm"
+            className="absolute right-3 top-1/2 -translate-y-1/2 rounded px-1 py-1 text-sm font-medium transition-colors"
             style={{ color: "var(--primary)" }}
           >
             {showPassword ? "Hide" : "Show"}
@@ -116,16 +131,21 @@ export default function LoginPage() {
         </div>
 
         {errors.password && (
-          <p className="text-red-500 text-sm mb-3">{errors.password}</p>
+          <p
+            className="mb-3 text-sm"
+            style={{ color: "var(--primary)" }}
+          >
+            {errors.password}
+          </p>
         )}
 
         {/* Login Button */}
         <button
           onClick={handleSubmit}
-          className="w-full p-3 rounded font-medium transition mb-3"
+          className="mb-3 mt-3 w-full rounded-lg p-3 font-medium transition-colors hover:opacity-90 active:opacity-80"
           style={{
             background: "var(--primary)",
-            color: "white",
+            color: "#FFFFFF",
           }}
         >
           Login
@@ -133,14 +153,14 @@ export default function LoginPage() {
 
         {/* Register Link */}
         <p
-          className="text-center mt-4 text-sm"
+          className="mt-4 text-center text-sm leading-relaxed sm:text-base"
           style={{ color: "var(--text-muted)" }}
         >
           You have no account?{" "}
           <Link
             href="/auth/register"
             style={{ color: "var(--primary)" }}
-            className="font-medium"
+            className="rounded font-medium transition-opacity hover:opacity-80"
           >
             Register
           </Link>

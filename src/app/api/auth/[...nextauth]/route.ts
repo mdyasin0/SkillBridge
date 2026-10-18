@@ -111,14 +111,14 @@ export const authOptions: NextAuthOptions = {
       session: Session;
       token: JWT;
     }) {
-      if (session.user) {
-        session.user.id = token.id;
-        session.user.name = token.name;
-        session.user.email = token.email;
-        session.user.role = token.role;
-        session.user.image = token.image;
-        session.user.status = token.status;
-      }
+     if (session.user) {
+    session.user.id = token.id ?? "";
+    session.user.name = token.name ?? null;
+    session.user.email = token.email ?? null;
+    session.user.role = token.role ?? "";
+    session.user.image = token.image ?? null;
+    session.user.status = token.status ?? "";
+  }
 
       return session;
     },

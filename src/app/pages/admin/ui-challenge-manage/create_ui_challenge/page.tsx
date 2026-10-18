@@ -1,3 +1,4 @@
+
 "use client";
 
 import { useState } from "react";
@@ -26,6 +27,7 @@ export default function ChallengeForm() {
     "AWS",
     "Git",
   ];
+
   const [loading, setLoading] = useState(false);
   const [formData, setFormData] = useState<FormData>({
     title: "",
@@ -47,7 +49,9 @@ export default function ChallengeForm() {
     setFormData((prev) => ({
       ...prev,
       [name]:
-        name === "timeLimit" || name === "maxAttempts" ? Number(value) : value,
+        name === "timeLimit" || name === "maxAttempts"
+          ? Number(value)
+          : value,
     }));
   };
 
@@ -93,66 +97,84 @@ export default function ChallengeForm() {
   };
 
   return (
-    <div className="max-w-4xl mx-auto p-6">
+    <div className="mx-auto w-full min-w-0 max-w-4xl px-3 py-4 sm:px-5 sm:py-6 lg:px-6">
       <div
-        className="rounded-2xl border p-8 shadow-lg"
+        className="w-full min-w-0 rounded-2xl border p-4 shadow-lg sm:p-6 md:p-8"
         style={{
           background: "var(--surface)",
           borderColor: "var(--border)",
           boxShadow: "var(--shadow)",
         }}
       >
-        <h2 className="text-3xl font-bold mb-8">Create-ui-challenge</h2>
+        <h2 className="mb-6 text-2xl font-bold text-(--text) sm:mb-8 sm:text-3xl">
+          Create-ui-challenge
+        </h2>
 
-        <form onSubmit={handleSubmit} className="space-y-6">
+        <form onSubmit={handleSubmit} className="space-y-5 sm:space-y-6">
           {/* Title */}
-          <div>
-            <label className="block mb-2 font-medium">Title</label>
+          <div className="min-w-0">
+            <label
+              htmlFor="title"
+              className="mb-2 block text-sm font-medium text-(--text) sm:text-base"
+            >
+              Title
+            </label>
+
             <input
+              id="title"
               type="text"
               name="title"
               value={formData.title}
               onChange={handleChange}
               placeholder="Enter challenge title"
-              className="w-full rounded-xl border px-4 py-3 outline-none transition"
+              className="w-full min-w-0 rounded-xl border bg-(--bg-secondary) px-4 py-3 text-(--text) outline-none transition placeholder:text-(--text-muted) focus:border-(--primary) focus:ring-2 focus:ring-(--primary)"
               style={{
-                background: "var(--bg-secondary)",
                 borderColor: "var(--border)",
               }}
             />
           </div>
 
           {/* Description */}
-          <div>
-            <label className="block mb-2 font-medium">Description</label>
+          <div className="min-w-0">
+            <label
+              htmlFor="description"
+              className="mb-2 block text-sm font-medium text-(--text) sm:text-base"
+            >
+              Description
+            </label>
 
             <textarea
+              id="description"
               rows={6}
               name="description"
               value={formData.description}
               onChange={handleChange}
               placeholder="Write challenge description..."
-              className="w-full rounded-xl border px-4 py-3 outline-none resize-none transition"
+              className="w-full min-w-0 resize-y rounded-xl border bg-(--bg-secondary) px-4 py-3 text-(--text) outline-none transition placeholder:text-(--text-muted) focus:border-(--primary) focus:ring-2 focus:ring-(--primary)"
               style={{
-                background: "var(--bg-secondary)",
                 borderColor: "var(--border)",
               }}
             />
           </div>
 
           {/* Grid */}
-          <div className="grid md:grid-cols-2 gap-6">
+          <div className="grid min-w-0 grid-cols-1 gap-5 sm:gap-6 md:grid-cols-2">
             {/* Technology */}
-            <div>
-              <label className="mb-2 block font-medium">Technology</label>
+            <div className="min-w-0">
+              <label
+                htmlFor="technology"
+                className="mb-2 block text-sm font-medium text-(--text) sm:text-base"
+              >
+                Technology
+              </label>
 
               <select
+                id="technology"
                 name="technology"
                 value={formData.technology}
                 onChange={handleChange}
-                className="w-full rounded-xl border px-4 py-3 outline-none"
+                className="w-full min-w-0 rounded-xl border bg-(--bg-secondary) px-4 py-3 text-(--text) outline-none transition focus:border-(--primary) focus:ring-2 focus:ring-(--primary)"
                 style={{
-                  background: "var(--bg-secondary)",
                   borderColor: "var(--border)",
                 }}
               >
@@ -167,16 +189,21 @@ export default function ChallengeForm() {
             </div>
 
             {/* Difficulty */}
-            <div>
-              <label className="block mb-2 font-medium">Difficulty</label>
+            <div className="min-w-0">
+              <label
+                htmlFor="difficulty"
+                className="mb-2 block text-sm font-medium text-(--text) sm:text-base"
+              >
+                Difficulty
+              </label>
 
               <select
+                id="difficulty"
                 name="difficulty"
                 value={formData.difficulty}
                 onChange={handleChange}
-                className="w-full rounded-xl border px-4 py-3 outline-none"
+                className="w-full min-w-0 rounded-xl border bg-(--bg-secondary) px-4 py-3 text-(--text) outline-none transition focus:border-(--primary) focus:ring-2 focus:ring-(--primary)"
                 style={{
-                  background: "var(--bg-secondary)",
                   borderColor: "var(--border)",
                 }}
               >
@@ -188,74 +215,79 @@ export default function ChallengeForm() {
             </div>
 
             {/* Category */}
-            <div>
-              <label className="block mb-2 font-medium">Category</label>
+            <div className="min-w-0">
+              <label
+                htmlFor="category"
+                className="mb-2 block text-sm font-medium text-(--text) sm:text-base"
+              >
+                Category
+              </label>
 
               <input
+                id="category"
                 type="text"
                 name="category"
                 value={formData.category}
                 onChange={handleChange}
                 placeholder="Algorithms"
-                className="w-full rounded-xl border px-4 py-3 outline-none"
+                className="w-full min-w-0 rounded-xl border bg-(--bg-secondary) px-4 py-3 text-(--text) outline-none transition placeholder:text-(--text-muted) focus:border-(--primary) focus:ring-2 focus:ring-(--primary)"
                 style={{
-                  background: "var(--bg-secondary)",
                   borderColor: "var(--border)",
                 }}
               />
             </div>
 
             {/* Time Limit */}
-            <div>
-              <label className="block mb-2 font-medium">
+            <div className="min-w-0">
+              <label
+                htmlFor="timeLimit"
+                className="mb-2 block text-sm font-medium text-(--text) sm:text-base"
+              >
                 Time Limit (Minutes)
               </label>
 
               <input
+                id="timeLimit"
                 type="number"
                 name="timeLimit"
                 value={formData.timeLimit}
                 onChange={handleChange}
-                className="w-full rounded-xl border px-4 py-3 outline-none"
+                className="w-full min-w-0 rounded-xl border bg-(--bg-secondary) px-4 py-3 text-(--text) outline-none transition focus:border-(--primary) focus:ring-2 focus:ring-(--primary)"
                 style={{
-                  background: "var(--bg-secondary)",
                   borderColor: "var(--border)",
                 }}
               />
             </div>
 
             {/* Max Attempts */}
-            <div>
-              <label className="block mb-2 font-medium">Max Attempts</label>
+            <div className="min-w-0">
+              <label
+                htmlFor="maxAttempts"
+                className="mb-2 block text-sm font-medium text-(--text) sm:text-base"
+              >
+                Max Attempts
+              </label>
 
               <input
+                id="maxAttempts"
                 type="number"
                 name="maxAttempts"
                 value={formData.maxAttempts}
                 onChange={handleChange}
-                className="w-full rounded-xl border px-4 py-3 outline-none"
+                className="w-full min-w-0 rounded-xl border bg-(--bg-secondary) px-4 py-3 text-(--text) outline-none transition focus:border-(--primary) focus:ring-2 focus:ring-(--primary)"
                 style={{
-                  background: "var(--bg-secondary)",
                   borderColor: "var(--border)",
                 }}
               />
             </div>
           </div>
 
-          <div className="pt-4">
+          {/* Submit */}
+          <div className="flex flex-col gap-3 pt-2 sm:flex-row sm:items-center sm:pt-4">
             <button
               type="submit"
               disabled={loading}
-              className="rounded-xl px-8 py-3 font-semibold text-white transition disabled:opacity-50 disabled:cursor-not-allowed"
-              style={{
-                background: "var(--primary)",
-              }}
-              onMouseOver={(e) =>
-                (e.currentTarget.style.background = "var(--primary-hover)")
-              }
-              onMouseOut={(e) =>
-                (e.currentTarget.style.background = "var(--primary)")
-              }
+              className="w-full rounded-xl bg-(--primary) px-6 py-3 font-semibold text-white transition-colors hover:bg-(--primary-hover) focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-(--primary) disabled:cursor-not-allowed disabled:opacity-50 sm:w-auto sm:min-w-48 sm:px-8"
             >
               {loading ? "Creating..." : "Create Challenge"}
             </button>

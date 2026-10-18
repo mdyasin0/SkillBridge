@@ -1,3 +1,4 @@
+
 "use client";
 
 import LoadingUI from "@/components/Loadinui";
@@ -56,64 +57,63 @@ export default function ChallengesPage() {
 
     return difficultyMatch && categoryMatch;
   });
- 
-useEffect(() => {
-  if (!user?.id) return;
 
-  const getChallenges = async () => {
-    try {
-      setLoading(true);
+  useEffect(() => {
+    if (!user?.id) return;
 
-      const response = await fetch(
-        `/api/developer_coding-challenge/all-coding-challenge?userId=${user.id}`
-      );
+    const getChallenges = async () => {
+      try {
+        setLoading(true);
 
-      const result = await response.json();
-
-      if (!response.ok || !result.success) {
-        throw new Error(
-          result.message || "Failed to fetch challenges"
+        const response = await fetch(
+          `/api/developer_coding-challenge/all-coding-challenge?userId=${user.id}`,
         );
+
+        const result = await response.json();
+
+        if (!response.ok || !result.success) {
+          throw new Error(
+            result.message || "Failed to fetch challenges",
+          );
+        }
+
+        setApiData({
+          available: Array.isArray(result.data?.available)
+            ? result.data.available
+            : [],
+          completed: Array.isArray(result.data?.completed)
+            ? result.data.completed
+            : [],
+        });
+
+        setTableData(
+          Array.isArray(result.data?.available)
+            ? result.data.available
+            : [],
+        );
+
+        setCounts(result.counts);
+      } catch (error) {
+        console.error("Challenge fetch error:", error);
+        toast.error("Failed to load coding challenges.");
+
+        setApiData({
+          available: [],
+          completed: [],
+        });
+        setTableData([]);
+        setCounts({
+          all: 0,
+          available: 0,
+          completed: 0,
+        });
+      } finally {
+        setLoading(false);
       }
+    };
 
-      setApiData({
-        available: Array.isArray(result.data?.available)
-          ? result.data.available
-          : [],
-        completed: Array.isArray(result.data?.completed)
-          ? result.data.completed
-          : [],
-      });
-
-      setTableData(
-        Array.isArray(result.data?.available)
-          ? result.data.available
-          : []
-      );
-
-      setCounts(result.counts);
-    } catch (error) {
-      console.error("Challenge fetch error:", error);
-      toast.error("Failed to load coding challenges.");
-
-      setApiData({
-        available: [],
-        completed: [],
-      });
-      setTableData([]);
-      setCounts({
-        all: 0,
-        available: 0,
-        completed: 0,
-      });
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  getChallenges();
-}, [user?.id]);
-
+    getChallenges();
+  }, [user?.id]);
 
   const router = useRouter();
 
@@ -122,15 +122,15 @@ useEffect(() => {
       title: "Start Coding Challenge",
 
       html: (
-        <div className="mt-3 text-left">
+        <div className="mt-3 w-full min-w-0 text-left">
           {/* Hero */}
-          <div className="mb-5 flex items-center gap-4 rounded-2xl border border-(--border) bg-(--surface-hover) p-5">
-            <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-(--primary) text-white shadow-lg">
+          <div className="mb-5 flex flex-col gap-4 rounded-2xl border border-(--border) bg-(--surface-hover) p-4 sm:flex-row sm:items-center sm:p-5">
+            <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-(--primary) text-white shadow-lg sm:h-14 sm:w-14">
               <LuClock3 size={30} />
             </div>
 
-            <div>
-              <h3 className="text-lg font-semibold text-(--text)">
+            <div className="min-w-0">
+              <h3 className="text-base font-semibold text-(--text) sm:text-lg">
                 Your timer starts instantly
               </h3>
 
@@ -141,14 +141,14 @@ useEffect(() => {
           </div>
 
           {/* Rules */}
-          <div className="rounded-2xl border border-(--border) bg-(--surface-hover) p-5">
+          <div className="rounded-2xl border border-(--border) bg-(--surface-hover) p-4 sm:p-5">
             <h4 className="mb-4 text-base font-semibold text-(--text)">
               Before you continue
             </h4>
 
             <div className="space-y-4">
               <div className="flex items-start gap-3">
-                <div className="mt-0.5 rounded-full bg-green-100 p-1 text-green-600">
+                <div className="mt-0.5 shrink-0 rounded-full bg-(--surface) p-1 text-(--primary)">
                   <IoCheckmarkDone size={18} />
                 </div>
 
@@ -162,7 +162,7 @@ useEffect(() => {
               </div>
 
               <div className="flex items-start gap-3">
-                <div className="mt-0.5 rounded-full bg-green-100 p-1 text-green-600">
+                <div className="mt-0.5 shrink-0 rounded-full bg-(--surface) p-1 text-(--primary)">
                   <IoCheckmarkDone size={18} />
                 </div>
 
@@ -172,22 +172,24 @@ useEffect(() => {
               </div>
 
               <div className="flex items-start gap-3">
-                <div className="mt-0.5 rounded-full bg-amber-100 p-1 text-amber-600">
+                <div className="mt-0.5 shrink-0 rounded-full bg-(--surface) p-1 text-(--text-muted)">
                   <LuTimerReset size={18} />
                 </div>
 
                 <p className="text-sm text-(--text-muted)">
                   The timer{" "}
-                  <strong>cannot be paused, restarted, or reset.</strong>
+                  <strong className="text-(--text)">
+                    cannot be paused, restarted, or reset.
+                  </strong>
                 </p>
               </div>
 
-              <div className="flex items-start gap-3 rounded-xl border border-red-200 bg-red-50 p-4">
-                <div className="mt-0.5 rounded-full bg-red-100 p-1 text-red-600">
+              <div className="flex items-start gap-3 rounded-xl border border-(--border) bg-(--surface) p-3 sm:p-4">
+                <div className="mt-0.5 shrink-0 rounded-full bg-(--surface-hover) p-1 text-(--primary)">
                   <LuShieldAlert size={18} />
                 </div>
 
-                <p className="text-sm font-medium text-red-700">
+                <p className="text-sm font-medium text-(--text)">
                   If the time limit expires, your solution will be submitted
                   automatically. If no valid solution is submitted, you will
                   receive <strong>0 score</strong>.
@@ -204,8 +206,9 @@ useEffect(() => {
 
       icon: undefined,
 
-      width: 720,
+      width: "min(720px, calc(100vw - 2rem))",
       background: "var(--surface)",
+      color: "var(--text)",
 
       showCancelButton: true,
       reverseButtons: true,
@@ -214,15 +217,18 @@ useEffect(() => {
       confirmButtonText: "Start Challenge",
       cancelButtonText: "Cancel",
 
-      confirmButtonColor: "#5B6CFF",
-      cancelButtonColor: "#CBD5E1",
+      confirmButtonColor: "var(--primary)",
+      cancelButtonColor: "var(--surface-hover)",
 
       customClass: {
-        popup: "rounded-3xl shadow-2xl",
-        title: "pt-4 text-3xl font-bold text-[var(--text)]",
+        popup: "rounded-2xl shadow-2xl sm:rounded-3xl",
+        title: "px-3 pt-4 text-xl font-bold text-[var(--text)] sm:text-3xl",
+        htmlContainer: "px-3 sm:px-5",
+        actions: "flex w-full flex-wrap justify-center gap-2 px-3 sm:px-5",
         confirmButton:
-          "rounded-xl px-7 py-3 font-semibold text-white flex items-center gap-2",
-        cancelButton: "rounded-xl px-7 py-3 font-semibold text-slate-700",
+          "rounded-xl px-4 py-3 font-semibold text-white sm:px-7",
+        cancelButton:
+          "rounded-xl px-4 py-3 font-semibold text-[var(--text)] sm:px-7",
       },
     });
 
@@ -263,6 +269,7 @@ useEffect(() => {
       });
     }
   };
+
   const handleResubmitChallenge = async (
     id: number,
     submit_attempts: number,
@@ -272,15 +279,15 @@ useEffect(() => {
       title: "Start Challenge Resubmission",
 
       html: (
-        <div className="mt-3 text-left">
+        <div className="mt-3 w-full min-w-0 text-left">
           {/* Hero */}
-          <div className="mb-5 flex items-center gap-4 rounded-2xl border border-(--border) bg-(--surface-hover) p-5">
-            <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-(--primary) text-white shadow-lg">
+          <div className="mb-5 flex flex-col gap-4 rounded-2xl border border-(--border) bg-(--surface-hover) p-4 sm:flex-row sm:items-center sm:p-5">
+            <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-(--primary) text-white shadow-lg sm:h-14 sm:w-14">
               <LuClock3 size={30} />
             </div>
 
-            <div>
-              <h3 className="text-lg font-semibold text-(--text)">
+            <div className="min-w-0">
+              <h3 className="text-base font-semibold text-(--text) sm:text-lg">
                 Your resubmission timer starts immediately
               </h3>
 
@@ -291,14 +298,14 @@ useEffect(() => {
           </div>
 
           {/* Rules */}
-          <div className="rounded-2xl border border-(--border) bg-(--surface-hover) p-5">
+          <div className="rounded-2xl border border-(--border) bg-(--surface-hover) p-4 sm:p-5">
             <h4 className="mb-4 text-base font-semibold text-(--text)">
               Before you continue
             </h4>
 
             <div className="space-y-4">
               <div className="flex items-start gap-3">
-                <div className="mt-0.5 rounded-full bg-green-100 p-1 text-green-600">
+                <div className="mt-0.5 shrink-0 rounded-full bg-(--surface) p-1 text-(--primary)">
                   <IoCheckmarkDone size={18} />
                 </div>
 
@@ -312,22 +319,24 @@ useEffect(() => {
               </div>
 
               <div className="flex items-start gap-3">
-                <div className="mt-0.5 rounded-full bg-amber-100 p-1 text-amber-600">
+                <div className="mt-0.5 shrink-0 rounded-full bg-(--surface) p-1 text-(--text-muted)">
                   <LuTimerReset size={18} />
                 </div>
 
                 <p className="text-sm text-(--text-muted)">
                   The timer{" "}
-                  <strong>cannot be paused, restarted, or reset.</strong>
+                  <strong className="text-(--text)">
+                    cannot be paused, restarted, or reset.
+                  </strong>
                 </p>
               </div>
 
-              <div className="flex items-start gap-3 rounded-xl border border-red-200 bg-red-50 p-4">
-                <div className="mt-0.5 rounded-full bg-red-100 p-1 text-red-600">
+              <div className="flex items-start gap-3 rounded-xl border border-(--border) bg-(--surface) p-3 sm:p-4">
+                <div className="mt-0.5 shrink-0 rounded-full bg-(--surface-hover) p-1 text-(--primary)">
                   <LuShieldAlert size={18} />
                 </div>
 
-                <p className="text-sm font-medium text-red-700">
+                <p className="text-sm font-medium text-(--text)">
                   Starting a resubmission will use{" "}
                   <strong>1 additional attempt</strong>. You have used{" "}
                   <strong>{submit_attempts}</strong> of{" "}
@@ -346,8 +355,9 @@ useEffect(() => {
 
       icon: undefined,
 
-      width: 720,
+      width: "min(720px, calc(100vw - 2rem))",
       background: "var(--surface)",
+      color: "var(--text)",
 
       showCancelButton: true,
       reverseButtons: true,
@@ -356,15 +366,18 @@ useEffect(() => {
       confirmButtonText: "Start Resubmission",
       cancelButtonText: "Cancel",
 
-      confirmButtonColor: "#5B6CFF",
-      cancelButtonColor: "#CBD5E1",
+      confirmButtonColor: "var(--primary)",
+      cancelButtonColor: "var(--surface-hover)",
 
       customClass: {
-        popup: "rounded-3xl shadow-2xl",
-        title: "pt-4 text-3xl font-bold text-[var(--text)]",
+        popup: "rounded-2xl shadow-2xl sm:rounded-3xl",
+        title: "px-3 pt-4 text-xl font-bold text-[var(--text)] sm:text-3xl",
+        htmlContainer: "px-3 sm:px-5",
+        actions: "flex w-full flex-wrap justify-center gap-2 px-3 sm:px-5",
         confirmButton:
-          "rounded-xl px-7 py-3 font-semibold text-white flex items-center gap-2",
-        cancelButton: "rounded-xl px-7 py-3 font-semibold text-slate-700",
+          "rounded-xl px-4 py-3 font-semibold text-white sm:px-7",
+        cancelButton:
+          "rounded-xl px-4 py-3 font-semibold text-[var(--text)] sm:px-7",
       },
     });
 
@@ -377,7 +390,7 @@ useEffect(() => {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          userId: user.id, //  login user id
+          userId: user.id, // login user id
           challengeId: id,
         }),
       });
@@ -415,21 +428,28 @@ useEffect(() => {
       });
     }
   };
-  if (loading) return <LoadingUI/>;
+
+  if (loading) return <LoadingUI />;
 
   return (
-    <div className="max-w-7xl mx-auto p-8">
-      <div className="mb-6  items-center justify-between">
-        <h1 className="text-3xl font-bold">Coding Challenge Lists</h1>
-        <p className="mt-2 text-sm text-gray-500">
+    <div className="mx-auto w-full max-w-7xl min-w-0 p-3 sm:p-5 md:p-6 lg:p-8">
+      <div className="mb-6 min-w-0">
+        <h1 className="text-2xl font-bold text-(--text) sm:text-3xl">
+          Coding Challenge Lists
+        </h1>
+
+        <p className="mt-2 text-sm leading-6 text-(--text-muted)">
           {activeTab === "available"
             ? "Explore all available coding challenges and complete the ones that match your skills and interests."
             : "Review your completed coding challenges and resubmit them if you still have attempts remaining."}
         </p>
-        <div className="flex mt-5 gap-5 ">
+
+        <div className="mt-5 flex flex-wrap items-center gap-2 sm:gap-3">
           <button
-            className={`px-4 py-2 rounded-lg ${
-              activeTab === "available" ? "bg-blue-600 text-white" : "border"
+            className={`rounded-lg border px-3 py-2 text-sm font-medium transition sm:px-4 ${
+              activeTab === "available"
+                ? "border-(--primary) bg-(--primary) text-white"
+                : "border-(--border) bg-(--surface) text-(--text) hover:bg-(--surface-hover)"
             }`}
             onClick={() => {
               setActiveTab("available");
@@ -441,8 +461,10 @@ useEffect(() => {
 
           {counts.completed > 0 && (
             <button
-              className={`px-4 py-2 rounded-lg ${
-                activeTab === "completed" ? "bg-blue-600 text-white" : "border"
+              className={`rounded-lg border px-3 py-2 text-sm font-medium transition sm:px-4 ${
+                activeTab === "completed"
+                  ? "border-(--primary) bg-(--primary) text-white"
+                  : "border-(--border) bg-(--surface) text-(--text) hover:bg-(--surface-hover)"
               }`}
               onClick={() => {
                 setActiveTab("completed");
@@ -452,38 +474,41 @@ useEffect(() => {
               Completed ({counts.completed})
             </button>
           )}
+
           <button
             onClick={() => setShowFilter(!showFilter)}
-            className="flex items-center gap-2 rounded-lg border px-4 py-2 transition hover:bg-gray-100"
+            className="flex items-center justify-center gap-2 rounded-lg border border-(--border) bg-(--surface) px-3 py-2 text-sm font-medium text-(--text) transition hover:bg-(--surface-hover) sm:px-4"
           >
-            <Filter className="h-5 w-5" />
+            <Filter className="h-5 w-5 shrink-0" />
             <span>Filters</span>
           </button>
         </div>
       </div>
+
       {showFilter && (
-        <div className="mb-6 rounded-2xl border border-gray-200 bg-white p-6 shadow-sm">
+        <div className="mb-6 min-w-0 rounded-2xl border border-(--border) bg-(--surface) p-4 shadow-sm sm:p-6">
           {/* Header */}
-          <div className="mb-6 flex items-center justify-between border-b pb-4">
-            <div className="flex gap-3 items-center">
-              <Filter className="h-5 w-5 text-blue-600" />
-              <h2 className="text-lg font-semibold text-gray-900">
+          <div className="mb-6 flex items-center justify-between gap-3 border-b border-(--border) pb-4">
+            <div className="flex min-w-0 items-center gap-3">
+              <Filter className="h-5 w-5 shrink-0 text-(--primary)" />
+              <h2 className="text-base font-semibold text-(--text) sm:text-lg">
                 Filter Challenges
               </h2>
             </div>
 
             <button
               onClick={() => setShowFilter(false)}
-              className="rounded-lg p-2 transition hover:bg-gray-100"
+              aria-label="Close filters"
+              className="shrink-0 rounded-lg p-2 text-(--text-muted) transition hover:bg-(--surface-hover) hover:text-(--text)"
             >
-              <X className="h-5 w-5 text-gray-500" />
+              <X className="h-5 w-5" />
             </button>
           </div>
 
-          <div className="grid gap-6 md:grid-cols-2">
+          <div className="grid min-w-0 grid-cols-1 gap-6 md:grid-cols-2">
             {/* Difficulty */}
-            <div>
-              <label className="mb-3 block text-sm font-medium text-gray-700">
+            <div className="min-w-0">
+              <label className="mb-3 block text-sm font-medium text-(--text)">
                 Difficulty
               </label>
 
@@ -493,12 +518,11 @@ useEffect(() => {
                     key={level}
                     type="button"
                     onClick={() => setDifficultyFilter(level)}
-                    className={`rounded-lg border px-4 py-2 text-sm font-medium transition
-              ${
-                difficultyFilter === level
-                  ? "border-blue-600 bg-blue-600 text-white"
-                  : "border-gray-300 bg-white text-gray-700 hover:border-blue-400 hover:bg-blue-50"
-              }`}
+                    className={`rounded-lg border px-3 py-2 text-sm font-medium transition sm:px-4 ${
+                      difficultyFilter === level
+                        ? "border-(--primary) bg-(--primary) text-white"
+                        : "border-(--border) bg-(--surface) text-(--text) hover:border-(--primary) hover:bg-(--surface-hover)"
+                    }`}
                   >
                     {level}
                   </button>
@@ -507,15 +531,15 @@ useEffect(() => {
             </div>
 
             {/* Category */}
-            <div>
-              <label className="mb-3 block text-sm font-medium text-gray-700">
+            <div className="min-w-0">
+              <label className="mb-3 block text-sm font-medium text-(--text)">
                 Technology
               </label>
 
               <select
                 value={categoryFilter}
                 onChange={(e) => setCategoryFilter(e.target.value)}
-                className="w-full rounded-lg border border-gray-300 bg-white px-4 py-2.5 text-sm outline-none transition focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
+                className="w-full min-w-0 rounded-lg border border-(--border) bg-(--surface) px-4 py-2.5 text-sm text-(--text) outline-none transition focus:border-(--primary) focus:ring-2 focus:ring-(--primary)/20"
               >
                 {categories.map((category) => (
                   <option key={category}>{category}</option>
@@ -525,25 +549,25 @@ useEffect(() => {
           </div>
 
           {/* Footer */}
-          <div className="mt-8 flex items-center justify-between border-t pt-5">
-            <p className="text-sm text-gray-500">
+          <div className="mt-8 flex flex-col gap-4 border-t border-(--border) pt-5 sm:flex-row sm:items-center sm:justify-between">
+            <p className="text-sm text-(--text-muted)">
               Filters are applied instantly.
             </p>
 
-            <div className="flex gap-3">
+            <div className="flex flex-wrap gap-3">
               <button
                 onClick={() => {
                   setDifficultyFilter("All");
                   setCategoryFilter("All");
                 }}
-                className="rounded-lg border border-gray-300 px-5 py-2 text-sm font-medium transition hover:bg-gray-100"
+                className="rounded-lg border border-(--border) bg-(--surface) px-5 py-2 text-sm font-medium text-(--text) transition hover:bg-(--surface-hover)"
               >
                 Reset
               </button>
 
               <button
                 onClick={() => setShowFilter(false)}
-                className="rounded-lg bg-blue-600 px-5 py-2 text-sm font-medium text-white transition hover:bg-blue-700"
+                className="rounded-lg bg-(--primary) px-5 py-2 text-sm font-medium text-white transition hover:bg-(--primary-hover)"
               >
                 Done
               </button>
@@ -553,83 +577,112 @@ useEffect(() => {
       )}
 
       <div
-        className="overflow-hidden rounded-xl border"
+        className="w-full min-w-0 overflow-hidden rounded-xl border"
         style={{
           background: "var(--surface)",
           borderColor: "var(--border)",
         }}
       >
-        <table className="w-full">
-          <thead
-            style={{
-              background: "var(--surface-hover)",
-            }}
-          >
-            <tr>
-              <th className="text-left p-4">Title</th>
-              <th className="text-left p-4">Difficulty</th>
-              <th className="text-left p-4">Category</th>
-              <th className="text-center p-4">Action</th>
-            </tr>
-          </thead>
-
-          <tbody>
-            {filteredData.map((item) => (
-              <tr
-                key={item.id}
-                className="border-t"
-                style={{
-                  borderColor: "var(--border)",
-                }}
-              >
-                <td className="p-4">{item.title}</td>
-
-                <td className="p-4">{item.difficulty}</td>
-
-                <td className="p-4">{item.category}</td>
-
-                <td className="p-4 text-center">
-                  {activeTab === "available" ? (
-                    <button
-                      onClick={() => handleStartChallenge(item.id)}
-                      className="px-4 py-2 rounded-lg text-white"
-                      style={{ background: "var(--primary)" }}
-                    >
-                      Complete Challenge
-                    </button>
-                  ) : (
-                    <div className=" items-center gap-2">
-                      {item.submit_attempts >= item.maxAttempt ? (
-                        <button
-                          disabled
-                          className="px-4 py-2 rounded-lg bg-red-600 text-white cursor-not-allowed opacity-80"
-                        >
-                          Maximum Attempts Reached {item.submit_attempts} /{" "}
-                          {item.maxAttempt}
-                        </button>
-                      ) : (
-                        <button
-                          onClick={() =>
-                            handleResubmitChallenge(
-                              item.id,
-                              item.submit_attempts,
-                              item.maxAttempt,
-                            )
-                          }
-                          className="px-4 py-2 rounded-lg text-white"
-                          style={{ background: "var(--primary)" }}
-                        >
-                          Resubmit Challenge {item.submit_attempts} /{" "}
-                          {item.maxAttempt}
-                        </button>
-                      )}
-                    </div>
-                  )}
-                </td>
+        <div className="w-full overflow-x-auto">
+          <table className="w-full min-w-[600px] border-collapse text-sm sm:text-base">
+            <thead
+              style={{
+                background: "var(--surface-hover)",
+                color: "var(--text)",
+              }}
+            >
+              <tr>
+                <th className="p-3 text-left font-semibold sm:p-4">
+                  Title
+                </th>
+                <th className="p-3 text-left font-semibold sm:p-4">
+                  Difficulty
+                </th>
+                <th className="p-3 text-left font-semibold sm:p-4">
+                  Category
+                </th>
+                <th className="p-3 text-center font-semibold sm:p-4">
+                  Action
+                </th>
               </tr>
-            ))}
-          </tbody>
-        </table>
+            </thead>
+
+            <tbody>
+              {filteredData.map((item) => (
+                <tr
+                  key={item.id}
+                  className="border-t transition hover:bg-(--surface-hover)"
+                  style={{
+                    borderColor: "var(--border)",
+                    color: "var(--text)",
+                  }}
+                >
+                  <td className="break-words p-3 sm:p-4">
+                    {item.title}
+                  </td>
+
+                  <td className="p-3 sm:p-4">
+                    {item.difficulty}
+                  </td>
+
+                  <td className="break-words p-3 sm:p-4">
+                    {item.category}
+                  </td>
+
+                  <td className="p-3 text-center sm:p-4">
+                    {activeTab === "available" ? (
+                      <button
+                        onClick={() => handleStartChallenge(item.id)}
+                        className="inline-flex max-w-full items-center justify-center rounded-lg px-3 py-2 text-sm font-medium text-white transition hover:opacity-90 sm:px-4"
+                        style={{ background: "var(--primary)" }}
+                      >
+                        Complete Challenge
+                      </button>
+                    ) : (
+                      <div className="flex flex-wrap items-center justify-center gap-2">
+                        {item.submit_attempts >= item.maxAttempt ? (
+                          <button
+                            disabled
+                            className="max-w-full cursor-not-allowed rounded-lg border border-(--border) bg-(--surface-hover) px-3 py-2 text-sm font-medium text-(--text-muted) opacity-80 sm:px-4"
+                          >
+                            Maximum Attempts Reached {item.submit_attempts} /{" "}
+                            {item.maxAttempt}
+                          </button>
+                        ) : (
+                          <button
+                            onClick={() =>
+                              handleResubmitChallenge(
+                                item.id,
+                                item.submit_attempts,
+                                item.maxAttempt,
+                              )
+                            }
+                            className="inline-flex max-w-full items-center justify-center rounded-lg px-3 py-2 text-sm font-medium text-white transition hover:opacity-90 sm:px-4"
+                            style={{ background: "var(--primary)" }}
+                          >
+                            Resubmit Challenge {item.submit_attempts} /{" "}
+                            {item.maxAttempt}
+                          </button>
+                        )}
+                      </div>
+                    )}
+                  </td>
+                </tr>
+              ))}
+
+              {filteredData.length === 0 && (
+                <tr>
+                  <td
+                    colSpan={4}
+                    className="p-8 text-center text-sm text-(--text-muted) sm:p-10"
+                  >
+                    No challenges found.
+                  </td>
+                </tr>
+              )}
+            </tbody>
+          </table>
+        </div>
       </div>
     </div>
   );

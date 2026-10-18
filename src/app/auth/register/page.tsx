@@ -1,14 +1,14 @@
+
 "use client";
 
 import { useState } from "react";
-
 import Link from "next/link";
 import { toast } from "react-toastify";
 import Swal from "sweetalert2";
 import { useRouter } from "next/navigation";
 
 export default function RegisterPage() {
-    const router = useRouter();
+  const router = useRouter();
 
   const [showPassword, setShowPassword] = useState(false);
   const [imageFile, setImageFile] = useState<File | null>(null);
@@ -73,6 +73,7 @@ export default function RegisterPage() {
     setErrors(newErrors);
     return valid;
   };
+
   const uploadImageToImgbb = async (file: File) => {
     const apiKey = process.env.NEXT_PUBLIC_IMGBB_KEY;
     const formData = new FormData();
@@ -119,20 +120,22 @@ export default function RegisterPage() {
 
       const data = await res.json();
 
-      //  ERROR CASE  TOAST
+      // ERROR CASE TOAST
       if (!res.ok) {
         toast.error(data.message || "Something went wrong");
         return;
       }
 
-      // SUCCESS CASE  SWEETALERT
+      // SUCCESS CASE SWEETALERT
       Swal.fire({
         title: "Success!",
         text: "Registration completed successfully",
         icon: "success",
         confirmButtonColor: "#5B6CFF",
       });
-router.push("/auth/login");
+
+      router.push("/auth/login");
+
       // optional reset
       setForm({
         name: "",
@@ -147,13 +150,17 @@ router.push("/auth/login");
       setUploading(false);
     }
   };
+
   return (
     <div
-      className="min-h-screen flex items-center justify-center px-4"
-      style={{ background: "var(--bg)" }}
+      className="flex min-h-screen w-full items-center justify-center px-3 py-6 sm:px-5 sm:py-8"
+      style={{
+        background: "var(--bg)",
+        color: "var(--text)",
+      }}
     >
       <div
-        className="w-full max-w-md p-6 rounded-xl"
+        className="w-full min-w-0 max-w-md rounded-xl p-4 sm:p-6 md:p-7"
         style={{
           background: "var(--surface)",
           border: "1px solid var(--border)",
@@ -161,8 +168,14 @@ router.push("/auth/login");
         }}
       >
         {/* Title */}
-        <h1 className="text-2xl font-bold mb-1">Create Account</h1>
-        <p style={{ color: "var(--text-muted)" }} className="mb-5">
+        <h1 className="mb-1 text-xl font-bold sm:text-2xl">
+          Create Account
+        </h1>
+
+        <p
+          className="mb-5 text-sm sm:text-base"
+          style={{ color: "var(--text-muted)" }}
+        >
           Join SkillBridge and prove your skills
         </p>
 
@@ -170,7 +183,7 @@ router.push("/auth/login");
         <input
           name="name"
           placeholder="Full Name"
-          className="w-full p-3 rounded mb-1 outline-none"
+          className="mb-1 w-full min-w-0 rounded-lg p-3 text-sm outline-none transition sm:text-base"
           style={{
             background: "var(--bg-secondary)",
             border: "1px solid var(--border)",
@@ -178,8 +191,14 @@ router.push("/auth/login");
           }}
           onChange={handleChange}
         />
+
         {errors.name && (
-          <p className="text-red-500 text-sm mb-2">{errors.name}</p>
+          <p
+            className="mb-2 text-sm"
+            style={{ color: "var(--primary)" }}
+          >
+            {errors.name}
+          </p>
         )}
 
         {/* Email */}
@@ -187,7 +206,7 @@ router.push("/auth/login");
           name="email"
           type="email"
           placeholder="Email"
-          className="w-full p-3 rounded mb-1 outline-none"
+          className="mb-1 w-full min-w-0 rounded-lg p-3 text-sm outline-none transition sm:text-base"
           style={{
             background: "var(--bg-secondary)",
             border: "1px solid var(--border)",
@@ -195,15 +214,21 @@ router.push("/auth/login");
           }}
           onChange={handleChange}
         />
+
         {errors.email && (
-          <p className="text-red-500 text-sm mb-2">{errors.email}</p>
+          <p
+            className="mb-2 text-sm"
+            style={{ color: "var(--primary)" }}
+          >
+            {errors.email}
+          </p>
         )}
 
         {/* Photo URL */}
         <input
           type="file"
           accept="image/*"
-          className="w-full p-3 rounded mb-2"
+          className="mb-2 w-full min-w-0 rounded-lg p-2.5 text-sm outline-none sm:p-3 sm:text-base"
           style={{
             background: "var(--bg-secondary)",
             border: "1px solid var(--border)",
@@ -215,8 +240,12 @@ router.push("/auth/login");
             }
           }}
         />
+
         {!imageFile && (
-          <p className="text-sm mb-2" style={{ color: "red" }}>
+          <p
+            className="mb-2 text-sm"
+            style={{ color: "var(--primary)" }}
+          >
             Profile image is required
           </p>
         )}
@@ -224,7 +253,7 @@ router.push("/auth/login");
         {/* Role Dropdown */}
         <select
           name="role"
-          className="w-full p-3 rounded mb-1 outline-none"
+          className="mb-1 w-full min-w-0 rounded-lg p-3 text-sm outline-none transition sm:text-base"
           style={{
             background: "var(--bg-secondary)",
             border: "1px solid var(--border)",
@@ -236,17 +265,23 @@ router.push("/auth/login");
           <option value="developer">Developer</option>
           <option value="recruiter">Recruiter</option>
         </select>
+
         {errors.role && (
-          <p className="text-red-500 text-sm mb-2">{errors.role}</p>
+          <p
+            className="mb-2 text-sm"
+            style={{ color: "var(--primary)" }}
+          >
+            {errors.role}
+          </p>
         )}
 
         {/* Password */}
-        <div className="relative mb-1">
+        <div className="relative mb-1 w-full min-w-0">
           <input
             name="password"
             placeholder="Password"
             type={showPassword ? "text" : "password"}
-            className="w-full p-3 rounded pr-16 outline-none"
+            className="w-full min-w-0 rounded-lg p-3 pr-16 text-sm outline-none transition sm:text-base"
             style={{
               background: "var(--bg-secondary)",
               border: "1px solid var(--border)",
@@ -258,37 +293,44 @@ router.push("/auth/login");
           <button
             type="button"
             onClick={() => setShowPassword(!showPassword)}
-            className="absolute right-3 top-3 text-sm"
+            className="absolute right-3 top-1/2 -translate-y-1/2 text-sm font-medium"
             style={{ color: "var(--primary)" }}
           >
             {showPassword ? "Hide" : "Show"}
           </button>
         </div>
+
         {errors.password && (
-          <p className="text-red-500 text-sm mb-2">{errors.password}</p>
+          <p
+            className="mb-2 text-sm"
+            style={{ color: "var(--primary)" }}
+          >
+            {errors.password}
+          </p>
         )}
 
         {/* Submit */}
         <button
           onClick={handleSubmit}
-          className="w-full p-3 rounded font-medium mb-3 transition"
+          className="mb-3 mt-3 w-full rounded-lg p-3 font-medium transition hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-60"
           style={{
             background: "var(--primary)",
-            color: "white",
+            color: "var(--bg-secondary)",
           }}
+          disabled={uploading}
         >
           Register
         </button>
 
         {/* Login Link */}
         <p
-          className="text-center mt-4 text-sm"
+          className="mt-4 text-center text-xs leading-6 sm:text-sm"
           style={{ color: "var(--text-muted)" }}
         >
           You already have an account?{" "}
           <Link
             href="/auth/login"
-            className="font-medium"
+            className="font-medium transition hover:opacity-80"
             style={{ color: "var(--primary)" }}
           >
             Login

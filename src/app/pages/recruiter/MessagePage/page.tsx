@@ -1,3 +1,4 @@
+
 "use client";
 
 import { useEffect, useRef, useState } from "react";
@@ -49,61 +50,12 @@ type SendMessageData = {
 };
 
 const emojis = [
-  "😀",
-  "😃",
-  "😄",
-  "😁",
-  "😆",
-  "😅",
-  "😂",
-  "🤣",
-  "😊",
-  "😇",
-  "🙂",
-  "🙃",
-  "😉",
-  "😌",
-  "😍",
-  "🥰",
-  "😘",
-  "😎",
-  "🤩",
-  "🤔",
-  "😐",
-  "😑",
-  "😶",
-  "🙄",
-  "😏",
-  "😢",
-  "😭",
-  "😡",
-  "🤬",
-  "😱",
-  "🤯",
-  "😴",
-  "🤝",
-  "👍",
-  "👎",
-  "👏",
-  "🙌",
-  "🙏",
-  "💪",
-  "❤️",
-  "💙",
-  "💚",
-  "💛",
-  "🧡",
-  "💜",
-  "🖤",
-  "🤍",
-  "🔥",
-  "✨",
-  "🎉",
-  "🚀",
-  "💯",
-  "⭐",
-  "✅",
-  "❌",
+  "😀", "😃", "😄", "😁", "😆", "😅", "😂", "🤣", "😊", "😇",
+  "🙂", "🙃", "😉", "😌", "😍", "🥰", "😘", "😎", "🤩", "🤔",
+  "😐", "😑", "😶", "🙄", "😏", "😢", "😭", "😡", "🤬", "😱",
+  "🤯", "😴", "🤝", "👍", "👎", "👏", "🙌", "🙏", "💪", "❤️",
+  "💙", "💚", "💛", "🧡", "💜", "🖤", "🤍", "🔥", "✨", "🎉",
+  "🚀", "💯", "⭐", "✅", "❌",
 ];
 
 export default function MessagePage() {
@@ -132,9 +84,8 @@ export default function MessagePage() {
   /*
     Message container reference
     ---------------------------
-    using this "ref" automatically 
+    using this "ref" automatically
     scroll to the last message
- 
   */
   const messagesContainerRef = useRef<HTMLDivElement>(null);
 
@@ -145,19 +96,6 @@ export default function MessagePage() {
     --------------------------------------------------
     Relative Time Function
     --------------------------------------------------
-
-    Example:
-
-    Just now
-    1 minute ago
-    5 minutes ago
-    1 hour ago
-    3 hours ago
-    1 day ago
-    5 days ago
-    2 weeks ago
-    3 months ago
-    1 year ago
   */
 
   const getRelativeTime = (dateString: string) => {
@@ -215,8 +153,6 @@ export default function MessagePage() {
     const fetchDeveloper = async () => {
       if (!developerId) return;
 
-     
-
       try {
         setLoading(true);
 
@@ -226,7 +162,7 @@ export default function MessagePage() {
 
         setProfile(data);
       } catch (error) {
-        toast.error( String(error));
+        toast.error(String(error));
       } finally {
         setLoading(false);
       }
@@ -293,16 +229,10 @@ export default function MessagePage() {
   };
 
   /*
-  --------------------------------------------------
-  Mark Messages As Read
-  --------------------------------------------------
-
-  Current user = receiver
-  Other user = sender
-  that means whic unread messages are  sent 
-  from   developer to  recruiter ,
-  just those will be = 1.
-*/
+    --------------------------------------------------
+    Mark Messages As Read
+    --------------------------------------------------
+  */
 
   const markMessagesAsRead = async () => {
     if (!developer?.user_id || !user?.id) {
@@ -326,14 +256,12 @@ export default function MessagePage() {
       const result = await response.json();
 
       if (!response.ok) {
-       toast.error(result);
+        toast.error(result);
 
         return;
       }
-
-     
     } catch (error) {
-  toast.error(String(error));
+      toast.error(String(error));
     }
   };
 
@@ -363,7 +291,7 @@ export default function MessagePage() {
       const result = await response.json();
 
       if (!response.ok) {
-       toast.error( result);
+        toast.error(result);
         return;
       }
 
@@ -386,12 +314,6 @@ export default function MessagePage() {
       );
 
       setMessages(formattedMessages);
-
-      /*
-      after Messages successfully loading
-      this  conversation's incoming unread messages will made 
-      read = 1 .
-    */
 
       await markMessagesAsRead();
     } catch (error) {
@@ -416,17 +338,11 @@ export default function MessagePage() {
   /*
     --------------------------------------------------
     Automatically scroll to last message
-    when messages will  load/update 
     --------------------------------------------------
   */
 
   useEffect(() => {
     if (messages.length === 0) return;
-
-    /*
-      after DOM updating , for scrolling 
-      setTimeout is used 
-    */
 
     const timer = setTimeout(() => {
       scrollToBottom(false);
@@ -439,12 +355,6 @@ export default function MessagePage() {
     --------------------------------------------------
     Refresh Button
     --------------------------------------------------
-
-    if click on Button ;
-    1. API call 
-    2. new messages come
-    3. scroll to the Last message 
-    --------------------------------------------------
   */
 
   const handleRefresh = async () => {
@@ -455,16 +365,11 @@ export default function MessagePage() {
 
       await fetchMessages(false);
 
-      /*
-        after API data state updating for 
-        scrolling small  delay .
-      */
-
       setTimeout(() => {
         scrollToBottom(true);
       }, 100);
     } catch (error) {
-     toast.error(String(error));
+      toast.error(String(error));
     } finally {
       setRefreshing(false);
     }
@@ -481,10 +386,10 @@ export default function MessagePage() {
   };
 
   /*
-  --------------------------------------------------
-  Start Editing Message
-  --------------------------------------------------
-*/
+    --------------------------------------------------
+    Start Editing Message
+    --------------------------------------------------
+  */
 
   const handleStartEdit = (item: Message) => {
     setEditingMessageId(item.id);
@@ -493,10 +398,10 @@ export default function MessagePage() {
   };
 
   /*
-  --------------------------------------------------
-  Cancel Editing
-  --------------------------------------------------
-*/
+    --------------------------------------------------
+    Cancel Editing
+    --------------------------------------------------
+  */
 
   const handleCancelEdit = () => {
     setEditingMessageId(null);
@@ -504,10 +409,10 @@ export default function MessagePage() {
   };
 
   /*
-  --------------------------------------------------
-  Save Edited Message
-  --------------------------------------------------
-*/
+    --------------------------------------------------
+    Save Edited Message
+    --------------------------------------------------
+  */
 
   const handleSaveEdit = async () => {
     const trimmedText = editingText.trim();
@@ -517,7 +422,7 @@ export default function MessagePage() {
     if (editingMessageId === null) return;
 
     if (!user?.id) {
-     toast.error("User information not available");
+      toast.error("User information not available");
       return;
     }
 
@@ -538,10 +443,8 @@ export default function MessagePage() {
 
       const result = await response.json();
 
-      
-
       if (!response.ok) {
-       toast.error(result);
+        toast.error(result);
         return;
       }
 
@@ -567,6 +470,7 @@ export default function MessagePage() {
       toast.error(String(error));
     }
   };
+
   /*
     --------------------------------------------------
     Send Message
@@ -600,8 +504,6 @@ export default function MessagePage() {
       createdAt: new Date().toISOString(),
     };
 
-    
-
     try {
       const response = await fetch("/api/conversations", {
         method: "POST",
@@ -623,17 +525,10 @@ export default function MessagePage() {
 
       const result = await response.json();
 
-      
-
       if (!response.ok) {
-      toast.error(result);
+        toast.error(result);
         return;
       }
-
-      /*
-        new  message  added in locally .
-        for this without refreshing  message will be showed immediately
-      */
 
       const newMessage: Message = {
         id: result.data?.id ?? Date.now(),
@@ -652,10 +547,6 @@ export default function MessagePage() {
       setMessage("");
 
       setShowEmojiPicker(false);
-
-      /*
-        after new message scroll to bottom
-      */
 
       setTimeout(() => {
         scrollToBottom(true);
@@ -680,8 +571,8 @@ export default function MessagePage() {
   };
 
   return (
-    <main className="min-h-screen w-full text-(--text)">
-      <div className="mx-auto flex h-screen flex-col px-4 py-4 sm:px-6 lg:px-8">
+    <main className="h-[100dvh] min-h-0 w-full overflow-hidden bg-(--bg) text-(--text)">
+      <div className="mx-auto flex h-full min-h-0 w-full max-w-7xl flex-col px-2 py-2 sm:px-4 sm:py-4 lg:px-6">
         {/* =====================================================
             HEADER
         ====================================================== */}
@@ -689,67 +580,73 @@ export default function MessagePage() {
         <div
           className="
             flex
+            shrink-0
             items-center
             justify-between
-            rounded-t-2xl
+            gap-2
+            rounded-t-xl
             border
             border-(--border)
             bg-(--surface)
-            px-4
+            px-3
             py-3
             shadow-sm
+            sm:rounded-t-2xl
             sm:px-5
           "
         >
-          <div className="flex min-w-0 items-center gap-3">
+          <div className="flex min-w-0 flex-1 items-center gap-2.5 sm:gap-3">
             {/* Developer Avatar */}
 
             <div className="relative shrink-0">
-              <Link href={`/pages/recruiter/developer_profile_details/${developerId}`}>
-              <div
-                className="
-                  flex
-                  h-11
-                  w-11
-                  shrink-0
-                  items-center
-                  justify-center
-                  overflow-hidden
-                  rounded-full
-                  bg-(--primary)
-                  text-sm
-                  font-semibold
-                  text-white
-                "
+              <Link
+                href={`/pages/recruiter/developer_profile_details/${developerId}`}
+                aria-label="View developer profile"
+                className="block rounded-full focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-(--primary)"
               >
-                {developer?.developer_photo || developer?.user_photo ? (
-                  <Image
-                    src={developer.developer_photo || developer.user_photo!}
-                    alt={developer.name || "Developer"}
-                    width={44}
-                    height={44}
-                    className="h-full w-full object-cover"
-                  />
-                ) : (
-                  <span>
-                    {developer?.name
-                      ? getInitials(developer.name)
-                      : "??"}
-                  </span>
-                )}
-              </div>
+                <div
+                  className="
+                    flex
+                    h-10
+                    w-10
+                    items-center
+                    justify-center
+                    overflow-hidden
+                    rounded-full
+                    bg-(--primary)
+                    text-sm
+                    font-semibold
+                    text-white
+                    sm:h-11
+                    sm:w-11
+                  "
+                >
+                  {developer?.developer_photo || developer?.user_photo ? (
+                    <Image
+                      src={developer.developer_photo || developer.user_photo!}
+                      alt={developer.name || "Developer"}
+                      width={44}
+                      height={44}
+                      sizes="(max-width: 639px) 40px, 44px"
+                      className="h-full w-full object-cover"
+                    />
+                  ) : (
+                    <span>
+                      {developer?.name ? getInitials(developer.name) : "??"}
+                    </span>
+                  )}
+                </div>
               </Link>
-              
             </div>
 
             {/* Developer Info */}
 
-            <div className="min-w-0">
+            <div className="min-w-0 flex-1">
               <h1 className="truncate text-sm font-semibold sm:text-base">
                 {developer?.name}
               </h1>
 
-              <p className="mt-0.5 truncate text-xs text-(--text-muted)">
+              <p className="mt-0.5 truncate text-xs text-(--text-muted) sm:text-sm">
                 {developer?.title} •{" "}
                 {developer?.availability === 1
                   ? "Available for work"
@@ -760,7 +657,7 @@ export default function MessagePage() {
 
           {/* Header Actions */}
 
-          <div className="flex items-center gap-1">
+          <div className="flex shrink-0 items-center gap-1">
             {/* Refresh */}
 
             <button
@@ -775,11 +672,16 @@ export default function MessagePage() {
                 justify-center
                 rounded-lg
                 text-(--text-muted)
-                transition
+                transition-colors
                 hover:bg-(--surface-hover)
                 hover:text-(--text)
+                focus-visible:outline-2
+                focus-visible:outline-offset-2
+                focus-visible:outline-(--primary)
                 disabled:cursor-not-allowed
                 disabled:opacity-50
+                sm:h-10
+                sm:w-10
               "
               aria-label="Refresh messages"
               title="Refresh messages"
@@ -802,6 +704,7 @@ export default function MessagePage() {
             min-h-0
             flex-1
             flex-col
+            overflow-hidden
             border-x
             border-(--border)
             bg-(--bg-secondary)
@@ -809,8 +712,8 @@ export default function MessagePage() {
         >
           {/* Conversation Info */}
 
-          <div className="border-b border-(--border) px-5 py-3">
-            <p className="text-center text-xs text-(--text-muted)">
+          <div className="shrink-0 border-b border-(--border) px-3 py-2.5 sm:px-5 sm:py-3">
+            <p className="text-center text-xs leading-5 text-(--text-muted)">
               This conversation is between you and{" "}
               {developer?.name || "the developer"}.
             </p>
@@ -821,21 +724,29 @@ export default function MessagePage() {
           <div
             ref={messagesContainerRef}
             className="
+              min-h-0
               flex-1
-              space-y-5
+              space-y-4
+              overflow-x-hidden
               overflow-y-auto
-              px-4
-              py-6
-              sm:px-6
+              overscroll-y-contain
+              px-3
+              py-4
+              sm:space-y-5
+              sm:px-5
+              sm:py-6
+              lg:px-6
             "
           >
             {messagesLoading ? (
               <div className="flex h-full items-center justify-center">
-               <LoadingUI/>
+                <LoadingUI />
               </div>
             ) : messages.length === 0 ? (
               <div className="flex h-full items-center justify-center">
-                <p className="text-sm text-(--text-muted)">No messages yet.</p>
+                <p className="text-center text-sm text-(--text-muted)">
+                  No messages yet.
+                </p>
               </div>
             ) : (
               messages.map((item) => {
@@ -845,22 +756,20 @@ export default function MessagePage() {
                 return (
                   <div
                     key={item.id}
-                    className={`flex ${
+                    className={`flex min-w-0 ${
                       isMine ? "justify-end" : "justify-start"
                     }`}
                   >
                     <div
-                      className={`flex max-w-[85%] flex-col sm:max-w-[70%] ${
+                      className={`flex min-w-0 max-w-[92%] flex-col sm:max-w-[80%] lg:max-w-[70%] ${
                         isMine ? "items-end" : "items-start"
                       }`}
                     >
                       {isEditing ? (
                         /*
-            --------------------------------------------------
-            Editing Mode
-            --------------------------------------------------
-          */
-                        <div className="w-full min-w-70 max-w-125 rounded-2xl border border-(--primary) bg-(--surface) p-3 shadow-sm">
+                          Editing Mode
+                        */
+                        <div className="w-full min-w-0 max-w-full rounded-2xl border border-(--primary) bg-(--surface) p-3 shadow-sm sm:min-w-70 sm:max-w-125">
                           <textarea
                             autoFocus
                             value={editingText}
@@ -878,42 +787,42 @@ export default function MessagePage() {
                             }}
                             rows={3}
                             className="
-                w-full
-                resize-none
-                rounded-lg
-                border-none
-                bg-transparent
-                px-1
-                py-1
-                text-sm
-                leading-6
-                text-(--text)
-                outline-none
-                placeholder:text-(--text-muted)
-              "
+                              w-full
+                              resize-none
+                              rounded-lg
+                              border-none
+                              bg-transparent
+                              px-1
+                              py-1
+                              text-sm
+                              leading-6
+                              text-(--text)
+                              outline-none
+                              placeholder:text-(--text-muted)
+                            "
                             placeholder="Edit your message..."
                           />
 
-                          <div className="mt-2 flex items-center justify-end gap-2 border-t border-(--border) pt-2">
+                          <div className="mt-2 flex flex-wrap items-center justify-end gap-2 border-t border-(--border) pt-2">
                             {/* Cancel */}
 
                             <button
                               type="button"
                               onClick={handleCancelEdit}
                               className="
-                  inline-flex
-                  h-8
-                  items-center
-                  gap-1.5
-                  rounded-lg
-                  px-3
-                  text-xs
-                  font-medium
-                  text-(--text-muted)
-                  transition
-                  hover:bg-(--surface-hover)
-                  hover:text-(--text)
-                "
+                                inline-flex
+                                h-9
+                                items-center
+                                gap-1.5
+                                rounded-lg
+                                px-3
+                                text-xs
+                                font-medium
+                                text-(--text-muted)
+                                transition-colors
+                                hover:bg-(--surface-hover)
+                                hover:text-(--text)
+                              "
                             >
                               <X size={14} />
                               Cancel
@@ -926,21 +835,21 @@ export default function MessagePage() {
                               onClick={handleSaveEdit}
                               disabled={!editingText.trim()}
                               className="
-                  inline-flex
-                  h-8
-                  items-center
-                  gap-1.5
-                  rounded-lg
-                  bg-(--primary)
-                  px-3
-                  text-xs
-                  font-medium
-                  text-white
-                  transition
-                  hover:bg-(--primary-hover)
-                  disabled:cursor-not-allowed
-                  disabled:opacity-40
-                "
+                                inline-flex
+                                h-9
+                                items-center
+                                gap-1.5
+                                rounded-lg
+                                bg-(--primary)
+                                px-3
+                                text-xs
+                                font-medium
+                                text-white
+                                transition-colors
+                                hover:bg-(--primary-hover)
+                                disabled:cursor-not-allowed
+                                disabled:opacity-40
+                              "
                             >
                               <Check size={14} />
                               Save
@@ -951,11 +860,11 @@ export default function MessagePage() {
                         <>
                           {/* Normal Message Row */}
 
-                          <div className="flex items-end gap-1.5">
+                          <div className="flex min-w-0 max-w-full items-end gap-1.5">
                             {/* Message Bubble */}
 
                             <div
-                              className={`rounded-2xl px-4 py-3 text-sm leading-6 ${
+                              className={`min-w-0 max-w-full overflow-hidden break-words [overflow-wrap:anywhere] rounded-2xl px-3 py-2.5 text-sm leading-6 sm:px-4 sm:py-3 ${
                                 isMine
                                   ? "rounded-br-md bg-(--primary) text-white"
                                   : "rounded-bl-md border border-(--border) bg-(--surface) text-(--text)"
@@ -971,19 +880,22 @@ export default function MessagePage() {
                                 type="button"
                                 onClick={() => handleStartEdit(item)}
                                 className="
-                    mb-1
-                    flex
-                    h-7
-                    w-7
-                    shrink-0
-                    items-center
-                    justify-center
-                    rounded-md
-                    text-(--text-muted)
-                    transition
-                    hover:bg-(--surface-hover)
-                    hover:text-(--primary)
-                  "
+                                  mb-1
+                                  flex
+                                  h-8
+                                  w-8
+                                  shrink-0
+                                  items-center
+                                  justify-center
+                                  rounded-md
+                                  text-(--text-muted)
+                                  transition-colors
+                                  hover:bg-(--surface-hover)
+                                  hover:text-(--primary)
+                                  focus-visible:outline-2
+                                  focus-visible:outline-offset-2
+                                  focus-visible:outline-(--primary)
+                                "
                                 aria-label="Edit message"
                                 title="Edit message"
                               >
@@ -996,11 +908,14 @@ export default function MessagePage() {
 
                           <span
                             className="
-                mt-1.5
-                px-1
-                text-[11px]
-                text-(--text-muted)
-              "
+                              mt-1.5
+                              max-w-full
+                              break-words
+                              px-1
+                              text-[11px]
+                              leading-4
+                              text-(--text-muted)
+                            "
                             title={new Date(
                               item.updatedAt || item.createdAt,
                             ).toLocaleString()}
@@ -1027,12 +942,15 @@ export default function MessagePage() {
 
         <div
           className="
-            rounded-b-2xl
+            relative
+            shrink-0
+            rounded-b-xl
             border
             border-(--border)
             bg-(--surface)
-            p-3
+            p-2.5
             shadow-sm
+            sm:rounded-b-2xl
             sm:p-4
           "
         >
@@ -1046,16 +964,19 @@ export default function MessagePage() {
                 ref={emojiPickerRef}
                 className="
                   absolute
-                  bottom-14
-                  right-12
+                  bottom-[calc(100%+12px)]
+                  right-0
                   z-50
-                  w-72
+                  w-[min(18rem,calc(100vw-2rem))]
+                  max-w-full
                   rounded-2xl
                   border
                   border-(--border)
                   bg-(--surface)
                   p-3
+                  text-(--text)
                   shadow-(--shadow)
+                  sm:right-12
                 "
               >
                 <div
@@ -1075,8 +996,13 @@ export default function MessagePage() {
                     type="button"
                     onClick={() => setShowEmojiPicker(false)}
                     className="
+                      rounded-md
+                      px-2
+                      py-1
                       text-xs
                       text-(--text-muted)
+                      transition-colors
+                      hover:bg-(--surface-hover)
                       hover:text-(--text)
                     "
                   >
@@ -1087,10 +1013,12 @@ export default function MessagePage() {
                 <div
                   className="
                     grid
-                    max-h-56
+                    max-h-48
                     grid-cols-8
                     gap-1
                     overflow-y-auto
+                    overscroll-contain
+                    sm:max-h-56
                   "
                 >
                   {emojis.map((emoji, index) => (
@@ -1101,14 +1029,14 @@ export default function MessagePage() {
                       className="
                         flex
                         h-8
-                        w-8
+                        w-full
                         items-center
                         justify-center
                         rounded-lg
-                        text-xl
-                        transition
-                        hover:scale-110
+                        text-lg
+                        transition-colors
                         hover:bg-(--surface-hover)
+                        sm:text-xl
                       "
                       aria-label={`Select ${emoji}`}
                     >
@@ -1124,15 +1052,18 @@ export default function MessagePage() {
             <div
               className="
                 flex
+                min-w-0
                 items-end
-                gap-2
+                gap-1
                 rounded-xl
                 border
                 border-(--border)
                 bg-(--bg)
-                p-2
-                transition
+                p-1.5
+                transition-colors
                 focus-within:border-(--primary)
+                sm:gap-2
+                sm:p-2
               "
             >
               {/* Attachment */}
@@ -1140,7 +1071,7 @@ export default function MessagePage() {
               <button
                 type="button"
                 className="
-                  mb-1
+                  mb-0.5
                   flex
                   h-9
                   w-9
@@ -1149,9 +1080,12 @@ export default function MessagePage() {
                   justify-center
                   rounded-lg
                   text-(--text-muted)
-                  transition
+                  transition-colors
                   hover:bg-(--surface-hover)
                   hover:text-(--text)
+                  focus-visible:outline-2
+                  focus-visible:outline-offset-2
+                  focus-visible:outline-(--primary)
                 "
                 aria-label="Attach file"
               >
@@ -1169,16 +1103,19 @@ export default function MessagePage() {
                 className="
                   max-h-32
                   min-h-9
+                  min-w-0
                   flex-1
                   resize-none
                   border-none
                   bg-transparent
-                  px-2
+                  px-1
                   py-2
                   text-sm
+                  leading-5
                   text-(--text)
                   outline-none
                   placeholder:text-(--text-muted)
+                  sm:px-2
                 "
               />
 
@@ -1188,7 +1125,7 @@ export default function MessagePage() {
                 type="button"
                 onClick={() => setShowEmojiPicker((prev) => !prev)}
                 className={`
-                  mb-1
+                  mb-0.5
                   flex
                   h-9
                   w-9
@@ -1196,7 +1133,7 @@ export default function MessagePage() {
                   items-center
                   justify-center
                   rounded-lg
-                  transition
+                  transition-colors
                   ${
                     showEmojiPicker
                       ? "bg-(--surface-hover) text-(--primary)"
@@ -1215,7 +1152,7 @@ export default function MessagePage() {
                 onClick={handleSend}
                 disabled={!message.trim()}
                 className="
-                  mb-1
+                  mb-0.5
                   flex
                   h-9
                   w-9
@@ -1225,8 +1162,11 @@ export default function MessagePage() {
                   rounded-lg
                   bg-(--primary)
                   text-white
-                  transition
+                  transition-colors
                   hover:bg-(--primary-hover)
+                  focus-visible:outline-2
+                  focus-visible:outline-offset-2
+                  focus-visible:outline-(--primary)
                   disabled:cursor-not-allowed
                   disabled:opacity-40
                 "

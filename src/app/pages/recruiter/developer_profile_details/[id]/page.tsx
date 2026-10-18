@@ -1,3 +1,4 @@
+
 "use client";
 
 import Image from "next/image";
@@ -30,6 +31,7 @@ import { useParams } from "next/navigation";
 import ContactDeveloperButton from "../../contact_button/page";
 import LoadingUI from "@/components/Loadinui";
 import { toast } from "react-toastify";
+
 interface DeveloperProfileResponse {
   success: boolean;
   completedChallenges: number;
@@ -122,6 +124,7 @@ interface Challenge {
   feedback: string;
   updated_at: string;
 }
+
 export default function DeveloperProfilePage() {
   const params = useParams<{ id: string }>();
 
@@ -131,6 +134,7 @@ export default function DeveloperProfilePage() {
   const [loading, setLoading] = useState(true);
 
   const overallSkillScore = profile?.overallSkillScore;
+
   const getTimeAgo = (date: string) => {
     const now = new Date();
     const updated = new Date(date);
@@ -159,6 +163,7 @@ export default function DeveloperProfilePage() {
 
     return `${years} years ago`;
   };
+
   const recentActivities = [
     ...(profile?.recentProjectChallenges ?? []).map((item) => ({
       ...item,
@@ -173,6 +178,7 @@ export default function DeveloperProfilePage() {
     (a, b) =>
       new Date(b.updated_at).getTime() - new Date(a.updated_at).getTime(),
   );
+
   const latestFeedbacks = [
     ...(profile?.recentProjectChallenges ?? []).map((item) => ({
       ...item,
@@ -189,15 +195,17 @@ export default function DeveloperProfilePage() {
       (a, b) =>
         new Date(b.updated_at).getTime() - new Date(a.updated_at).getTime(),
     );
+
   const verifiedBadges = [
     ...(profile?.badgeSystem.projectBadges ?? []),
     ...(profile?.badgeSystem.problemBadges ?? []),
   ].filter((item) => item.verified);
+
   useEffect(() => {
     const fetchDeveloper = async () => {
       try {
         const res = await fetch(
-          `http://localhost:3000/api/developer_profile?userId=${userId}`,
+          `/api/developer_profile?userId=${userId}`,
         );
 
         const data = await res.json();
@@ -212,37 +220,41 @@ export default function DeveloperProfilePage() {
 
     fetchDeveloper();
   }, [params]);
+
   const developer = profile?.data;
   const ranking = profile?.ranking;
   const badge = profile?.badgeSystem;
+
   if (loading) {
-    return <LoadingUI/>;
+    return <LoadingUI />;
   }
+
   return (
-    <div className="pb-10 bg-slate-100">
+    <div className="min-h-screen overflow-x-clip bg-(--bg) pb-8 text-(--text) transition-colors duration-300 sm:pb-10">
       <ContactDeveloperButton developerId={developer?.user_id} />
+
       {/* Cover */}
       <div
-        className="relative h-90  w-full overflow-hidden "
+        className="relative min-h-72 w-full overflow-hidden sm:min-h-80 lg:min-h-90"
         style={{
           background:
             "linear-gradient(135deg,var(--primary),var(--primary-hover))",
         }}
       >
-        <div className="absolute  inset-0 bg-black/20" />
+        <div className="absolute inset-0 bg-black/10" />
 
-        <div className=" mx-auto max-w-7xl px-6">
+        <div className="relative mx-auto max-w-7xl px-3 sm:px-5 lg:px-6">
           <div
-            className="translate-y-20 rounded-3xl border p-8 backdrop-blur-sm"
+            className="relative translate-y-8 rounded-2xl border p-4 backdrop-blur-sm sm:translate-y-12 sm:rounded-3xl sm:p-6 lg:translate-y-20 lg:p-8"
             style={{
               background: "color-mix(in srgb,var(--surface) 94%,transparent)",
               borderColor: "var(--border)",
               boxShadow: "var(--shadow)",
             }}
           >
-            <div className="flex flex-col gap-6 lg:flex-row lg:items-center lg:justify-between">
+            <div className="flex flex-col gap-7 lg:flex-row lg:items-center lg:justify-between lg:gap-8">
               {/* Left */}
-              <div className="flex flex-col items-center gap-5 sm:flex-row">
+              <div className="flex min-w-0 flex-col items-center gap-5 sm:flex-row sm:items-start lg:items-center">
                 <Image
                   src={
                     developer?.developer_photo ||
@@ -252,38 +264,41 @@ export default function DeveloperProfilePage() {
                   alt={developer?.name || "Developer"}
                   width={130}
                   height={130}
-                  className="rounded-full border-4"
+                  className="h-24 w-24 shrink-0 rounded-full border-4 object-cover sm:h-28 sm:w-28 lg:h-[130px] lg:w-[130px]"
                   style={{
                     borderColor: "var(--surface)",
                     boxShadow: "var(--shadow)",
                   }}
                 />
 
-                <div>
+                <div className="min-w-0 w-full text-center sm:text-left">
                   <h1
-                    className="text-4xl font-bold tracking-tight"
+                    className="break-words text-2xl font-bold tracking-tight sm:text-3xl lg:text-4xl"
                     style={{ color: "var(--text)" }}
                   >
                     {developer?.name}
                   </h1>
-                  <p className="mt-1 text-lg font-bold text-(--text-muted)">
+
+                  <p className="mt-1 break-words text-base font-bold text-(--text-muted) sm:text-lg">
                     {developer?.title}
                   </p>
-                  <div className="mt-2 flex flex-wrap items-center gap-2">
+
+                  <div className="mt-3 flex flex-wrap items-center justify-center gap-2 sm:justify-start">
                     {(profile?.badgeSystem?.totalBadgeNumber ?? 0) > 0 ? (
                       <span
-                        className="flex items-center gap-2 rounded-full px-4 py-2 text-sm font-semibold"
+                        className="flex items-center gap-2 rounded-full border px-3 py-2 text-xs font-semibold sm:text-sm"
                         style={{
-                          background: "#DCFCE7",
-                          color: "#166534",
+                          background: "var(--surface-hover)",
+                          borderColor: "var(--border)",
+                          color: "var(--primary)",
                         }}
                       >
-                        <CheckCircle2 size={16} />
+                        <CheckCircle2 size={16} className="shrink-0" />
                         Verified skills {badge?.totalBadgeNumber}
                       </span>
                     ) : (
                       <span
-                        className="rounded-full  px-3 py-1 text-sm font-medium "
+                        className="rounded-full px-3 py-1.5 text-xs font-medium sm:text-sm"
                         style={{
                           background: "var(--surface-hover)",
                           color: "var(--text-muted)",
@@ -294,10 +309,10 @@ export default function DeveloperProfilePage() {
                     )}
 
                     <span
-                      className="rounded-full  px-3 py-1 text-sm font-medium "
+                      className="rounded-full px-3 py-1.5 text-xs font-medium sm:text-sm"
                       style={{
                         background:
-                          "color-mix(in srgb,var(--primary) 12%,white)",
+                          "color-mix(in srgb,var(--primary) 12%,var(--surface))",
                         color: "var(--primary)",
                       }}
                     >
@@ -306,7 +321,7 @@ export default function DeveloperProfilePage() {
                   </div>
 
                   <p
-                    className="mt-4 max-w-xl "
+                    className="mx-auto mt-4 max-w-xl break-words text-sm leading-7 sm:mx-0 sm:text-base"
                     style={{ color: "var(--text-muted)" }}
                   >
                     {developer?.bio}
@@ -315,24 +330,26 @@ export default function DeveloperProfilePage() {
               </div>
 
               {/* Right */}
-              <div className="flex flex-col items-center gap-5">
-                <div className="text-center">
-                  <h2 className="text-sm text-slate-500">
+              <div className="flex w-full shrink-0 flex-col items-center gap-5 border-t pt-6 lg:w-auto lg:border-l lg:border-t-0 lg:pl-8 lg:pt-0">
+                <div className="w-full text-center">
+                  <h2 className="text-sm leading-6 text-(--text-muted)">
                     Overall Platform Performance Score
                   </h2>
 
-                  <h1 className="mt-2 text-6xl font-extrabold text-indigo-600">
+                  <h2
+                    className="mt-2 break-words text-5xl font-extrabold sm:text-6xl"
+                    style={{ color: "var(--primary)" }}
+                  >
                     {overallSkillScore?.score ?? 0}
-                  </h1>
+                  </h2>
 
-                  <p className="font-medium text-slate-500">
-                    {" "}
-                    out of {overallSkillScore?.maxScore ?? 100}{" "}
+                  <p className="font-medium text-(--text-muted)">
+                    out of {overallSkillScore?.maxScore ?? 100}
                   </p>
                 </div>
 
                 <button
-                  className="flex items-center var(--primary-hover) gap-2 rounded-xl px-5 py-3 font-semibold  transition "
+                  className="flex w-full items-center justify-center gap-2 rounded-xl px-5 py-3 font-semibold transition hover:opacity-90 active:scale-[0.98] sm:w-auto"
                   style={{
                     background: "var(--primary)",
                     color: "#fff",
@@ -347,10 +364,8 @@ export default function DeveloperProfilePage() {
         </div>
       </div>
 
-      {/* ===================== */}
-
       {/* Quick Stats */}
-      <div className="mx-auto pt-10 grid max-w-7xl gap-6 px-6 md:grid-cols-2 xl:grid-cols-3">
+      <div className="mx-auto grid max-w-7xl grid-cols-1 gap-4 px-3 pt-16 sm:grid-cols-2 sm:gap-5 sm:px-5 md:pt-20 xl:grid-cols-3 lg:px-6">
         <StatCard
           title="Completed Challenges"
           value={String(profile?.completedChallenges ?? 0)}
@@ -368,11 +383,13 @@ export default function DeveloperProfilePage() {
           value={`${profile?.project_challenge_average_score ?? "0"} / 100`}
           icon={<FolderKanban />}
         />
+
         <StatCard
           title="Problem Solving Avg."
           value={`${profile?.problem_solving_average_score ?? "0"} / 100`}
           icon={<Brain />}
         />
+
         <StatCard
           title="Success Rate"
           value={`${profile?.successRate ?? "0"}%`}
@@ -385,10 +402,10 @@ export default function DeveloperProfilePage() {
           icon={<BadgeCheck />}
         />
       </div>
-      {/* ========================== */}
 
+      {/* Experience & Background */}
       <section
-        className="rounded-3xl max-w-6xl mx-auto mt-10 border p-8"
+        className="mx-3 mt-8 rounded-2xl border p-4 sm:mx-5 sm:mt-10 sm:rounded-3xl sm:p-6 lg:mx-auto lg:max-w-6xl lg:p-8"
         style={{
           background: "var(--surface)",
           borderColor: "var(--border)",
@@ -396,23 +413,30 @@ export default function DeveloperProfilePage() {
         }}
       >
         <div
-          className="mb-8 flex items-center justify-between border-b pb-6"
+          className="mb-6 flex items-start justify-between gap-3 border-b pb-5 sm:mb-8 sm:items-center sm:pb-6"
           style={{ borderColor: "var(--border)" }}
         >
-          <div>
-            <h2 className="text-2xl font-bold" style={{ color: "var(--text)" }}>
+          <div className="min-w-0">
+            <h2
+              className="text-xl font-bold sm:text-2xl"
+              style={{ color: "var(--text)" }}
+            >
               Experience & Background
             </h2>
 
-            <p style={{ color: "var(--text-muted)" }}>
+            <p className="mt-1 text-sm leading-6 sm:text-base" style={{ color: "var(--text-muted)" }}>
               Professional experience and education.
             </p>
           </div>
 
-          <UserRound size={28} style={{ color: "var(--primary)" }} />
+          <UserRound
+            size={26}
+            className="shrink-0 sm:h-7 sm:w-7"
+            style={{ color: "var(--primary)" }}
+          />
         </div>
 
-        <div className="grid gap-5 md:grid-cols-2">
+        <div className="grid grid-cols-1 gap-4 sm:gap-5 md:grid-cols-2">
           <InfoCard
             icon={<Briefcase />}
             title="Experience"
@@ -439,11 +463,9 @@ export default function DeveloperProfilePage() {
         </div>
       </section>
 
-      {/* ================== */}
-      {/* =============================== */}
-
+      {/* Skills & Technologies */}
       <section
-        className="rounded-3xl mt-10 max-w-6xl mx-auto border p-8"
+        className="mx-3 mt-8 rounded-2xl border p-4 sm:mx-5 sm:mt-10 sm:rounded-3xl sm:p-6 lg:mx-auto lg:max-w-6xl lg:p-8"
         style={{
           background: "var(--surface)",
           borderColor: "var(--border)",
@@ -451,33 +473,43 @@ export default function DeveloperProfilePage() {
         }}
       >
         <div
-          className="mb-8 flex items-center justify-between border-b pb-6"
+          className="mb-6 flex items-start justify-between gap-3 border-b pb-5 sm:mb-8 sm:items-center sm:pb-6"
           style={{ borderColor: "var(--border)" }}
         >
-          <div>
-            <h2 className="text-2xl font-bold" style={{ color: "var(--text)" }}>
+          <div className="min-w-0">
+            <h2
+              className="text-xl font-bold sm:text-2xl"
+              style={{ color: "var(--text)" }}
+            >
               Skills & Technologies
             </h2>
 
-            <p className="mt-1" style={{ color: "var(--text-muted)" }}>
+            <p className="mt-1 text-sm leading-6 sm:text-base" style={{ color: "var(--text-muted)" }}>
               Technical expertise and programming skills.
             </p>
           </div>
 
-          <Code2 size={28} style={{ color: "var(--primary)" }} />
+          <Code2
+            size={26}
+            className="shrink-0 sm:h-7 sm:w-7"
+            style={{ color: "var(--primary)" }}
+          />
         </div>
 
-        <div className="space-y-7">
+        <div className="space-y-6 sm:space-y-7">
           <div>
-            <h4 className="mb-3 font-semibold" style={{ color: "var(--text)" }}>
+            <h4
+              className="mb-3 font-semibold"
+              style={{ color: "var(--text)" }}
+            >
               Skills
             </h4>
 
-            <div className="flex flex-wrap gap-3">
+            <div className="flex flex-wrap gap-2 sm:gap-3">
               {JSON.parse(developer?.skills || "[]").map((skill: string) => (
                 <span
                   key={skill}
-                  className="rounded-full px-4 py-2 text-sm font-medium"
+                  className="max-w-full break-words rounded-full px-3 py-2 text-sm font-medium sm:px-4"
                   style={{
                     background:
                       "color-mix(in srgb,var(--primary) 10%,transparent)",
@@ -491,23 +523,34 @@ export default function DeveloperProfilePage() {
           </div>
 
           <div>
-            <h4 className="mb-2 font-semibold" style={{ color: "var(--text)" }}>
+            <h4
+              className="mb-2 font-semibold"
+              style={{ color: "var(--text)" }}
+            >
               Tech Stack
             </h4>
 
-            <p style={{ color: "var(--text-muted)" }}>{developer?.techStack}</p>
+            <p
+              className="break-words text-sm leading-7 sm:text-base"
+              style={{ color: "var(--text-muted)" }}
+            >
+              {developer?.techStack}
+            </p>
           </div>
 
           <div>
-            <h4 className="mb-3 font-semibold" style={{ color: "var(--text)" }}>
+            <h4
+              className="mb-3 font-semibold"
+              style={{ color: "var(--text)" }}
+            >
               Languages
             </h4>
 
-            <div className="flex flex-wrap gap-3">
+            <div className="flex flex-wrap gap-2 sm:gap-3">
               {JSON.parse(developer?.languages || "[]").map((lang: string) => (
                 <span
                   key={lang}
-                  className="rounded-full px-4 py-2 text-sm"
+                  className="max-w-full break-words rounded-full px-3 py-2 text-sm sm:px-4"
                   style={{
                     background: "var(--surface-hover)",
                     color: "var(--text)",
@@ -521,10 +564,9 @@ export default function DeveloperProfilePage() {
         </div>
       </section>
 
-      {/* ========================= */}
-      {/* =================== */}
+      {/* Professional Links */}
       <section
-        className="rounded-3xl mt-10  max-w-6xl mx-auto border p-8"
+        className="mx-3 mt-8 rounded-2xl border p-4 sm:mx-5 sm:mt-10 sm:rounded-3xl sm:p-6 lg:mx-auto lg:max-w-6xl lg:p-8"
         style={{
           background: "var(--surface)",
           borderColor: "var(--border)",
@@ -532,34 +574,42 @@ export default function DeveloperProfilePage() {
         }}
       >
         <div
-          className="mb-8 flex items-center justify-between border-b pb-6"
+          className="mb-6 flex items-start justify-between gap-3 border-b pb-5 sm:mb-8 sm:items-center sm:pb-6"
           style={{ borderColor: "var(--border)" }}
         >
-          <div>
-            <h2 className="text-2xl font-bold" style={{ color: "var(--text)" }}>
+          <div className="min-w-0">
+            <h2
+              className="text-xl font-bold sm:text-2xl"
+              style={{ color: "var(--text)" }}
+            >
               Professional Links
             </h2>
 
-            <p style={{ color: "var(--text-muted)" }}>
+            <p className="mt-1 text-sm leading-6 sm:text-base" style={{ color: "var(--text-muted)" }}>
               Connect through professional platforms.
             </p>
           </div>
 
-          <Globe size={28} style={{ color: "var(--primary)" }} />
+          <Globe
+            size={26}
+            className="shrink-0 sm:h-7 sm:w-7"
+            style={{ color: "var(--primary)" }}
+          />
         </div>
 
-        <div className="grid gap-5 md:grid-cols-3">
+        <div className="grid grid-cols-1 gap-4 sm:gap-5 md:grid-cols-3">
           <a
             href={developer?.github}
             target="_blank"
-            className="rounded-2xl border p-5 transition hover:-translate-y-1"
+            className="min-w-0 rounded-2xl border p-4 transition hover:-translate-y-1 hover:bg-(--surface-hover) sm:p-5"
             style={{
               borderColor: "var(--border)",
+              color: "var(--text)",
             }}
           >
-            <BsGithub className="mb-4" />
+            <BsGithub className="mb-4" size={22} />
 
-            <h4>GitHub</h4>
+            <h4 className="font-semibold">GitHub</h4>
 
             <p className="mt-2 text-sm" style={{ color: "var(--text-muted)" }}>
               View repositories
@@ -569,14 +619,15 @@ export default function DeveloperProfilePage() {
           <a
             href={developer?.portfolio}
             target="_blank"
-            className="rounded-2xl border p-5 transition hover:-translate-y-1"
+            className="min-w-0 rounded-2xl border p-4 transition hover:-translate-y-1 hover:bg-(--surface-hover) sm:p-5"
             style={{
               borderColor: "var(--border)",
+              color: "var(--text)",
             }}
           >
-            <BriefcaseBusiness className="mb-4" />
+            <BriefcaseBusiness className="mb-4" size={22} />
 
-            <h4>Portfolio</h4>
+            <h4 className="font-semibold">Portfolio</h4>
 
             <p className="mt-2 text-sm" style={{ color: "var(--text-muted)" }}>
               Visit portfolio
@@ -586,14 +637,15 @@ export default function DeveloperProfilePage() {
           <a
             href={developer?.linkedin}
             target="_blank"
-            className="rounded-2xl border p-5 transition hover:-translate-y-1"
+            className="min-w-0 rounded-2xl border p-4 transition hover:-translate-y-1 hover:bg-(--surface-hover) sm:p-5"
             style={{
               borderColor: "var(--border)",
+              color: "var(--text)",
             }}
           >
-            <LiaLinkedin className="mb-4" />
+            <LiaLinkedin className="mb-4" size={22} />
 
-            <h4>LinkedIn</h4>
+            <h4 className="font-semibold">LinkedIn</h4>
 
             <p className="mt-2 text-sm" style={{ color: "var(--text-muted)" }}>
               Professional profile
@@ -601,41 +653,45 @@ export default function DeveloperProfilePage() {
           </a>
         </div>
       </section>
-      {/* ========================= */}
-      <div className="mx-auto mt-10 max-w-7xl space-y-8 px-6">
-        {/* ================= VERIFIED BADGES ================= */}
 
+      {/* Verified Badges & Recent Activity */}
+      <div className="mx-3 mt-8 max-w-7xl space-y-6 sm:mx-5 sm:mt-10 sm:space-y-8 lg:mx-auto lg:px-6">
+        {/* Verified Badges */}
         <section
-          className="rounded-3xl  p-8 shadow-sm"
+          className="rounded-2xl border p-4 sm:rounded-3xl sm:p-6 lg:p-8"
           style={{
             background: "var(--surface)",
             borderColor: "var(--border)",
             boxShadow: "var(--shadow)",
           }}
         >
-          <div className="mb-8 flex items-center justify-between">
-            <div>
+          <div className="mb-6 flex items-start justify-between gap-3 sm:mb-8 sm:items-center">
+            <div className="min-w-0">
               <h2
-                className="text-2xl font-bold "
+                className="break-words text-xl font-bold sm:text-2xl"
                 style={{ color: "var(--text)" }}
               >
                 Verified Badges ({verifiedBadges.length})
               </h2>
 
-              <p className="mt-1" style={{ color: "var(--text-muted)" }}>
+              <p className="mt-1 text-sm leading-6 sm:text-base" style={{ color: "var(--text-muted)" }}>
                 Badges earned from verified assessments.
               </p>
             </div>
 
-            <Award className="text-indigo-600" size={34} />
+            <Award
+              className="shrink-0"
+              style={{ color: "var(--primary)" }}
+              size={30}
+            />
           </div>
 
-          <div className="grid gap-5 md:grid-cols-2 xl:grid-cols-5">
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 sm:gap-5 xl:grid-cols-5">
             {verifiedBadges.length > 0 ? (
               verifiedBadges.map((badge) => (
                 <div
                   key={`${badge.badgeName}-${badge.id}`}
-                  className="rounded-2xl border  p-6 transition hover:-translate-y-1 hover:shadow-lg"
+                  className="min-w-0 rounded-2xl border p-4 transition hover:-translate-y-1 hover:shadow-lg sm:p-6"
                   style={{
                     background: "var(--surface)",
                     borderColor: "var(--border)",
@@ -643,7 +699,7 @@ export default function DeveloperProfilePage() {
                   }}
                 >
                   <div
-                    className="mb-4 flex h-16 w-16 items-center justify-center rounded-xl "
+                    className="mb-4 flex h-16 w-16 items-center justify-center rounded-xl"
                     style={{
                       background:
                         "color-mix(in srgb,var(--primary) 10%,transparent)",
@@ -654,18 +710,19 @@ export default function DeveloperProfilePage() {
                       alt={badge.title || badge.badgeName}
                       width={40}
                       height={40}
+                      className="max-h-10 max-w-10 object-contain"
                     />
                   </div>
 
                   <h3
-                    className="mt-5 text-lg font-semibold"
+                    className="mt-4 break-words text-lg font-semibold sm:mt-5"
                     style={{ color: "var(--text)" }}
                   >
                     {badge.title || badge.badgeName}
                   </h3>
 
                   <p
-                    className="mt-3 text-sm leading-6"
+                    className="mt-3 break-words text-sm leading-6"
                     style={{ color: "var(--text-muted)" }}
                   >
                     {badge.short_description ??
@@ -675,31 +732,31 @@ export default function DeveloperProfilePage() {
               ))
             ) : (
               <div
-                className="col-span-full rounded-3xl border border-dashed py-14 text-center"
+                className="col-span-full rounded-2xl border border-dashed px-4 py-10 text-center sm:rounded-3xl sm:py-14"
                 style={{
                   borderColor: "var(--border)",
                 }}
               >
                 <div
-                  className="mx-auto flex h-20 w-20 items-center justify-center rounded-full"
+                  className="mx-auto flex h-16 w-16 items-center justify-center rounded-full sm:h-20 sm:w-20"
                   style={{
                     background:
                       "color-mix(in srgb,var(--primary) 10%,transparent)",
                     color: "var(--primary)",
                   }}
                 >
-                  <Award size={38} />
+                  <Award size={34} />
                 </div>
 
                 <h3
-                  className="mt-6 text-xl font-semibold"
+                  className="mt-5 text-lg font-semibold sm:mt-6 sm:text-xl"
                   style={{ color: "var(--text)" }}
                 >
                   No Verified Badges Yet
                 </h3>
 
                 <p
-                  className="mx-auto mt-3 max-w-md leading-7"
+                  className="mx-auto mt-3 max-w-md text-sm leading-7 sm:text-base"
                   style={{ color: "var(--text-muted)" }}
                 >
                   Complete more verified challenges and maintain strong
@@ -710,31 +767,29 @@ export default function DeveloperProfilePage() {
           </div>
         </section>
 
-        {/* ================= RECENT ACTIVITY ================= */}
-
+        {/* Recent Activity */}
         <section
-          className="rounded-3xl border p-8"
+          className="rounded-2xl border p-4 sm:rounded-3xl sm:p-6 lg:p-8"
           style={{
             background: "var(--surface)",
             borderColor: "var(--border)",
             boxShadow: "var(--shadow)",
           }}
         >
-          {/* Header */}
           <div
-            className="mb-8 flex items-center justify-between border-b pb-6"
+            className="mb-6 flex items-start justify-between gap-3 border-b pb-5 sm:mb-8 sm:items-center sm:pb-6"
             style={{ borderColor: "var(--border)" }}
           >
-            <div>
+            <div className="min-w-0">
               <h2
-                className="text-2xl font-bold"
+                className="text-xl font-bold sm:text-2xl"
                 style={{ color: "var(--text)" }}
               >
                 Recent Activity
               </h2>
 
               <p
-                className="mt-1 text-sm"
+                className="mt-1 text-sm leading-6"
                 style={{ color: "var(--text-muted)" }}
               >
                 Your latest approved challenge activities.
@@ -742,45 +797,41 @@ export default function DeveloperProfilePage() {
             </div>
 
             <div
-              className="flex h-12 w-12 items-center justify-center rounded-2xl"
+              className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl sm:h-12 sm:w-12 sm:rounded-2xl"
               style={{
-                background: "rgba(91,108,255,.12)",
+                background:
+                  "color-mix(in srgb,var(--primary) 12%,transparent)",
               }}
             >
               <Activity size={24} style={{ color: "var(--primary)" }} />
             </div>
           </div>
 
-          {/* Activity List */}
-
-          <div className="space-y-4">
+          <div className="space-y-3 sm:space-y-4">
             {recentActivities.length > 0 ? (
               recentActivities.map((item, index) => (
                 <div
                   key={index}
-                  className="flex items-start gap-4 rounded-2xl border p-5 transition-all hover:bg-(--surface-hover)
-hover:shadow-lg duration-300 hover:-translate-y-1"
+                  className="flex min-w-0 items-start gap-3 rounded-2xl border p-3 transition-all duration-300 hover:-translate-y-0.5 hover:bg-(--surface-hover) hover:shadow-lg sm:gap-4 sm:p-5"
                   style={{
                     background: "var(--surface)",
                     borderColor: "var(--border)",
                   }}
                 >
-                  {/* Icon */}
-
                   <div
-                    className="flex h-11 w-11 items-center justify-center rounded-xl shrink-0"
+                    className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl sm:h-11 sm:w-11"
                     style={{
-                      background: "rgba(34,197,94,.12)",
+                      background:
+                        "color-mix(in srgb,var(--primary) 12%,transparent)",
+                      color: "var(--primary)",
                     }}
                   >
-                    <CheckCircle2 size={20} className="text-green-600" />
+                    <CheckCircle2 size={20} />
                   </div>
 
-                  {/* Content */}
-
-                  <div className="flex-1">
+                  <div className="min-w-0 flex-1">
                     <h3
-                      className="font-semibold"
+                      className="break-words font-semibold"
                       style={{ color: "var(--text)" }}
                     >
                       {item.title}
@@ -788,9 +839,10 @@ hover:shadow-lg duration-300 hover:-translate-y-1"
 
                     <div className="mt-3 flex flex-wrap items-center gap-2">
                       <span
-                        className="rounded-full px-3 py-1 text-xs font-semibold"
+                        className="max-w-full break-words rounded-full px-3 py-1 text-xs font-semibold"
                         style={{
-                          background: "rgba(91,108,255,.12)",
+                          background:
+                            "color-mix(in srgb,var(--primary) 12%,transparent)",
                           color: "var(--primary)",
                         }}
                       >
@@ -800,7 +852,7 @@ hover:shadow-lg duration-300 hover:-translate-y-1"
                       <span style={{ color: "var(--text-muted)" }}>•</span>
 
                       <span
-                        className="text-sm"
+                        className="text-xs sm:text-sm"
                         style={{ color: "var(--text-muted)" }}
                       >
                         {getTimeAgo(item.updated_at)}
@@ -811,18 +863,22 @@ hover:shadow-lg duration-300 hover:-translate-y-1"
               ))
             ) : (
               <div
-                className="rounded-2xl border border-dashed py-16 text-center"
+                className="rounded-2xl border border-dashed px-4 py-10 text-center sm:py-16"
                 style={{
                   borderColor: "var(--border)",
                 }}
               >
                 <div
-                  className="mx-auto mb-5 flex h-16 w-16 items-center justify-center rounded-2xl"
+                  className="mx-auto mb-5 flex h-14 w-14 items-center justify-center rounded-2xl sm:h-16 sm:w-16"
                   style={{
-                    background: "rgba(91,108,255,.10)",
+                    background:
+                      "color-mix(in srgb,var(--primary) 10%,transparent)",
                   }}
                 >
-                  <Activity size={30} style={{ color: "var(--primary)" }} />
+                  <Activity
+                    size={30}
+                    style={{ color: "var(--primary)" }}
+                  />
                 </div>
 
                 <h3
@@ -832,7 +888,10 @@ hover:shadow-lg duration-300 hover:-translate-y-1"
                   No Recent Activity
                 </h3>
 
-                <p className="mt-2" style={{ color: "var(--text-muted)" }}>
+                <p
+                  className="mt-2 text-sm leading-6"
+                  style={{ color: "var(--text-muted)" }}
+                >
                   Your approved submissions will appear here once they are
                   reviewed.
                 </p>
@@ -842,53 +901,51 @@ hover:shadow-lg duration-300 hover:-translate-y-1"
         </section>
       </div>
 
-      {/* ================= LATEST ADMIN FEEDBACK ================= */}
-
+      {/* Latest Admin Feedback */}
       <section
-        className="mx-auto mt-10 max-w-6xl rounded-3xl border"
+        className="mx-3 mt-8 rounded-2xl border sm:mx-5 sm:mt-10 sm:rounded-3xl lg:mx-auto lg:max-w-6xl"
         style={{
           background: "var(--surface)",
           borderColor: "var(--border)",
           boxShadow: "var(--shadow)",
         }}
       >
-        {/* Header */}
-
         <div
-          className="flex items-center justify-between border-b px-8 py-6"
+          className="flex items-start justify-between gap-3 border-b px-4 py-5 sm:items-center sm:px-6 sm:py-6 lg:px-8"
           style={{ borderColor: "var(--border)" }}
         >
-          <div>
-            <h2 className="text-2xl font-bold" style={{ color: "var(--text)" }}>
+          <div className="min-w-0">
+            <h2
+              className="text-xl font-bold sm:text-2xl"
+              style={{ color: "var(--text)" }}
+            >
               Latest Admin Feedback
             </h2>
 
-            <p className="mt-1 text-sm" style={{ color: "var(--text-muted)" }}>
+            <p
+              className="mt-1 text-sm leading-6"
+              style={{ color: "var(--text-muted)" }}
+            >
               Feedback received from approved challenge reviews.
             </p>
           </div>
         </div>
 
-        {/* Feedback Cards */}
-
-        <div className="grid gap-6 p-8 md:grid-cols-2">
+        <div className="grid grid-cols-1 gap-4 p-4 sm:gap-6 sm:p-6 md:grid-cols-2 lg:p-8">
           {latestFeedbacks.length > 0 ? (
             latestFeedbacks.map((item, index) => (
               <div
                 key={index}
-                className="rounded-2xl border hover:bg-(--surface-hover)
-hover:shadow-lg p-6 transition-all duration-300 hover:-translate-y-1"
+                className="min-w-0 rounded-2xl border p-4 transition-all duration-300 hover:-translate-y-0.5 hover:bg-(--surface-hover) hover:shadow-lg sm:p-6"
                 style={{
                   background: "var(--surface)",
                   borderColor: "var(--border)",
                 }}
               >
-                {/* Top */}
-
-                <div className="flex items-start justify-between gap-5">
-                  <div className="flex-1">
+                <div className="flex min-w-0 items-start justify-between gap-3 sm:gap-5">
+                  <div className="min-w-0 flex-1">
                     <h3
-                      className="text-lg font-semibold"
+                      className="break-words text-base font-semibold sm:text-lg"
                       style={{ color: "var(--text)" }}
                     >
                       {item.title}
@@ -896,9 +953,10 @@ hover:shadow-lg p-6 transition-all duration-300 hover:-translate-y-1"
 
                     <div className="mt-3 flex flex-wrap items-center gap-2">
                       <span
-                        className="rounded-full px-3 py-1 text-xs font-semibold"
+                        className="max-w-full break-words rounded-full px-3 py-1 text-xs font-semibold"
                         style={{
-                          background: "rgba(91,108,255,.12)",
+                          background:
+                            "color-mix(in srgb,var(--primary) 12%,transparent)",
                           color: "var(--primary)",
                         }}
                       >
@@ -906,7 +964,7 @@ hover:shadow-lg p-6 transition-all duration-300 hover:-translate-y-1"
                       </span>
 
                       <span
-                        className="text-sm"
+                        className="text-xs sm:text-sm"
                         style={{
                           color: "var(--text-muted)",
                         }}
@@ -916,16 +974,15 @@ hover:shadow-lg p-6 transition-all duration-300 hover:-translate-y-1"
                     </div>
                   </div>
 
-                  {/* Score */}
-
                   <div
-                    className=" flex items-center gap-2 rounded-2xl px-4 py-3 text-center"
+                    className="flex shrink-0 items-center gap-1.5 rounded-xl px-2.5 py-2 sm:gap-2 sm:rounded-2xl sm:px-4 sm:py-3"
                     style={{
-                      background: "rgba(245,158,11,.12)",
+                      background:
+                        "color-mix(in srgb,var(--primary) 10%,transparent)",
                     }}
                   >
                     <p
-                      className="text-xl font-bold"
+                      className="text-lg font-bold sm:text-xl"
                       style={{
                         color: "var(--text)",
                       }}
@@ -944,16 +1001,14 @@ hover:shadow-lg p-6 transition-all duration-300 hover:-translate-y-1"
                   </div>
                 </div>
 
-                {/* Feedback */}
-
                 <div
-                  className="mt-6 rounded-2xl p-4"
+                  className="mt-5 rounded-xl p-3 sm:mt-6 sm:rounded-2xl sm:p-4"
                   style={{
                     background: "var(--surface-hover)",
                   }}
                 >
                   <p
-                    className="line-clamp-4 leading-7"
+                    className="line-clamp-4 break-words text-sm leading-7 sm:text-base"
                     style={{
                       color: "var(--text-muted)",
                     }}
@@ -962,10 +1017,8 @@ hover:shadow-lg p-6 transition-all duration-300 hover:-translate-y-1"
                   </p>
                 </div>
 
-                {/* Footer */}
-
                 <div
-                  className="mt-6 flex items-center justify-between border-t pt-4"
+                  className="mt-5 flex flex-wrap items-center justify-between gap-2 border-t pt-4 sm:mt-6"
                   style={{
                     borderColor: "var(--border)",
                   }}
@@ -980,7 +1033,7 @@ hover:shadow-lg p-6 transition-all duration-300 hover:-translate-y-1"
                   </span>
 
                   <span
-                    className="font-semibold"
+                    className="text-sm font-semibold sm:text-base"
                     style={{
                       color: "var(--primary)",
                     }}
@@ -992,15 +1045,16 @@ hover:shadow-lg p-6 transition-all duration-300 hover:-translate-y-1"
             ))
           ) : (
             <div
-              className="col-span-full rounded-2xl border border-dashed py-16 text-center"
+              className="col-span-full rounded-2xl border border-dashed px-4 py-10 text-center sm:py-16"
               style={{
                 borderColor: "var(--border)",
               }}
             >
               <div
-                className="mx-auto mb-5 flex h-16 w-16 items-center justify-center rounded-2xl"
+                className="mx-auto mb-5 flex h-14 w-14 items-center justify-center rounded-2xl sm:h-16 sm:w-16"
                 style={{
-                  background: "rgba(91,108,255,.10)",
+                  background:
+                    "color-mix(in srgb,var(--primary) 10%,transparent)",
                 }}
               >
                 <Star
@@ -1021,7 +1075,7 @@ hover:shadow-lg p-6 transition-all duration-300 hover:-translate-y-1"
               </h3>
 
               <p
-                className="mt-2"
+                className="mt-2 text-sm leading-6"
                 style={{
                   color: "var(--text-muted)",
                 }}
@@ -1036,6 +1090,7 @@ hover:shadow-lg p-6 transition-all duration-300 hover:-translate-y-1"
     </div>
   );
 }
+
 function InfoCard({
   icon,
   title,
@@ -1047,13 +1102,14 @@ function InfoCard({
 }) {
   return (
     <div
-      className="flex items-center gap-4 rounded-2xl border p-5"
+      className="flex min-w-0 items-start gap-3 rounded-2xl border p-4 sm:items-center sm:gap-4 sm:p-5"
       style={{
+        background: "var(--surface)",
         borderColor: "var(--border)",
       }}
     >
       <div
-        className="flex h-12 w-12 items-center justify-center rounded-xl"
+        className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl sm:h-12 sm:w-12"
         style={{
           background: "color-mix(in srgb,var(--primary) 10%,transparent)",
           color: "var(--primary)",
@@ -1062,18 +1118,22 @@ function InfoCard({
         {icon}
       </div>
 
-      <div>
+      <div className="min-w-0 flex-1">
         <p className="text-sm" style={{ color: "var(--text-muted)" }}>
           {title}
         </p>
 
-        <h3 className="font-semibold" style={{ color: "var(--text)" }}>
+        <h3
+          className="mt-1 break-words text-sm font-semibold sm:text-base"
+          style={{ color: "var(--text)" }}
+        >
           {value}
         </h3>
       </div>
     </div>
   );
 }
+
 type CardProps = {
   title: string;
   value: string;
@@ -1083,16 +1143,16 @@ type CardProps = {
 function StatCard({ title, value, icon }: CardProps) {
   return (
     <div
-      className="group rounded-3xl border p-6 transition-all duration-300 hover:-translate-y-1"
+      className="group min-w-0 rounded-2xl border p-4 transition-all duration-300 hover:-translate-y-1 sm:rounded-3xl sm:p-6"
       style={{
         background: "var(--surface)",
         borderColor: "var(--border)",
         boxShadow: "var(--shadow)",
       }}
     >
-      <div className="flex items-center justify-between">
+      <div className="flex items-center justify-between gap-3 sm:gap-4">
         <div
-          className="flex h-14 w-14 items-center justify-center rounded-2xl transition-all duration-300 group-hover:scale-105"
+          className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl transition-all duration-300 group-hover:scale-105 sm:h-14 sm:w-14 sm:rounded-2xl"
           style={{
             background: "color-mix(in srgb,var(--primary) 10%,transparent)",
             color: "var(--primary)",
@@ -1101,16 +1161,16 @@ function StatCard({ title, value, icon }: CardProps) {
           {icon}
         </div>
 
-        <div className="text-right">
+        <div className="min-w-0 flex-1 text-right">
           <p
-            className="text-sm font-medium"
+            className="break-words text-xs font-medium sm:text-sm"
             style={{ color: "var(--text-muted)" }}
           >
             {title}
           </p>
 
           <h2
-            className="mt-2 text-4xl font-black tracking-tight"
+            className="mt-2 break-words text-2xl font-black tracking-tight sm:text-3xl lg:text-4xl"
             style={{ color: "var(--text)" }}
           >
             {value}
