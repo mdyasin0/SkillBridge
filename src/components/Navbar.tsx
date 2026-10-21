@@ -39,11 +39,11 @@ const Navbar = () => {
 
   const dashboardLink =
     isLoggedIn && user?.role === "recruiter"
-      ? { href: "/pages/recruiter", label: "Recruiter" }
+      ? { href: "/pages/recruiter", label: "Dashboard" }
       : isLoggedIn && user?.role === "developer"
-        ? { href: "/pages/developer", label: "Developer" }
+        ? { href: "/pages/developer", label: "Dashboard" }
         : isLoggedIn && user?.role === "admin"
-          ? { href: "/pages/admin", label: "Admin" }
+          ? { href: "/pages/admin", label: "Dashboard" }
           : null;
 
   return (
