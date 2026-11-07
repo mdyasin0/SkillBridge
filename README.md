@@ -431,38 +431,7 @@ Removed duplicated user information from profile tables and retrieved shared use
 - **React Toastify** – Toast notifications.
 - **SweetAlert2** – Alerts and confirmation dialogs.
 
----
 
-## Project Structure
-
-The project follows an organized application structure to separate routes, UI components, server-side logic, and supporting resources.
-
-```text
-SkillBridge/
-│
-├── app/
-│   ├── api/
-│   ├── components/
-│   ├── dashboard/
-│   │   ├── admin/
-│   │   ├── developer/
-│   │   └── recruiter/
-│   ├── login/
-│   ├── register/
-│   └── page.tsx
-│
-├── public/
-│
-├── styles/
-│
-├── package.json
-├── tsconfig.json
-└── README.md
-```
-
-*Note: This is a conceptual overview, not a verified representation of every directory and file in the repository.*
-
----
 
 ## Getting Started
 
