@@ -467,8 +467,16 @@ npm install
 
 Create a `.env.local` file in the project root and configure the required environment variables for your database connection, authentication, and other integrations.
 
-Use the environment variable names and configuration expected by the project source code.
+NEXTAUTH_SECRET=
+NEXTAUTH_URL=
+NEXT_PUBLIC_IMGBB_KEY=
 
+database cloude aiven.io
+DB_HOST=
+DB_USER=
+DB_PASSWORD=
+DB_NAME=
+DB_PORT=
 ### 5. Configure MySQL
 
 Make sure your MySQL server is running and the database is configured according to the application's database setup.
@@ -481,7 +489,7 @@ npm run dev
 
 ### 7. Open the Application
 
-Visit:
+Visit: 
 
 ```text
 http://localhost:3000
